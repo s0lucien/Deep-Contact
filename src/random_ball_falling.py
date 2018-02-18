@@ -9,6 +9,8 @@ from Box2D import (
     b2LoopShape,
     b2_pi,
     b2FixtureDef,
+    b2Random,
+    b2Vec2,
 )
 
 import numpy as np
@@ -21,25 +23,30 @@ class FallingBall(Framework):
     def __init__(self):
         super(FallingBall, self).__init__()
 
+        xlow, xhi = -20, 20
+        ylow, yhi = 0, 40
+
         ground  = self.world.CreateBody(
             shapes=b2LoopShape(
-                vertices=[(20, 0), (20, 40), (-20, 40), (-20, 0)]
+                vertices=[(xhi, ylow), (xhi, yhi), (xlow, yhi), (xlow, ylow)]
             )
+        )
+        random_vector = lambda: b2Vec2(
+            b2Random(xlow, xhi), b2Random(ylow, yhi)
         )
 
         circle = b2FixtureDef(
-            shape=b2CircleShape(radius=0.5),
+            shape=b2CircleShape(radius=1),
             density=1,
             friction=0.3,
         )
 
+        self.using_contacts = True
+
         for i in range(100):
             self.world.CreateDynamicBody(
                 fixtures=circle,
-                position=(
-                    40*np.random.random_sample()-20,
-                    40*np.random.random_sample(),
-                ),
+                position=random_vector(),
             )
 
     def Step(self, settings):
