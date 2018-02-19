@@ -22,11 +22,7 @@ python -m src.random_ball_falling --pause
 ```
 
 The final results:
-> The result was build without gravity
-![image](https://github.com/JaggerWu/Deep-Contact/blob/master/example/nogravity.gif)
-
-> The result was build with gravity
-![image](https://github.com/JaggerWu/Deep-Contact/blob/master/example/normal.gif)
-
-
-
+<img src='https://github.com/JaggerWu/Deep-Contact/blob/master/example/nogravity.gif'
+     width='50%' height='50%'>
+<img src='https://github.com/JaggerWu/Deep-Contact/blob/master/example/normal.gif'
+     width='50%' height='50%'>
