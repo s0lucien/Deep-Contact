@@ -57,14 +57,12 @@ class FallingBall(Framework):
                 if distance(position, prepared_position) < 2:
                     good = False
                     break
-            if not good:
-                continue
-            self.world.CreateDynamicBody(
-                fixtures=circle,
-                position=position,
-            )
-            positions.append(position)
-
+            if good:
+                self.world.CreateDynamicBody(
+                    fixtures=circle,
+                    position=position,
+                )
+                positions.append(position)
 
     def Step(self, settings):
         super(FallingBall, self).Step(settings)
