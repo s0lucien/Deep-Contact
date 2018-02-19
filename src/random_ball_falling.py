@@ -28,6 +28,7 @@ class FallingBall(Framework):
 
     def __init__(self):
         super(FallingBall, self).__init__()
+        self.world.gravity = (0, -10)
 
         xlow, xhi = -20, 20
         ylow, yhi = 0, 40
@@ -58,9 +59,11 @@ class FallingBall(Framework):
                     good = False
                     break
             if good:
-                self.world.CreateDynamicBody(
-                    fixtures=circle,
-                    position=position,
+                self.bodies.append(
+                    self.world.CreateDynamicBody(
+                        fixtures=circle,
+                        position=position,
+                    )
                 )
                 positions.append(position)
 
