@@ -8,7 +8,7 @@ This is for master thesis for [Jian Wu](https://github.com/JaggerWu)(xcb479, IT 
 [Project Description](https://github.com/JaggerWu/Deep-Contact/blob/master/Project_description.pdf) for the first draft.
 (**Still** Waiting for J.WU to write something here.:cry:)
 
-## Planned Timetable
+## Current Task
 
 The task for this week:
 
