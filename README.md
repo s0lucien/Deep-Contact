@@ -10,10 +10,18 @@ This is for master thesis for [Jian Wu](https://github.com/JaggerWu)(xcb479, IT 
 
 ## Planned Timetable
 
-The first week(05.02.2018 -- 11.02.2018):
+The task for this week:
 
-  - [ ] Install and become familiar with [pybox2d](https://github.com/pybox2d/pybox2d)
-  - [ ] Generate the data(1000 random samples, 100 objects)
+  - [x] Install and become familiar with [pybox2d](https://github.com/pybox2d/pybox2d)
+  - [x] Generate the data(1000 random samples, 100 objects)
 
+Command:
+You can run it with
+```
+python -m src.random_ball_falling --pause
+```
+
+The final results:
+![image]()
 
 
