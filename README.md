@@ -15,14 +15,18 @@ The task for this week:
   - [x] Install and become familiar with [pybox2d](https://github.com/pybox2d/pybox2d)
   - [x] Generate the data(1000 random samples, 100 objects)
 
-Command:
-You can run it with
+## Experiment
+
+### Command:
+
+Run it with
 ```
 python -m src.random_ball_falling --pause
 ```
 
-The final results:
+### The final results:
+
 <img src='https://github.com/JaggerWu/Deep-Contact/blob/master/example/nogravity.gif'
-     width='50%' height='50%'>
+     width='40%' height='40%'>
 <img src='https://github.com/JaggerWu/Deep-Contact/blob/master/example/normal.gif'
-     width='50%' height='50%'>
+     width='40%' height='40%'>
