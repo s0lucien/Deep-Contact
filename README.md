@@ -35,6 +35,11 @@ python -m src.random_ball_falling --pause
 The we want restore configuration file in XML format and use them for training
 afterwards. The configuration file includes bodies and contacts
 
+*Note*:
+```
+python -m src.random_ball_falling --build_xml 
+```
+
 ```
 <body index="86" type="free">
     <mass value="3.14159274101"/>

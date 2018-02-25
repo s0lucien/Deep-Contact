@@ -84,14 +84,15 @@ class FallingBall(Framework):
     def Step(self, settings):
         super(FallingBall, self).Step(settings)
         timeStep = 1 / settings.hz * self.stepCount
-        config = Configuration(
-            bodies=self.bodies,
-            contacts=self.contacts,
-            stepCount=self.stepCount,
-            timeStep=timeStep,
-        )
-        print(config.build_xml(
-            export_path='~/KU/Deep-Contact/xml'))
+        if settings.config_build:
+            config = Configuration(
+                bodies=self.bodies,
+                contacts=self.contacts,
+                stepCount=self.stepCount,
+                timeStep=timeStep,
+            )
+            print(config.build_xml(
+                export_path='~/KU/Deep-Contact/xml'))
         contacts=[]
 
 

@@ -58,7 +58,7 @@ class fwSettings(object):
     onlyInit = False
 
     # configuration buildind
-    conifg_build = False
+    config_build = False
 
 #             text                  variable
 checkboxes = (("Warm Starting", "enableWarmStarting"),
