@@ -57,6 +57,9 @@ class fwSettings(object):
     # testing)
     onlyInit = False
 
+    # configuration buildind
+    conifg_build = False
+
 #             text                  variable
 checkboxes = (("Warm Starting", "enableWarmStarting"),
               ("Time of Impact", "enableContinuous"),
