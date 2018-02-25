@@ -9,6 +9,7 @@ from .framework import (
     Keys,
     main,
 )
+from .xml_writing.build_xml import Configuration
 
 from Box2D import (
     b2CircleShape,
@@ -20,6 +21,7 @@ from Box2D import (
 )
 
 import numpy as np
+import os
 
 
 class FallingBall(Framework):
@@ -28,16 +30,21 @@ class FallingBall(Framework):
 
     def __init__(self):
         super(FallingBall, self).__init__()
-        self.world.gravity = (0, -10)
+        self.using_contacts = True
+        self.contacts = []
 
         xlow, xhi = -20, 20
         ylow, yhi = 0, 40
 
+        index = 0
+
         ground  = self.world.CreateBody(
             shapes=b2LoopShape(
-                vertices=[(xhi, ylow), (xhi, yhi), (xlow, yhi), (xlow, ylow)]
-            )
+                vertices=[(xlow, yhi), (xlow, ylow), (xhi, ylow), (xhi, yhi)]
+            ),
+            userData = index,
         )
+        self.bodies.append(ground)
         random_vector = lambda: (
             b2Random(xlow+1, xhi-1), b2Random(ylow+1, yhi-1)
         )
@@ -52,6 +59,7 @@ class FallingBall(Framework):
 
         positions = []
         while len(positions)<100:
+            index += 1
             position = random_vector()
             good = True
             for prepared_position in positions:
@@ -63,12 +71,29 @@ class FallingBall(Framework):
                     self.world.CreateDynamicBody(
                         fixtures=circle,
                         position=position,
+                        userData=index,
                     )
                 )
                 positions.append(position)
 
+    def PreSolve(self, contact, old_manifold):
+        super(FallingBall, self).PreSolve(contact, old_manifold)
+        self.contacts.append(contact)
+
+
     def Step(self, settings):
         super(FallingBall, self).Step(settings)
+        timeStep = 1 / settings.hz * self.stepCount
+        if settings.config_build:
+            config = Configuration(
+                bodies=self.bodies,
+                contacts=self.contacts,
+                stepCount=self.stepCount,
+                timeStep=timeStep,
+            )
+            print(config.build_xml(
+                export_path='~/KU/Deep-Contact/xml'))
+        contacts=[]
 
 
 def distance(point_1, point_2):

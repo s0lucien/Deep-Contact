@@ -1,2 +1,6 @@
 # __pycache__
 __pycache__/
+*.pyc
+.*.swp
+xml/
+>>>>>>> refs/remotes/origin/master
