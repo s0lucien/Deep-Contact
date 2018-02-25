@@ -54,17 +54,10 @@ import pygame
 from pygame.locals import (QUIT, KEYDOWN, KEYUP, MOUSEBUTTONDOWN,
                            MOUSEBUTTONUP, MOUSEMOTION, KMOD_LSHIFT)
 
-from ..framework import (FrameworkBase, Keys)
-from ..settings import fwSettings
+from own.framework import (FrameworkBase, Keys)
+from own.settings import fwSettings
 from Box2D import (b2DrawExtended, b2Vec2)
 
-try:
-    from .pygame_gui import (fwGUI, gui)
-    GUIEnabled = True
-except Exception as ex:
-    print('Unable to load PGU; menu disabled.')
-    print('(%s) %s' % (ex.__class__.__name__, ex))
-    GUIEnabled = False
 
 
 class PygameDraw(b2DrawExtended):
@@ -252,24 +245,7 @@ class PygameFramework(FrameworkBase):
         self.renderer = PygameDraw(surface=self.screen, test=self)
         self.world.renderer = self.renderer
 
-        try:
-            self.font = pygame.font.Font(None, 15)
-        except IOError:
-            try:
-                self.font = pygame.font.Font("freesansbold.ttf", 15)
-            except IOError:
-                print("Unable to load default font or 'freesansbold.ttf'")
-                print("Disabling text drawing.")
-                self.Print = lambda *args: 0
-                self.DrawStringAt = lambda *args: 0
 
-        # GUI Initialization
-        if GUIEnabled:
-            self.gui_app = gui.App()
-            self.gui_table = fwGUI(self.settings)
-            container = gui.Container(align=1, valign=-1)
-            container.add(self.gui_table, 0, 0)
-            self.gui_app.init(container)
 
         self.viewCenter = (0, 20.0)
         self.groundbody = self.world.CreateBody()
@@ -302,45 +278,8 @@ class PygameFramework(FrameworkBase):
         for event in pygame.event.get():
             if event.type == QUIT or (event.type == KEYDOWN and event.key == Keys.K_ESCAPE):
                 return False
-            elif event.type == KEYDOWN:
-                self._Keyboard_Event(event.key, down=True)
-            elif event.type == KEYUP:
-                self._Keyboard_Event(event.key, down=False)
-            elif event.type == MOUSEBUTTONDOWN:
-                p = self.ConvertScreenToWorld(*event.pos)
-                if event.button == 1:  # left
-                    mods = pygame.key.get_mods()
-                    if mods & KMOD_LSHIFT:
-                        self.ShiftMouseDown(p)
-                    else:
-                        self.MouseDown(p)
-                elif event.button == 2:  # middle
-                    pass
-                elif event.button == 3:  # right
-                    self.rMouseDown = True
-                elif event.button == 4:
-                    self.viewZoom *= 1.1
-                elif event.button == 5:
-                    self.viewZoom /= 1.1
-            elif event.type == MOUSEBUTTONUP:
-                p = self.ConvertScreenToWorld(*event.pos)
-                if event.button == 3:  # right
-                    self.rMouseDown = False
-                else:
-                    self.MouseUp(p)
-            elif event.type == MOUSEMOTION:
-                p = self.ConvertScreenToWorld(*event.pos)
-
-                self.MouseMove(p)
-
-                if self.rMouseDown:
-                    self.viewCenter -= (event.rel[0] /
-                                        5.0, -event.rel[1] / 5.0)
-
-            if GUIEnabled:
-                self.gui_app.event(event)  # Pass the event to the GUI
-
         return True
+
 
     def run(self):
         """
@@ -354,14 +293,12 @@ class PygameFramework(FrameworkBase):
 
         # If any of the test constructors update the settings, reflect
         # those changes on the GUI before running
-        if GUIEnabled:
-            self.gui_table.updateGUI(self.settings)
 
         running = True
         clock = pygame.time.Clock()
         while running:
-            running = self.checkEvents()
             self.screen.fill((0, 0, 0))
+            running = self.checkEvents()
 
             # Check keys that should be checked every loop (not only on initial
             # keydown)
@@ -369,9 +306,6 @@ class PygameFramework(FrameworkBase):
 
             # Run the simulation loop
             self.SimulationLoop()
-
-            if GUIEnabled and self.settings.drawMenu:
-                self.gui_app.paint(self.screen)
 
             pygame.display.flip()
             clock.tick(self.settings.hz)
@@ -393,14 +327,8 @@ class PygameFramework(FrameworkBase):
                 self.viewZoom = min(1.1 * self.viewZoom, 50.0)
             elif key == Keys.K_x:     # Zoom out
                 self.viewZoom = max(0.9 * self.viewZoom, 0.02)
-            elif key == Keys.K_SPACE:  # Launch a bomb
-                self.LaunchRandomBomb()
-            elif key == Keys.K_F1:    # Toggle drawing the menu
-                self.settings.drawMenu = not self.settings.drawMenu
             elif key == Keys.K_F2:    # Do a single step
                 self.settings.singleStep = True
-                if GUIEnabled:
-                    self.gui_table.updateGUI(self.settings)
             else:              # Inform the test of the key press
                 self.Keyboard(key)
         else:
@@ -429,16 +357,7 @@ class PygameFramework(FrameworkBase):
             self.viewCenter = (0.0, 20.0)
 
     def Step(self, settings):
-        if GUIEnabled:
-            # Update the settings based on the GUI
-            self.gui_table.updateSettings(self.settings)
-
         super(PygameFramework, self).Step(settings)
-
-        if GUIEnabled:
-            # In case during the step the settings changed, update the GUI reflecting
-            # those settings.
-            self.gui_table.updateGUI(self.settings)
 
     def ConvertScreenToWorld(self, x, y):
         return b2Vec2((x + self.viewOffset.x) / self.viewZoom,
@@ -455,9 +374,7 @@ class PygameFramework(FrameworkBase):
         Draw some text at the top status lines
         and advance to the next line.
         """
-        self.screen.blit(self.font.render(
-            str, True, color), (5, self.textLine))
-        self.textLine += 15
+        pass
 
     def Keyboard(self, key):
         """
