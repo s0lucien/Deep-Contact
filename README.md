@@ -37,7 +37,7 @@ afterwards. The configuration file includes bodies and contacts
 
 *Note*:
 ```
-python -m src.random_ball_falling --build_xml 
+python -m src.random_ball_falling --config_build 
 ```
 
 ```
@@ -51,13 +51,10 @@ python -m src.random_ball_falling --build_xml
     <shape value="circle"/>
 </body>
 ...
-<body index="87" type="free">
-    <mass value="3.14159274101"/>
-    <position x="8.93841171265" y="6.69073057175"/>
-    <velocity x="0.0" y="-8.99999809265"/>
-    <orientation theta="0.0"/>
-    <inertia value="1.57079637051"/>
-    <spin omega="0.0"/>
-    <shape value="circle"/>
-</body>
+<contact index="543" master="46" slave="119">
+    <position x="0.0" y="0.0"/>
+    <velocity nx="0.0" ny="0.0"/>
+    <force n="0" t="0"/>
+    <depth value="0"/>
+</contact>
 ```
