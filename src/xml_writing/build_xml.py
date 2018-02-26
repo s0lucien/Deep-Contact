@@ -84,7 +84,7 @@ def _contact_2_xml(contact, index):
 
 def config_xml(bodies, contacts, stepCount, timeStep):
     config_xml = Element('Configuration')
-    config_xml.set('Step', str(stepCount))
+    config_xml.set('name', str(stepCount))
     config_xml.set('time', str(timeStep))
     config_xml.extend([
         _body_2_xml(body)
@@ -120,7 +120,10 @@ class Configuration():
             export_path,
             '{}.xml'.format(self.stepCount))
 
-        return xml
+        with open(file_path, 'w') as f:
+            f.write(xml)
+        print('Training data {}.xml has been created'.format(self.stepCount))
+
 
 def prettify(elem):
     """Return a pretty-printed XML string for the Element.
