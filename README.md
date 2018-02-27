@@ -59,8 +59,12 @@ python -m src.random_ball_falling --config_build
 </contact>
 ```
 
+A place for storing training datasets
 
-		       for body in self.world.bodies:
+http://www.erda.dk/
+
+
+	for body in self.world.bodies:
             if len(body.fixtures) > 0:
                 print('body:')
                 print('\tbody ID   = ', id(body))
