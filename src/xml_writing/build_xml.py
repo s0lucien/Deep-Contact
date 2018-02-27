@@ -54,25 +54,27 @@ def _body_2_xml(body):
     return body_xml
 
 
-def _contact_2_xml(contact, index):
+def _contact_2_xml(contact_point, index):
     contact_xml = Element('contact')
     contact_xml.set('index', str(index))
-    contact_xml.set("master", str(contact.fixtureA.body.userData))
-    contact_xml.set("slave", str(contact.fixtureB.body.userData))
+    contact_xml.set("master", str(contact_point['fixtureA']))
+    contact_xml.set("slave", str(contact_point['fixtureB']))
 
     # position
     pos = SubElement(contact_xml, "position")
-    pos.set('x', str(contact.manifold.localPoint.x))
-    pos.set("y", str(contact.manifold.localPoint.y))
+    pos.set('x', str(contact_point['position'][0]))
+    pos.set("y", str(contact_point['position'][1]))
 
-    # velocity
-    velocity = SubElement(contact_xml, 'velocity')
-    velocity.set('nx', str(contact.manifold.localPoint.x))
-    velocity.set('ny', str(contact.manifold.localPoint.y))
+    # normal
+    normal = SubElement(contact_xml, 'normal')
+    normal.set('nx', str(contact_point['normal'][0]))
+    normal.set('ny', str(contact_point['normal'][1]))
 
     # force
     force = SubElement(contact_xml, 'force')
-    force.set('n', str(0))
+    # normal Impulse
+    # force.set('n', str(contact.noramlImpulse))
+    # tangent Impulse
     force.set('t', str(0))
 
     # depth
@@ -82,7 +84,7 @@ def _contact_2_xml(contact, index):
     return contact_xml
 
 
-def config_xml(bodies, contacts, stepCount, timeStep):
+def config_xml(bodies, contact_points, stepCount, timeStep):
     config_xml = Element('Configuration')
     config_xml.set('name', str(stepCount))
     config_xml.set('time', str(timeStep))
@@ -92,8 +94,8 @@ def config_xml(bodies, contacts, stepCount, timeStep):
     ])
 
     config_xml.extend([
-        _contact_2_xml(contact, i)
-        for i, contact in enumerate(contacts)
+        _contact_2_xml(contact_point, i)
+        for i, contact_point in enumerate(contact_points)
     ])
 
     return config_xml
@@ -102,17 +104,17 @@ def config_xml(bodies, contacts, stepCount, timeStep):
 class Configuration():
     def __init__(self,
                  bodies,
-                 contacts,
+                 contact_points,
                  stepCount,
                  timeStep):
         self.bodies = bodies
-        self.contacts = contacts
+        self.contact_points = contact_points
         self.stepCount = stepCount
         self.timeStep = timeStep
 
     def build_xml(self, export_path):
         configuration = config_xml(self.bodies,
-                                self.contacts,
+                                self.contact_points,
                                 self.stepCount,
                                 self.timeStep)
         xml = prettify(configuration)

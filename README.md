@@ -51,10 +51,10 @@ python -m src.random_ball_falling --config_build
     <shape value="circle"/>
 </body>
 ...
-<contact index="543" master="46" slave="119">
-    <position x="0.0" y="0.0"/>
-    <velocity nx="0.0" ny="0.0"/>
-    <force n="0" t="0"/>
+<contact index="300" master="84" slave="110">
+    <position x="14.5105781555" y="1.86494529247"/>
+    <normal nx="-0.498518139124" ny="0.866879284382"/>
+    <force t="0"/>
     <depth value="0"/>
 </contact>
 ```

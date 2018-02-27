@@ -12,12 +12,13 @@ from .framework import (
 from .xml_writing.build_xml import Configuration
 
 from Box2D import (
+    b2EdgeShape,
     b2CircleShape,
-    b2LoopShape,
     b2_pi,
     b2FixtureDef,
     b2Random,
     b2Vec2,
+    b2GetPointStates,
 )
 
 import numpy as np
@@ -27,24 +28,34 @@ import os
 class FallingBall(Framework):
 
     bodies = []
+    name = 'Exp for 2D in Deep Contact'
 
     def __init__(self):
         super(FallingBall, self).__init__()
+
         self.using_contacts = True
         self.contacts = []
 
         xlow, xhi = -20, 20
         ylow, yhi = 0, 40
 
-        index = 0
-
-        ground  = self.world.CreateBody(
-            shapes=b2LoopShape(
-                vertices=[(xlow, yhi), (xlow, ylow), (xhi, ylow), (xhi, yhi)]
-            ),
-            userData = index,
+        ground_1 = self.world.CreateStaticBody(
+            shapes=[b2EdgeShape(vertices=[(xlow, ylow), (xhi, ylow)])],
+            userData=0,
         )
-        self.bodies.append(ground)
+        ground_2 = self.world.CreateStaticBody(
+            shapes=[b2EdgeShape(vertices=[(xlow, ylow), (xlow, yhi)])],
+            userData=1,
+        )
+        ground_3 = self.world.CreateStaticBody(
+            shapes=[b2EdgeShape(vertices=[(xhi, ylow), (xhi, yhi)])],
+            userData=2,
+        )
+
+        index = 2
+        grounds= [ground_1, ground_2, ground_3]
+
+        self.bodies.extend(grounds)
         random_vector = lambda: (
             b2Random(xlow+1, xhi-1), b2Random(ylow+1, yhi-1)
         )
@@ -54,8 +65,6 @@ class FallingBall(Framework):
             density=1,
             friction=0.3,
         )
-
-        self.using_contacts = True
 
         positions = []
         while len(positions)<100:
@@ -78,8 +87,6 @@ class FallingBall(Framework):
 
     def PreSolve(self, contact, old_manifold):
         super(FallingBall, self).PreSolve(contact, old_manifold)
-        self.contacts.append(contact)
-
 
     def Step(self, settings):
         super(FallingBall, self).Step(settings)
@@ -87,13 +94,13 @@ class FallingBall(Framework):
         if settings.config_build:
             config = Configuration(
                 bodies=self.bodies,
-                contacts=self.contacts,
+                contact_points=self.points,
                 stepCount=self.stepCount,
                 timeStep=timeStep,
             )
-            print(config.build_xml(
-                export_path='~/KU/Deep-Contact/xml'))
+            config.build_xml(export_path='/home/jwu/KU/Deep-Contact/xml')
         contacts=[]
+        # print([i['fixtureA'] for i in self.points])
 
 
 def distance(point_1, point_2):
