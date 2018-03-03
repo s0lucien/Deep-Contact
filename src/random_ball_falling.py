@@ -94,13 +94,13 @@ class FallingBall(Framework):
         if settings.config_build:
             config = Configuration(
                 bodies=self.bodies,
-                contact_points=self.points,
+                contact_points=self.world.contacts,
                 stepCount=self.stepCount,
                 timeStep=timeStep,
             )
             config.build_xml(export_path='/home/jwu/KU/Deep-Contact/xml')
         contacts=[]
-        # print([i['fixtureA'] for i in self.points])
+        print(self.world.contacts)
 
 
 def distance(point_1, point_2):

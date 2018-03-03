@@ -54,37 +54,42 @@ def _body_2_xml(body):
     return body_xml
 
 
-def _contact_2_xml(contact_point, index):
-    contact_xml = Element('contact')
-    contact_xml.set('index', str(index))
-    contact_xml.set("master", str(contact_point['fixtureA']))
-    contact_xml.set("slave", str(contact_point['fixtureB']))
+def _contact_2_xml(contact, index):
+    contact_xmls = []
+    for i in range(contact.manifold.pointCount):
+        point = contact.worldManifold.points[i]
+        normal = contact.worldManifold.normal
+        manifold_point = contact.manifold.points[i]
+        impulse = (manifold_point.normalImpulse, manifold_point.tangentImpulse)
 
-    # position
-    pos = SubElement(contact_xml, "position")
-    pos.set('x', str(contact_point['position'][0]))
-    pos.set("y", str(contact_point['position'][1]))
+        contact_xml = Element('contact')
+        # master
+        contact_xml.set('index', index + i)
+        contact_xml.set("master", contact.fixtureB.body)
+        contact_xml.set("slave", contact.fixtureB.body)
+        contact_xml.set('master_shape', contact.fixtureA.shape)
+        contact_xml.set('slave_shape', contact.fixtureB.shape)
 
-    # normal
-    normal = SubElement(contact_xml, 'normal')
-    normal.set('nx', str(contact_point['normal'][0]))
-    normal.set('ny', str(contact_point['normal'][1]))
+        # position
+        position = SubElement(contact_xml, 'position')
+        position.set('x', str(point.position[0]))
+        position.set('y', str(point.position[1]))
 
-    # force
-    force = SubElement(contact_xml, 'force')
-    # normal Impulse
-    # force.set('n', str(contact.noramlImpulse))
-    # tangent Impulse
-    force.set('t', str(0))
+        # normal
+        xml_normal = SubElement(contact_xml, 'normal')
+        xml_normal.set('normal', normal)
 
-    # depth
-    d = SubElement(contact_xml, 'depth')
-    d.set('value', str(0))
+        # Impulse
+        xml_impulse = SubElement(contact_xml, 'impulse')
+        xml_impulse.set('n', impulse[0])
+        xml_impulse.set('t', impulse[1])
 
-    return contact_xml
+        contact_xmls.append(contact_xml)
+
+    return contact_xmls, contact.manifold.pointCount
 
 
-def config_xml(bodies, contact_points, stepCount, timeStep):
+def config_xml(bodies, contacts, stepCount, timeStep):
     config_xml = Element('Configuration')
     config_xml.set('name', str(stepCount))
     config_xml.set('time', str(timeStep))
@@ -93,10 +98,11 @@ def config_xml(bodies, contact_points, stepCount, timeStep):
         for body in bodies
     ])
 
-    config_xml.extend([
-        _contact_2_xml(contact_point, i)
-        for i, contact_point in enumerate(contact_points)
-    ])
+    num_contact_point = 0
+    for i, contact in enumerate(contacts):
+        contact_xmls, num = _contact_2_xml(contact, i)
+        config_xml.extend(contact_xmls)
+        num_contact_point += num
 
     return config_xml
 
