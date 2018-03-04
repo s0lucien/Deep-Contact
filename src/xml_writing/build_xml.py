@@ -64,11 +64,11 @@ def _contact_2_xml(contact, index):
 
         contact_xml = Element('contact')
         # master
-        contact_xml.set('index', index + i)
-        contact_xml.set("master", contact.fixtureB.body)
-        contact_xml.set("slave", contact.fixtureB.body)
-        contact_xml.set('master_shape', contact.fixtureA.shape)
-        contact_xml.set('slave_shape', contact.fixtureB.shape)
+        contact_xml.set('index', str(index + i))
+        contact_xml.set("master", str(contact.fixtureB.body.userData))
+        contact_xml.set("slave", str(contact.fixtureB.body.userData))
+        contact_xml.set('master_shape', str(contact.fixtureA.shape))
+        contact_xml.set('slave_shape', str(contact.fixtureB.shape))
 
         # position
         position = SubElement(contact_xml, 'position')
@@ -77,12 +77,12 @@ def _contact_2_xml(contact, index):
 
         # normal
         xml_normal = SubElement(contact_xml, 'normal')
-        xml_normal.set('normal', normal)
+        xml_normal.set('normal', str(normal))
 
         # Impulse
         xml_impulse = SubElement(contact_xml, 'impulse')
-        xml_impulse.set('n', impulse[0])
-        xml_impulse.set('t', impulse[1])
+        xml_impulse.set('n', str(impulse[0]))
+        xml_impulse.set('t', str(impulse[1]))
 
         contact_xmls.append(contact_xml)
 
@@ -100,7 +100,7 @@ def config_xml(bodies, contacts, stepCount, timeStep):
 
     num_contact_point = 0
     for i, contact in enumerate(contacts):
-        contact_xmls, num = _contact_2_xml(contact, i)
+        contact_xmls, num = _contact_2_xml(contact, num_contact_point)
         config_xml.extend(contact_xmls)
         num_contact_point += num
 
@@ -120,9 +120,9 @@ class Configuration():
 
     def build_xml(self, export_path):
         configuration = config_xml(self.bodies,
-                                self.contact_points,
-                                self.stepCount,
-                                self.timeStep)
+                                   self.contact_points,
+                                   self.stepCount,
+                                   self.timeStep)
         xml = prettify(configuration)
         file_path = os.path.join(
             export_path,
@@ -138,4 +138,5 @@ def prettify(elem):
     """
     rough_string = ElementTree.tostring(elem, 'utf-8')
     reparsed = minidom.parseString(rough_string)
+
     return reparsed.toprettyxml(indent="  ")

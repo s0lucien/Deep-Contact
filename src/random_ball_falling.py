@@ -12,7 +12,7 @@ from .framework import (
 from .xml_writing.build_xml import Configuration
 
 from Box2D import (
-    b2EdgeShape,
+    b2LoopShape,
     b2CircleShape,
     b2_pi,
     b2FixtureDef,
@@ -37,25 +37,20 @@ class FallingBall(Framework):
         self.contacts = []
 
         xlow, xhi = -20, 20
-        ylow, yhi = 0, 40
+        ylow, yhi = 0, 60
 
-        ground_1 = self.world.CreateStaticBody(
-            shapes=[b2EdgeShape(vertices=[(xlow, ylow), (xhi, ylow)])],
+        ground = self.world.CreateStaticBody(
+            shapes=[
+                b2LoopShape(
+                    vertices=[
+                        (xlow, ylow), (xhi, ylow), (xhi, yhi), (xlow, yhi)])
+            ],
             userData=0,
         )
-        ground_2 = self.world.CreateStaticBody(
-            shapes=[b2EdgeShape(vertices=[(xlow, ylow), (xlow, yhi)])],
-            userData=1,
-        )
-        ground_3 = self.world.CreateStaticBody(
-            shapes=[b2EdgeShape(vertices=[(xhi, ylow), (xhi, yhi)])],
-            userData=2,
-        )
 
-        index = 2
-        grounds= [ground_1, ground_2, ground_3]
+        index = 0
 
-        self.bodies.extend(grounds)
+        self.bodies.append(ground)
         random_vector = lambda: (
             b2Random(xlow+1, xhi-1), b2Random(ylow+1, yhi-1)
         )
@@ -102,8 +97,6 @@ class FallingBall(Framework):
                 timeStep=timeStep,
             )
             config.build_xml(export_path=os.path.join(dir_name, 'xml'))
-        contacts=[]
-        print(self.world.contacts)
 
 
 def distance(point_1, point_2):
