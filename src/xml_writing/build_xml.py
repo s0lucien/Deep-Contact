@@ -72,8 +72,8 @@ def _contact_2_xml(contact, index):
 
         # position
         position = SubElement(contact_xml, 'position')
-        position.set('x', str(point.position[0]))
-        position.set('y', str(point.position[1]))
+        position.set('x', str(point[0]))
+        position.set('y', str(point[1]))
 
         # normal
         xml_normal = SubElement(contact_xml, 'normal')

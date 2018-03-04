@@ -89,6 +89,9 @@ class FallingBall(Framework):
         super(FallingBall, self).PreSolve(contact, old_manifold)
 
     def Step(self, settings):
+        here = os.path.dirname('__file__')
+        dir_name = os.path.dirname(here)
+
         super(FallingBall, self).Step(settings)
         timeStep = 1 / settings.hz * self.stepCount
         if settings.config_build:
@@ -98,7 +101,7 @@ class FallingBall(Framework):
                 stepCount=self.stepCount,
                 timeStep=timeStep,
             )
-            config.build_xml(export_path='/home/jwu/KU/Deep-Contact/xml')
+            config.build_xml(export_path=os.path.join(dir_name, 'xml'))
         contacts=[]
         print(self.world.contacts)
 
