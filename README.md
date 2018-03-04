@@ -37,7 +37,7 @@ afterwards. The configuration file includes bodies and contacts
 
 *Note*:
 ```
-python -m src.random_ball_falling --config_build 
+python -m src.random_ball_falling --config_build --hz 100
 ```
 
 ```
@@ -51,11 +51,14 @@ python -m src.random_ball_falling --config_build
     <shape value="circle"/>
 </body>
 ...
-<contact index="300" master="84" slave="110">
-    <position x="14.5105781555" y="1.86494529247"/>
-    <normal nx="-0.498518139124" ny="0.866879284382"/>
-    <force t="0"/>
-    <depth value="0"/>
+<contact index="1" master="90" master_shape="b2ChainShape(vertices: [(-20.0, 0.0), (20.0, 0.0), (20.0, 60.0), (-20.0, 60.0), (-20.0, 0.0)])" slave="90" slave_shape="b2CircleShape(childCount=1,
+              pos=b2Vec2(0,0),
+              radius=1.0,
+              type=0,
+              )">
+    <position x="8.590503692626953" y="0.008332252502441406"/>
+    <normal normal="b2Vec2(-0,1)"/>
+    <impulse n="0.03141593188047409" t="0.0"/>
 </contact>
 ```
 
