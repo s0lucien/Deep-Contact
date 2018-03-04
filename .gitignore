@@ -3,4 +3,4 @@ __pycache__/
 *.pyc
 .*.swp
 xml/
->>>>>>> refs/remotes/origin/master
+.DS_Store
