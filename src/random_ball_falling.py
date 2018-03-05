@@ -37,7 +37,7 @@ class FallingBall(Framework):
         self.contacts = []
 
         xlow, xhi = -20, 20
-        ylow, yhi = 0, 60
+        ylow, yhi = 0, 40
 
         ground = self.world.CreateStaticBody(
             shapes=[
@@ -55,19 +55,20 @@ class FallingBall(Framework):
             b2Random(xlow+1, xhi-1), b2Random(ylow+1, yhi-1)
         )
 
+        radius = 1.2
         circle = b2FixtureDef(
-            shape=b2CircleShape(radius=1),
+            shape=b2CircleShape(radius=radius),
             density=1,
-            friction=0.3,
+            friction=0.5,
         )
 
         positions = []
         while len(positions)<100:
             index += 1
-            position = random_vector()
+            position = normal_random()
             good = True
             for prepared_position in positions:
-                if distance(position, prepared_position) < 2:
+                if distance(position, prepared_position) < 2 * radius:
                     good = False
                     break
             if good:
@@ -96,13 +97,20 @@ class FallingBall(Framework):
                 stepCount=self.stepCount,
                 timeStep=timeStep,
             )
-            config.build_xml(export_path=os.path.join(dir_name, 'xml'))
+            config.build_xml(settings.export_path)
 
 
 def distance(point_1, point_2):
     return np.sqrt(
         (point_1[0]-point_2[0])**2 + (point_1[1]-point_2[1])**2
     )
+
+
+def normal_random():
+    mean = [0, 20]
+    cov = [[20, 0], [0, 20]]
+
+    return np.random.multivariate_normal(mean, cov)
 
 
 if __name__ == '__main__':
