@@ -15,7 +15,8 @@ for ((i=1;i<101;i++)); do
     echo "Creating data for Exp $i"
     python -m src.random_ball_falling \
       --drawContactPoints \
-      --config_build --hz 20 \
-      --velocityIterations 100 \
+      --config_build --hz 300 \
+      --velocityIterations 8 \
+      --positionIterations 8 \
       --export_path xml/data_exp_$i
   done

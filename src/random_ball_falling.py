@@ -66,6 +66,12 @@ class FallingBall(Framework):
         while len(positions)<100:
             index += 1
             position = normal_random()
+
+            if position[0] < xlow or position[0] > xhi:
+                break
+            if position[1] < ylow or position[1] > yhi:
+                break
+
             good = True
             for prepared_position in positions:
                 if distance(position, prepared_position) < 2 * radius:
