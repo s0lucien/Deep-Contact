@@ -60,6 +60,9 @@ class fwSettings(object):
     # configuration buildind
     config_build = False
 
+    # folder where the generated data is put
+    export_path = './xml'
+
 #             text                  variable
 checkboxes = ()
 

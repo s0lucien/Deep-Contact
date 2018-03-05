@@ -373,6 +373,9 @@ class PygameFramework(FrameworkBase):
             if GUIEnabled and self.settings.drawMenu:
                 self.gui_app.paint(self.screen)
 
+            if self.stepCount == 1000:
+                break
+
             pygame.display.flip()
             clock.tick(self.settings.hz)
             self.fps = clock.get_fps()
