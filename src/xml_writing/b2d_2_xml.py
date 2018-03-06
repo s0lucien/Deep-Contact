@@ -1,90 +1,79 @@
-from Box2D import (b2World, b2Body, b2Contact)
+from Box2D import (b2World, b2Body, b2Contact,b2_dynamicBody)
 from xml.etree.ElementTree import Element, SubElement
 from xml.etree import ElementTree
 from xml.dom import minidom
 import os, errno
 from sim_types import SimData
 
-def body_2_xml(b: b2Body):
+def body_2_xml(body: b2Body):
     try:
-        id = b.userData.id
-        px = b.position.x
-        py = b.position.y
-        m = b.mass
-        i = b.inertia
-        vx = b.linearVelocity.x
-        vy = b.linearVelocity.y
-        spin = b.angularVelocity
-        orientation = b.angle
-        shape = "circle"
+        body_xml = Element('body')
+        body_xml.set('index', str(body.userData.id))
 
-        body = Element('body')
-        body.set("index", str(id))
-        if m > 0:
-            body.set("type", "free")
-        else:
-            body.set("type", "fixed")
-        pos = SubElement(body, "position")
-        pos.set("x", str(px))
-        pos.set("y", str(py))
-        velocity = SubElement(body, "velocity")
-        velocity.set("vx", str(vx))
-        velocity.set("vy", str(vy))
-        o = SubElement(body, "orientation")
-        o.set("theta", str(orientation))
-        mass = SubElement(body, "mass")
-        mass.set("value", str(m))
-        inertia = SubElement(body, "inertia")
-        inertia.set("value", str(i))
-        s = SubElement(body, "spin")
-        s.set("omega", str(spin))
-        s = SubElement(body, "shape")
-        s.set("value", str(shape))
-        return body
+        body_xml.set('type', 'free' if body.type is b2_dynamicBody else 'fixed')
+
+        # mass
+        mass = SubElement(body_xml, 'mass')
+        mass.set('value', str(body.mass))
+
+        # position
+        pos = SubElement(body_xml, 'position')
+        pos.set('x', str(body.position.x))
+        pos.set('y', str(body.position.y))
+
+        # velocity
+        v = SubElement(body_xml, 'velocity')
+        v.set('vx', str(body.linearVelocity.x))
+        v.set('vy', str(body.linearVelocity.y))
+
+        # orientation
+        ori = SubElement(body_xml, 'orientation')
+        ori.set('theta', str(body.angle))
+
+        inertia = SubElement(body_xml, 'inertia')
+        inertia.set('value', str(body.inertia))
+
+        # spin
+        spin = SubElement(body_xml, 'spin')
+        spin.set('omega', str(body.angularVelocity))
+
+        # shape
+        shape = SubElement(body_xml, 'shape')
+        shape.set('value', ' '.join(str(body.fixtures[0].shape).split()).replace('\n', ' ').replace('\r', ''))
+        return body_xml
     except AttributeError:
         print("body without id encountered")
         raise
 
 
-def contact_2_xml(c: b2Contact,c_ix=None):
+def contact_2_xml(contact: b2Contact,c_ix=None):
     try:
-        p1 = p2 = c.manifold.points[0].localPoint
-        t1 = t2 = c.manifold.points[0].tangentImpulse
-        n1 = n2 = c.manifold.points[0].normalImpulse
-        if c.manifold.pointCount>1 : # B2D returns either 1 or 2 points
-            p2 = c.manifold.points[1].localPoint
-            t2 = c.manifold.points[1].tangentImpulse
-            n2 = c.manifold.points[1].normalImpulse
-        depth = None
-        master = c.fixtureA.body.userData.id
-        slave = c.fixtureB.body.userData.id
-        px = c.manifold.localPoint.x
-        py = c.manifold.localPoint.y
-        nx = c.manifold.localNormal.x
-        ny = c.manifold.localNormal.y
-        contact = Element('contact')
-        contact.set("index", str(c_ix))
-        contact.set("master", str(master))
-        contact.set("slave", str(slave))
-        pos = SubElement(contact, "position")
-        pos.set("x", str(px))
-        pos.set("y", str(py))
-        normal = SubElement(contact, "normal")
-        normal.set("nx", str(nx))
-        normal.set("ny", str(ny))
-        f1 = SubElement(contact, "force")
-        f1.set("n", str(n1))
-        f1.set("t", str(t1))
-        f1.set("px", str(p1.x))
-        f1.set("py", str(p1.y))
-        f2 = SubElement(contact, "force")
-        f2.set("n", str(n2))
-        f2.set("t", str(t2))
-        f2.set("px", str(p2.x))
-        f2.set("py", str(p2.y))
-        d = SubElement(contact, "depth")
-        d.set("value", str(depth))
-        return contact
+        contact_xmls = []
+        for i in range(contact.manifold.pointCount):
+            point = contact.worldManifold.points[i]
+            normal = contact.worldManifold.normal
+            manifold_point = contact.manifold.points[i]
+            impulse = (manifold_point.normalImpulse, manifold_point.tangentImpulse)
+
+            xml_contact = Element('contact')
+            # master
+            xml_contact.set('index', str(c_ix + i))
+            xml_contact.set("master", str(contact.fixtureA.body.userData.id))
+            xml_contact.set("slave", str(contact.fixtureB.body.userData.id))
+
+            # position
+            position = SubElement(xml_contact, 'position')
+            position.set('x', str(point[0]))
+            position.set('y', str(point[1]))
+
+            xml_normal = SubElement(xml_contact, "normal")
+            xml_normal.set("nx", str(normal.x))
+            xml_normal.set("ny", str(normal.y))
+            xml_impulse = SubElement(xml_contact, "impulse")
+            xml_impulse.set("n", str(impulse[0]))
+            xml_impulse.set("t", str(impulse[1]))
+            contact_xmls.append(xml_contact)
+        return contact_xmls
     except AttributeError:
         print("contact between body without id encountered")
         raise
@@ -98,26 +87,26 @@ def prettify(elem):
 
 
 class XMLExporter:
-    def __init__(self,world:b2World, export_root, simData : SimData):
+    def __init__(self,world:b2World, export_root):
         self.world = world
-        self.config_id = simData.name
         self.export_root = export_root
-        self.simData=simData
+        self.simData=world.userData
 
     def snapshot(self):
         cfg = Element('configuration')
-        cfg.set("name",self.config_id)
-        cfg.set("time",str(0))
+        cfg.set("name",str(self.simData.name))
+        cfg.set("time",str(self.simData.t))
         for b in self.world.bodies:
             xb = body_2_xml(b)
             if xb is not None:
                 cfg.append(xb)
-        c_ix=-1
+        c_ix=0
         for c in self.world.contacts:
-            c_ix += 1
-            xc = contact_2_xml(c,c_ix)
-            if xc is not None:
-                cfg.append(xc)
+            xcs = contact_2_xml(c,c_ix)
+            if xcs is not None:
+                for xc in xcs:
+                    cfg.append(xc)
+            c_ix += c.manifold.pointCount
         return cfg
 
     def save_snapshot(self):
@@ -128,12 +117,12 @@ class XMLExporter:
             out_path = os.path.join(file_dir,self.export_root)
         else:
             out_path=self.export_root
-        directory = os.path.join(out_path,self.config_id)
+        directory = os.path.join(out_path,self.simData.name)
         try:
             os.makedirs(directory)
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
-        file = os.path.join(directory,str(self.simData.t)+"s.xml")
+        file = os.path.join(directory,str(self.simData.step)+".xml")
         with open(file,"w") as f:
             f.write(xml)

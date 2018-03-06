@@ -1,4 +1,4 @@
-from Box2D import (b2CircleShape, b2EdgeShape, b2FixtureDef, b2World)
+from Box2D import (b2LoopShape, b2FixtureDef, b2World)
 
 from sim_types import BodyData, SimData
 from gen_world import create_circle
@@ -8,13 +8,17 @@ from xml_writing.b2d_2_xml import XMLExporter, prettify
 if __name__ == "__main__":
     world = b2World(doSleep=True)
     world.gravity = (0, -9.81)
+    world.userData=SimData("xml_config")
+    xlow, xhi = -20, 20
+    ylow, yhi = 0, 40
     # The ground
     ground = world.CreateStaticBody(
-        shapes=[b2EdgeShape(vertices=[(-10, 0), (10, 0)]),
-                b2EdgeShape(vertices=[(-10, 0), (-10, 20)]),
-                b2EdgeShape(vertices=[(10, 0), (10, 20)]),
-                ])
-
+        shapes=[
+            b2LoopShape(
+                vertices=[
+                    (xlow, ylow), (xhi, ylow), (xhi, yhi), (xlow, yhi)])
+        ],
+    )
     # The bodies
     radius = 0.5
     columnCount = 1
@@ -35,9 +39,10 @@ if __name__ == "__main__":
     world.Step(10e-4,100,100)
     world.Step(10e-4,100,100)
     world.Step(10e-4,100,100)
+    world.userData.tick(4)
     # the world now has bodies and contacts. Time to output them to XML
 
-    exp = XMLExporter(world, "../gen_data", SimData("cfg1"))
+    exp = XMLExporter(world, "../gen_data")
     snap = exp.snapshot()
     print(prettify(snap))
     exp.save_snapshot()
