@@ -20,39 +20,20 @@
 # misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
+from pgu.settings import uiSettings
 
-class fwSettings(object):
-    # The default backend to use in (can be: pyglet, pygame, etc.)
-    backend = 'pygame'
+class fwSettings(uiSettings):
 
     # Physics options
-    hz = 60.0
-    velocityIterations = 8
-    positionIterations = 3
+    timeStep = 1e-4
+    hz=1/timeStep
+    velocityIterations = 1000
+    positionIterations = 1000
     # Makes physics results more accurate (see Box2D wiki)
     enableWarmStarting = True
-    enableContinuous = True     # Calculate time of impact
+    enableContinuous = False     # Calculate time of impact
     enableSubStepping = False
 
-    # Drawing
-    drawStats = True
-    drawShapes = True
-    drawJoints = True
-    drawCoreShapes = False
-    drawAABBs = False
-    drawOBBs = False
-    drawPairs = False
-    drawContactPoints = False
-    maxContactPoints = 100
-    drawContactNormals = False
-    drawFPS = True
-    drawMenu = True             # toggle by pressing F1
-    drawCOMs = False            # Centers of mass
-    pointSize = 2.5             # pixel radius for drawing points
-
-    # Miscellaneous testbed options
-    pause = False
-    singleStep = False
     # run the test's initialization without graphics, and then quit (for
     # testing)
     onlyInit = False
@@ -61,16 +42,8 @@ class fwSettings(object):
     config_build = False
 
     # folder where the generated data is put
-    export_path = './xml'
+    export_path = './gen_data'
 
-#             text                  variable
-checkboxes = ()
-
-sliders = [
-    # {'name': 'hz', 'text': 'Hertz', 'min': 5, 'max': 200},
-    # {'name': 'positionIterations', 'text': 'Pos Iters', 'min': 0, 'max': 100},
-    # {'name': 'velocityIterations', 'text': 'Vel Iters', 'min': 1, 'max': 500},
-]
 
 from optparse import OptionParser
 
