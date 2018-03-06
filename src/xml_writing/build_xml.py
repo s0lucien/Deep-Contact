@@ -65,7 +65,7 @@ def _contact_2_xml(contact, index):
         contact_xml = Element('contact')
         # master
         contact_xml.set('index', str(index + i))
-        contact_xml.set("master", str(contact.fixtureB.body.userData))
+        contact_xml.set("master", str(contact.fixtureA.body.userData))
         contact_xml.set("slave", str(contact.fixtureB.body.userData))
         contact_xml.set('master_shape', str(contact.fixtureA.shape))
         contact_xml.set('slave_shape', str(contact.fixtureB.shape))
