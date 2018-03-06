@@ -39,6 +39,11 @@ afterwards. The configuration file includes bodies and contacts
 ```
 python -m src.random_ball_falling --config_build --hz 100
 ```
+Or just
+```
+./run
+```
+to generate the training data
 
 ```
 <body index="86" type="free">
@@ -51,15 +56,19 @@ python -m src.random_ball_falling --config_build --hz 100
     <shape value="circle"/>
 </body>
 ...
-<contact index="1" master="90" master_shape="b2ChainShape(vertices: [(-20.0, 0.0), (20.0, 0.0), (20.0, 60.0), (-20.0, 60.0), (-20.0, 0.0)])" slave="90" slave_shape="b2CircleShape(childCount=1,
+<contact index="1" master="2" master_shape="b2CircleShape(childCount=1,
               pos=b2Vec2(0,0),
-              radius=1.0,
+              radius=1.2000000476837158,
+              type=0,
+              )" slave="97" slave_shape="b2CircleShape(childCount=1,
+              pos=b2Vec2(0,0),
+              radius=1.2000000476837158,
               type=0,
               )">
-    <position x="8.590503692626953" y="0.008332252502441406"/>
-    <normal normal="b2Vec2(-0,1)"/>
-    <impulse n="0.03141593188047409" t="0.0"/>
-</contact>
+    <position x="0.21963849663734436" y="13.875240325927734"/>
+    <normal normal="b2Vec2(-1,2.9819e-05)"/>
+    <impulse n="0.005236322991549969" t="-0.002184529323130846"/>
+  </contact>
 ```
 
 A place for storing training datasets
