@@ -25,7 +25,7 @@ from .pgu.settings import uiSettings
 class fwSettings(uiSettings):
 
     # Physics options
-    d_t = 1e-3
+    d_t = 10e-3
     hz=1/d_t
     velocityIterations = 1000
     positionIterations = 1000

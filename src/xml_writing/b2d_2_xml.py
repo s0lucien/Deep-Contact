@@ -95,7 +95,7 @@ class XMLExporter:
     def snapshot(self):
         cfg = Element('configuration')
         cfg.set("name",str(self.simData.name))
-        cfg.set("time",str(self.simData.t))
+        cfg.set("time",str(self.simData.sim_t))
         for b in self.world.bodies:
             xb = body_2_xml(b)
             if xb is not None:

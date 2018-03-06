@@ -35,14 +35,16 @@ if __name__ == "__main__":
     for b in world.bodies:
         b_ix += 1
         b.userData=BodyData(b_ix)
-    world.Step(10e-4,100,100)
-    world.Step(10e-4,100,100)
-    world.Step(10e-4,100,100)
-    world.Step(10e-4,100,100)
-    world.userData.tick(4)
+    for _ in range(4):
+        world.userData.tick()
+        world.Step(10e-4,1000,1000)
+        world.userData.tock()
+        print("step took ", world.userData.wall_t)
     # the world now has bodies and contacts. Time to output them to XML
-
+    world.userData.tick()
     exp = XMLExporter(world, "../gen_data")
     snap = exp.snapshot()
     print(prettify(snap))
     exp.save_snapshot()
+    world.userData.tock()
+    print("Exporting the data took", world.userData.wall_t)
