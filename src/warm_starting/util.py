@@ -9,7 +9,8 @@ def copyWorld(world):
     for body in world.bodies:
         fixtures = []
         for fixture in body.fixtures:
-            fixtures.append(b2FixtureDef(shape=fixture.shape, density=fixture.density))
+            fixtures.append(b2FixtureDef(shape=fixture.shape, density=fixture.density,
+                                         restitution=fixture.restitution, friction=fixture.friction))
 
         copy.CreateBody(type=body.type, fixtures=fixtures, userData=body.userData,
                         position=b2Vec2(body.position.x, body.position.y), angle=body.angle,

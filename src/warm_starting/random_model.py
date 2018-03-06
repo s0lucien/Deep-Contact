@@ -3,14 +3,16 @@ from model import Model
 import random
 
 class RandomModel (Model):
+    # We manually choose a seed to ensure the same 'random' numbers each time
     def __init__(self, seed):
-        # We manually choose a seed to ensure the same 'random' numbers each time
         random.seed(seed)
         pass
 
-    def Step(self, world, timeStep, velocityIterations, positionIterations):
+    def Step(self, world, timeStep, velocityIterations, positionIterations,
+             velocityThreshold, positionThreshold):
         pass
 
+    # Predicts a random, some-what 'reasonable' set of impulses
     def Predict(self, contact):
         predictions = []
 

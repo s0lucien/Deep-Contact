@@ -1,6 +1,6 @@
 from model import Model
 
-class BadModel (Model):
+class VanillaModel (Model):
     def __init__(self):
         pass
 
@@ -8,12 +8,12 @@ class BadModel (Model):
              velocityThreshold, positionThreshold):
         pass
 
-    # Provides a bad prediction irregardless of input
+    # Set all starting iterates to 0
     def Predict(self, contact):
         predictions = []
 
         m = contact.manifold
         for point in m.points:
-            predictions.append((point.id, 10000, 10000))
+            predictions.append((point.id, 0, 0))
 
         return predictions
