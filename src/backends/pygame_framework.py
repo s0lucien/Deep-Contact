@@ -373,9 +373,6 @@ class PygameFramework(FrameworkBase):
             if GUIEnabled and self.settings.drawMenu:
                 self.gui_app.paint(self.screen)
 
-            if self.stepCount == 1000:
-                break
-
             pygame.display.flip()
             clock.tick(self.settings.hz)
             self.fps = clock.get_fps()
@@ -396,8 +393,6 @@ class PygameFramework(FrameworkBase):
                 self.viewZoom = min(1.1 * self.viewZoom, 50.0)
             elif key == Keys.K_x:     # Zoom out
                 self.viewZoom = max(0.9 * self.viewZoom, 0.02)
-            elif key == Keys.K_SPACE:  # Launch a bomb
-                self.LaunchRandomBomb()
             elif key == Keys.K_F1:    # Toggle drawing the menu
                 self.settings.drawMenu = not self.settings.drawMenu
             elif key == Keys.K_F2:    # Do a single step

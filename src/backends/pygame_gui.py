@@ -22,8 +22,8 @@ try:
 except:
     raise ImportError('Unable to load PGU')
 
-from ..settings import checkboxes
-from ..settings import sliders
+from ..pgu.settings import checkboxes
+from ..pgu.settings import sliders
 
 
 class fwGUI(gui.Table):
