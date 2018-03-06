@@ -32,6 +32,9 @@ struct b2Profile
 	float32 solvePosition;
 	float32 broadphase;
 	float32 solveTOI;
+    int32 velocityIterations;
+    int32 positionIterations;
+    int32 contactsSolved;
 };
 
 /// This is an internal structure.
@@ -42,6 +45,8 @@ struct b2TimeStep
 	float32 dtRatio;	// dt * inv_dt0
 	int32 velocityIterations;
 	int32 positionIterations;
+    float32 velocityThreshold;
+    float32 positionThreshold;
 	bool warmStarting;
 };
 

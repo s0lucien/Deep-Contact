@@ -75,7 +75,7 @@ public:
 	void InitializeVelocityConstraints();
 
 	void WarmStart();
-	void SolveVelocityConstraints();
+	bool SolveVelocityConstraints();
 	void StoreImpulses();
 
 	bool SolvePositionConstraints();
@@ -92,4 +92,3 @@ public:
 };
 
 #endif
-

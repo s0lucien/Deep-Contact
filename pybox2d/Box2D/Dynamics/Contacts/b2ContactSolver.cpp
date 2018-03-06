@@ -105,7 +105,7 @@ b2ContactSolver::b2ContactSolver(b2ContactSolverDef* def)
 		{
 			b2ManifoldPoint* cp = manifold->points + j;
 			b2VelocityConstraintPoint* vcp = vc->points + j;
-	
+
 			if (m_step.warmStarting)
 			{
 				vcp->normalImpulse = m_step.dtRatio * cp->normalImpulse;
@@ -286,8 +286,10 @@ void b2ContactSolver::WarmStart()
 	}
 }
 
-void b2ContactSolver::SolveVelocityConstraints()
+bool b2ContactSolver::SolveVelocityConstraints()
 {
+    float32 maxVelocityChange = 0.0f;
+
 	for (int32 i = 0; i < m_count; ++i)
 	{
 		b2ContactVelocityConstraint* vc = m_velocityConstraints + i;
@@ -379,17 +381,17 @@ void b2ContactSolver::SolveVelocityConstraints()
 			// implies that we must have in any solution either vn_i = 0 or x_i = 0. So for the 2D contact problem the cases
 			// vn1 = 0 and vn2 = 0, x1 = 0 and x2 = 0, x1 = 0 and vn2 = 0, x2 = 0 and vn1 = 0 need to be tested. The first valid
 			// solution that satisfies the problem is chosen.
-			// 
+			//
 			// In order to account of the accumulated impulse 'a' (because of the iterative nature of the solver which only requires
 			// that the accumulated impulse is clamped and not the incremental impulse) we change the impulse variable (x_i).
 			//
 			// Substitute:
-			// 
+			//
 			// x = a + d
-			// 
+			//
 			// a := old total impulse
 			// x := new total impulse
-			// d := incremental impulse 
+			// d := incremental impulse
 			//
 			// For the current iteration we extend the formula for the incremental impulse
 			// to compute the new total impulse:
@@ -473,7 +475,7 @@ void b2ContactSolver::SolveVelocityConstraints()
 				//
 				// Case 2: vn1 = 0 and x2 = 0
 				//
-				//   0 = a11 * x1 + a12 * 0 + b1' 
+				//   0 = a11 * x1 + a12 * 0 + b1'
 				// vn2 = a21 * x1 + a22 * 0 + b2'
 				//
 				x.x = - cp1->normalMass * b.x;
@@ -515,7 +517,7 @@ void b2ContactSolver::SolveVelocityConstraints()
 				//
 				// Case 3: vn2 = 0 and x1 = 0
 				//
-				// vn1 = a11 * 0 + a12 * x2 + b1' 
+				// vn1 = a11 * 0 + a12 * x2 + b1'
 				//   0 = a21 * 0 + a22 * x2 + b2'
 				//
 				x.x = 0.0f;
@@ -555,7 +557,7 @@ void b2ContactSolver::SolveVelocityConstraints()
 
 				//
 				// Case 4: x1 = 0 and x2 = 0
-				// 
+				//
 				// vn1 = b1
 				// vn2 = b2;
 				x.x = 0.0f;
@@ -589,11 +591,18 @@ void b2ContactSolver::SolveVelocityConstraints()
 			}
 		}
 
+        float32 changeA = b2Distance(vA, m_velocities[indexA].v);
+        maxVelocityChange = b2Max(maxVelocityChange, changeA);
 		m_velocities[indexA].v = vA;
 		m_velocities[indexA].w = wA;
-		m_velocities[indexB].v = vB;
+
+        float32 changeB = b2Distance(vB, m_velocities[indexB].v);
+        maxVelocityChange = b2Max(maxVelocityChange, changeB);
+        m_velocities[indexB].v = vB;
 		m_velocities[indexB].w = wB;
 	}
+
+	return maxVelocityChange <= m_step.velocityThreshold;
 }
 
 void b2ContactSolver::StoreImpulses()
@@ -666,6 +675,7 @@ struct b2PositionSolverManifold
 bool b2ContactSolver::SolvePositionConstraints()
 {
 	float32 minSeparation = 0.0f;
+    float32 maxPositionChange = 0.0f;
 
 	for (int32 i = 0; i < m_count; ++i)
 	{
@@ -729,16 +739,20 @@ bool b2ContactSolver::SolvePositionConstraints()
 			aB += iB * b2Cross(rB, P);
 		}
 
+        float32 changeA = b2Distance(cA, m_positions[indexA].c);
+        maxPositionChange = b2Max(maxPositionChange, changeA);
 		m_positions[indexA].c = cA;
 		m_positions[indexA].a = aA;
 
+        float32 changeB = b2Distance(cB, m_positions[indexB].c);
+        maxPositionChange = b2Max(maxPositionChange, changeB);
 		m_positions[indexB].c = cB;
 		m_positions[indexB].a = aB;
 	}
 
 	// We can't expect minSpeparation >= -b2_linearSlop because we don't
 	// push the separation above -b2_linearSlop.
-	return minSeparation >= -3.0f * b2_linearSlop;
+	return (minSeparation >= -3.0f * b2_linearSlop) && (maxPositionChange <= m_step.positionThreshold);
 }
 
 // Sequential position solver for position constraints.

@@ -1,27 +1,30 @@
-[![Build Status](https://travis-ci.org/pybox2d/pybox2d.svg?branch=master)](https://travis-ci.org/pybox2d/pybox2d) [![Coverage Status](https://coveralls.io/repos/pybox2d/pybox2d/badge.svg?branch=master&service=github)](https://coveralls.io/github/pybox2d/pybox2d?branch=master)
-
-pybox2d
+pybox2d*
 -------
-2D Game Physics for Python
+This is a modified version of pybox2D. The original can be found at:
 
 https://github.com/pybox2d/pybox2d
 
-What is it?
+What has changed:
 -----------
-pybox2d is a 2D physics library for your games and simple simulations. It's
-based on the Box2D library, written in C++. It supports several shape types
-(circle, polygon, thin line segments), and quite a few joint types (revolute,
-prismatic, wheel, etc.).
+The main change is that b2World.Step now takes two additional parameters.
+The first new parameter determines what threshold to use for early
+stopping when solving the velocity constraints, and the second new parameter
+similarly determines what threshold to use for early stopping when solving
+the position constraints.
+Setting the velocity threshold to 0 will result in the simulator treating the
+velocity constraints as it did originally, where it simply does all the
+iterations.
+Setting the position threshold to some large value, for instance 1000, will
+similarly result in the simulator treating the position constraints as it did
+originally, where all it cares about is solving penetration.
 
-Getting Started
----------------
-For installation or building instructions, see [INSTALL.md](INSTALL.md). Check
-out the testbed [examples](examples) to see what pybox2d can do. Then take a
-look at the 
-[getting started manual](https://github.com/pybox2d/pybox2d/wiki/manual)
-located on the pybox2d wiki.
-
-Bugs
-----
-Please submit any bugs that you find to the 
-[issue tracker](https://github.com/pybox2d/pybox2d/issues).
+Another change is that the b2Profile class, of which an instance is created
+after each step, now has three additional attributes.
+'velocityIterations' is the total number of iterations performed solving the
+velocity constraints.
+'positionIterations' is the total number of iterations performed solving the
+position constraints.
+'contactsSolved' is the total number of contacts considered when solving the
+constraints. Note that this number will often be different from the total
+number of contacts in the world, and might even be different from the total
+number of contacts in the world for which 'touching' is true.

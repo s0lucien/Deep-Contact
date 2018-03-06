@@ -54,7 +54,7 @@ public:
 
 	/// Register a contact filter to provide specific control over collision.
 	/// Otherwise the default filter is used (b2_defaultFilter). The listener is
-	/// owned by you and must remain in scope. 
+	/// owned by you and must remain in scope.
 	void SetContactFilter(b2ContactFilter* filter);
 
 	/// Register a contact event listener. The listener is owned by you and must
@@ -91,9 +91,13 @@ public:
 	/// @param timeStep the amount of time to simulate, this should not vary.
 	/// @param velocityIterations for the velocity constraint solver.
 	/// @param positionIterations for the position constraint solver.
+    /// @param velocityThreshold for the velocity constraint solver.
+    /// @param positionThreshold for the position constraint solver.
 	void Step(	float32 timeStep,
 				int32 velocityIterations,
-				int32 positionIterations);
+				int32 positionIterations,
+                float32 velocityThreshold,
+                float32 positionThreshold);
 
 	/// Manually clear the force buffer on all bodies. By default, forces are cleared automatically
 	/// after each call to Step. The default behavior is modified by calling SetAutoClearForces.
@@ -181,7 +185,7 @@ public:
 
 	/// Change the global gravity vector.
 	void SetGravity(const b2Vec2& gravity);
-	
+
 	/// Get the global gravity vector.
 	b2Vec2 GetGravity() const;
 

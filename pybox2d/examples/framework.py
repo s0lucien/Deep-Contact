@@ -186,8 +186,9 @@ class FrameworkBase(b2ContactListener):
 
         # Tell Box2D to step
         t_step = time()
-        self.world.Step(timeStep, settings.velocityIterations,
-                        settings.positionIterations)
+        self.world.Step(timeStep,
+                        settings.velocityIterations, settings.positionIterations,
+                        settings.velocityThreshold, settings.positionThreshold)
         self.world.ClearForces()
         t_step = time() - t_step
 

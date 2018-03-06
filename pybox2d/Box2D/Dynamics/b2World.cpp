@@ -388,6 +388,9 @@ void b2World::Solve(const b2TimeStep& step)
 	m_profile.solveInit = 0.0f;
 	m_profile.solveVelocity = 0.0f;
 	m_profile.solvePosition = 0.0f;
+    m_profile.velocityIterations = 0;
+    m_profile.positionIterations = 0;
+    m_profile.contactsSolved = 0;
 
 	// Size the island for the worst case.
 	b2Island island(m_bodyCount,
@@ -532,6 +535,12 @@ void b2World::Solve(const b2TimeStep& step)
 		m_profile.solveInit += profile.solveInit;
 		m_profile.solveVelocity += profile.solveVelocity;
 		m_profile.solvePosition += profile.solvePosition;
+        if (island.m_bodyCount > 1) // If the island has only 1 body, there is nothing to solve
+        {
+            m_profile.velocityIterations += profile.velocityIterations;
+            m_profile.positionIterations += profile.positionIterations;
+            m_profile.contactsSolved += island.m_contactCount;
+        }
 
 		// Post solve cleanup.
 		for (int32 i = 0; i < island.m_bodyCount; ++i)
@@ -839,7 +848,7 @@ void b2World::SolveTOI(const b2TimeStep& step)
 					{
 						continue;
 					}
-					
+
 					// Add the other body to the island.
 					other->m_flags |= b2Body::e_islandFlag;
 
@@ -894,7 +903,8 @@ void b2World::SolveTOI(const b2TimeStep& step)
 	}
 }
 
-void b2World::Step(float32 dt, int32 velocityIterations, int32 positionIterations)
+void b2World::Step(float32 dt, int32 velocityIterations, int32 positionIterations,
+                   float32 velocityThreshold, float32 positionThreshold)
 {
 	b2Timer stepTimer;
 
@@ -911,6 +921,8 @@ void b2World::Step(float32 dt, int32 velocityIterations, int32 positionIteration
 	step.dt = dt;
 	step.velocityIterations	= velocityIterations;
 	step.positionIterations = positionIterations;
+    step.velocityThreshold = velocityThreshold;
+    step.positionThreshold = positionThreshold;
 	if (dt > 0.0f)
 	{
 		step.inv_dt = 1.0f / dt;
@@ -923,7 +935,7 @@ void b2World::Step(float32 dt, int32 velocityIterations, int32 positionIteration
 	step.dtRatio = m_inv_dt0 * dt;
 
 	step.warmStarting = m_warmStarting;
-	
+
 	// Update contacts. This is where some contacts are destroyed.
 	{
 		b2Timer timer;
@@ -1085,7 +1097,7 @@ void b2World::DrawShape(b2Fixture* fixture, const b2Transform& xf, const b2Color
 			m_debugDraw->DrawSolidPolygon(vertices, vertexCount, color);
 		}
 		break;
-            
+
     default:
         break;
 	}

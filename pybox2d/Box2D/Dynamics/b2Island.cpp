@@ -247,7 +247,7 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 	{
 		contactSolver.WarmStart();
 	}
-	
+
 	for (int32 i = 0; i < m_jointCount; ++i)
 	{
 		m_joints[i]->InitVelocityConstraints(solverData);
@@ -257,15 +257,22 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 
 	// Solve velocity constraints
 	timer.Reset();
-	for (int32 i = 0; i < step.velocityIterations; ++i)
+    int32 i;
+	for (i = 0; i < step.velocityIterations; ++i)
 	{
 		for (int32 j = 0; j < m_jointCount; ++j)
 		{
 			m_joints[j]->SolveVelocityConstraints(solverData);
 		}
 
-		contactSolver.SolveVelocityConstraints();
+		bool contactsOkay = contactSolver.SolveVelocityConstraints();
+
+        if (contactsOkay)
+        {
+            break;
+        }
 	}
+    profile->velocityIterations = b2Min(i+1, step.velocityIterations);
 
 	// Store impulses for warm starting
 	contactSolver.StoreImpulses();
@@ -307,7 +314,7 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 	// Solve position constraints
 	timer.Reset();
 	bool positionSolved = false;
-	for (int32 i = 0; i < step.positionIterations; ++i)
+	for (i = 0; i < step.positionIterations; ++i)
 	{
 		bool contactsOkay = contactSolver.SolvePositionConstraints();
 
@@ -325,6 +332,7 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 			break;
 		}
 	}
+  profile->positionIterations = b2Min(i+1, step.positionIterations);
 
 	// Copy state buffers back to the bodies
 	for (int32 i = 0; i < m_bodyCount; ++i)
@@ -525,7 +533,7 @@ void b2Island::Report(const b2ContactVelocityConstraint* constraints)
 		b2Contact* c = m_contacts[i];
 
 		const b2ContactVelocityConstraint* vc = constraints + i;
-		
+
 		b2ContactImpulse impulse;
 		impulse.count = vc->pointCount;
 		for (int32 j = 0; j < vc->pointCount; ++j)

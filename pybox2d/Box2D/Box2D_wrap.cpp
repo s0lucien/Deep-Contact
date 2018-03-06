@@ -14946,6 +14946,57 @@ SWIGINTERN PyObject *_wrap_b2Profile_solveTOI_get(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "b2Profile_solveTOI_get" "', argument " "1"" of type '" "b2Profile *""'");  }
    arg1 = reinterpret_cast< b2Profile * >(argp1); result = (float32) ((arg1)->solveTOI);
   resultobj = SWIG_From_float(static_cast< float >(result)); return resultobj; fail: return NULL; }
+SWIGINTERN PyObject *_wrap_b2Profile_velocityIterations_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0; b2Profile *arg1 = (b2Profile *) 0 ; int32 arg2 ; void *argp1 = 0 ; int res1 = 0 ; int val2 ;
+  int ecode2 = 0 ; PyObject *swig_obj[2] ;
+  if (!SWIG_Python_UnpackTuple(args,"b2Profile_velocityIterations_set",2,2,swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_b2Profile, 0 |  0 ); if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "b2Profile_velocityIterations_set" "', argument " "1"" of type '" "b2Profile *""'");  }
+   arg1 = reinterpret_cast< b2Profile * >(argp1); ecode2 = SWIG_AsVal_int(swig_obj[1], &val2); if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "b2Profile_velocityIterations_set" "', argument " "2"" of type '" "int32""'"); }
+    arg2 = static_cast< int32 >(val2); if (arg1) (arg1)->velocityIterations = arg2; resultobj = SWIG_Py_Void();
+  return resultobj; fail: return NULL; }
+SWIGINTERN PyObject *_wrap_b2Profile_velocityIterations_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0; b2Profile *arg1 = (b2Profile *) 0 ; void *argp1 = 0 ; int res1 = 0 ; PyObject *swig_obj[1] ;
+  int32 result; if (!args) SWIG_fail; swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_b2Profile, 0 |  0 ); if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "b2Profile_velocityIterations_get" "', argument " "1"" of type '" "b2Profile *""'");  }
+   arg1 = reinterpret_cast< b2Profile * >(argp1); result = (int32) ((arg1)->velocityIterations);
+  resultobj = SWIG_From_int(static_cast< int >(result)); return resultobj; fail: return NULL; }
+SWIGINTERN PyObject *_wrap_b2Profile_positionIterations_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0; b2Profile *arg1 = (b2Profile *) 0 ; int32 arg2 ; void *argp1 = 0 ; int res1 = 0 ; int val2 ;
+  int ecode2 = 0 ; PyObject *swig_obj[2] ;
+  if (!SWIG_Python_UnpackTuple(args,"b2Profile_positionIterations_set",2,2,swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_b2Profile, 0 |  0 ); if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "b2Profile_positionIterations_set" "', argument " "1"" of type '" "b2Profile *""'");  }
+   arg1 = reinterpret_cast< b2Profile * >(argp1); ecode2 = SWIG_AsVal_int(swig_obj[1], &val2); if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "b2Profile_positionIterations_set" "', argument " "2"" of type '" "int32""'"); }
+    arg2 = static_cast< int32 >(val2); if (arg1) (arg1)->positionIterations = arg2; resultobj = SWIG_Py_Void();
+  return resultobj; fail: return NULL; }
+SWIGINTERN PyObject *_wrap_b2Profile_positionIterations_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0; b2Profile *arg1 = (b2Profile *) 0 ; void *argp1 = 0 ; int res1 = 0 ; PyObject *swig_obj[1] ;
+  int32 result; if (!args) SWIG_fail; swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_b2Profile, 0 |  0 ); if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "b2Profile_positionIterations_get" "', argument " "1"" of type '" "b2Profile *""'");  }
+   arg1 = reinterpret_cast< b2Profile * >(argp1); result = (int32) ((arg1)->positionIterations);
+  resultobj = SWIG_From_int(static_cast< int >(result)); return resultobj; fail: return NULL; }
+SWIGINTERN PyObject *_wrap_b2Profile_contactsSolved_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0; b2Profile *arg1 = (b2Profile *) 0 ; int32 arg2 ; void *argp1 = 0 ; int res1 = 0 ; int val2 ;
+  int ecode2 = 0 ; PyObject *swig_obj[2] ;
+  if (!SWIG_Python_UnpackTuple(args,"b2Profile_contactsSolved_set",2,2,swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_b2Profile, 0 |  0 ); if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "b2Profile_contactsSolved_set" "', argument " "1"" of type '" "b2Profile *""'");  }
+   arg1 = reinterpret_cast< b2Profile * >(argp1); ecode2 = SWIG_AsVal_int(swig_obj[1], &val2); if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "b2Profile_contactsSolved_set" "', argument " "2"" of type '" "int32""'"); }
+    arg2 = static_cast< int32 >(val2); if (arg1) (arg1)->contactsSolved = arg2; resultobj = SWIG_Py_Void(); return resultobj;
+  fail: return NULL; }
+SWIGINTERN PyObject *_wrap_b2Profile_contactsSolved_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0; b2Profile *arg1 = (b2Profile *) 0 ; void *argp1 = 0 ; int res1 = 0 ; PyObject *swig_obj[1] ;
+  int32 result; if (!args) SWIG_fail; swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_b2Profile, 0 |  0 ); if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "b2Profile_contactsSolved_get" "', argument " "1"" of type '" "b2Profile *""'");  }
+   arg1 = reinterpret_cast< b2Profile * >(argp1); result = (int32) ((arg1)->contactsSolved);
+  resultobj = SWIG_From_int(static_cast< int >(result)); return resultobj; fail: return NULL; }
 SWIGINTERN PyObject *_wrap_new_b2Profile(PyObject *SWIGUNUSEDPARM(self), PyObject *args) { PyObject *resultobj = 0;
   b2Profile *result = 0 ; if (!SWIG_Python_UnpackTuple(args,"new_b2Profile",0,0,0)) SWIG_fail; { try {
       result = (b2Profile *)new b2Profile(); }  catch(b2AssertException) {  SWIG_fail; }   if (PyErr_Occurred()) {  SWIG_fail; }
@@ -15307,11 +15358,13 @@ SWIGINTERN PyObject *_wrap_b2World___SetDebugDraw_internal(PyObject *SWIGUNUSEDP
    arg2 = reinterpret_cast< b2Draw * >(argp2); { try { (arg1)->SetDebugDraw(arg2); }  catch(b2AssertException) {  SWIG_fail; }  
     if (PyErr_Occurred()) {  SWIG_fail; }  }  resultobj = SWIG_Py_Void(); return resultobj; fail: return NULL; }
 SWIGINTERN PyObject *_wrap_b2World_Step(PyObject *SWIGUNUSEDPARM(self), PyObject *args, PyObject *kwargs) {
-  PyObject *resultobj = 0; b2World *arg1 = (b2World *) 0 ; float32 arg2 ; int32 arg3 ; int32 arg4 ; void *argp1 = 0 ;
-  int res1 = 0 ; float val2 ; int ecode2 = 0 ; int val3 ; int ecode3 = 0 ; int val4 ; int ecode4 = 0 ; PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ; PyObject * obj2 = 0 ; PyObject * obj3 = 0 ; char *  kwnames[] = {
-    (char *) "self",(char *) "timeStep",(char *) "velocityIterations",(char *) "positionIterations", NULL } ;
-  if (!PyArg_ParseTupleAndKeywords(args,kwargs,(char *)"OOOO:b2World_Step",kwnames,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  PyObject *resultobj = 0; b2World *arg1 = (b2World *) 0 ; float32 arg2 ; int32 arg3 ; int32 arg4 ; float32 arg5 ;
+  float32 arg6 ; void *argp1 = 0 ; int res1 = 0 ; float val2 ; int ecode2 = 0 ; int val3 ; int ecode3 = 0 ; int val4 ;
+  int ecode4 = 0 ; float val5 ; int ecode5 = 0 ; float val6 ; int ecode6 = 0 ; PyObject * obj0 = 0 ; PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ; PyObject * obj3 = 0 ; PyObject * obj4 = 0 ; PyObject * obj5 = 0 ; char *  kwnames[] = {
+    (char *) "self",(char *) "timeStep",(char *) "velocityIterations",(char *) "positionIterations",(char *) "velocityThreshold",(char *) "positionThreshold", NULL }
+  ;
+  if (!PyArg_ParseTupleAndKeywords(args,kwargs,(char *)"OOOOOO:b2World_Step",kwnames,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_b2World, 0 |  0 ); if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "b2World_Step" "', argument " "1"" of type '" "b2World *""'");  } 
   arg1 = reinterpret_cast< b2World * >(argp1); ecode2 = SWIG_AsVal_float(obj1, &val2); if (!SWIG_IsOK(ecode2)) {
@@ -15320,8 +15373,13 @@ SWIGINTERN PyObject *_wrap_b2World_Step(PyObject *SWIGUNUSEDPARM(self), PyObject
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "b2World_Step" "', argument " "3"" of type '" "int32""'"); }  
   arg3 = static_cast< int32 >(val3); ecode4 = SWIG_AsVal_int(obj3, &val4); if (!SWIG_IsOK(ecode4)) {
     SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "b2World_Step" "', argument " "4"" of type '" "int32""'"); }  
-  arg4 = static_cast< int32 >(val4); { try { (arg1)->Step(arg2,arg3,arg4); }  catch (Swig::DirectorException) { SWIG_fail; } 
-    catch (b2AssertException) { SWIG_fail; }  }  resultobj = SWIG_Py_Void(); return resultobj; fail: return NULL; }
+  arg4 = static_cast< int32 >(val4); ecode5 = SWIG_AsVal_float(obj4, &val5); if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "b2World_Step" "', argument " "5"" of type '" "float32""'"); }  
+  arg5 = static_cast< float32 >(val5); ecode6 = SWIG_AsVal_float(obj5, &val6); if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "b2World_Step" "', argument " "6"" of type '" "float32""'"); }  
+  arg6 = static_cast< float32 >(val6); { try { (arg1)->Step(arg2,arg3,arg4,arg5,arg6); }  catch (Swig::DirectorException) {
+      SWIG_fail; }  catch (b2AssertException) { SWIG_fail; }  }  resultobj = SWIG_Py_Void(); return resultobj; fail:
+  return NULL; }
 SWIGINTERN PyObject *_wrap_b2World_ClearForces(PyObject *SWIGUNUSEDPARM(self), PyObject *args) { PyObject *resultobj = 0;
   b2World *arg1 = (b2World *) 0 ; void *argp1 = 0 ; int res1 = 0 ; PyObject *swig_obj[1] ; if (!args) SWIG_fail;
   swig_obj[0] = args; res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_b2World, 0 |  0 ); if (!SWIG_IsOK(res1)) {
@@ -21716,6 +21774,12 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"b2Profile_broadphase_get", (PyCFunction)_wrap_b2Profile_broadphase_get, METH_O, (char *)"b2Profile_broadphase_get(b2Profile self) -> float32"},
 	 { (char *)"b2Profile_solveTOI_set", _wrap_b2Profile_solveTOI_set, METH_VARARGS, (char *)"b2Profile_solveTOI_set(b2Profile self, float32 solveTOI)"},
 	 { (char *)"b2Profile_solveTOI_get", (PyCFunction)_wrap_b2Profile_solveTOI_get, METH_O, (char *)"b2Profile_solveTOI_get(b2Profile self) -> float32"},
+	 { (char *)"b2Profile_velocityIterations_set", _wrap_b2Profile_velocityIterations_set, METH_VARARGS, (char *)"b2Profile_velocityIterations_set(b2Profile self, int32 velocityIterations)"},
+	 { (char *)"b2Profile_velocityIterations_get", (PyCFunction)_wrap_b2Profile_velocityIterations_get, METH_O, (char *)"b2Profile_velocityIterations_get(b2Profile self) -> int32"},
+	 { (char *)"b2Profile_positionIterations_set", _wrap_b2Profile_positionIterations_set, METH_VARARGS, (char *)"b2Profile_positionIterations_set(b2Profile self, int32 positionIterations)"},
+	 { (char *)"b2Profile_positionIterations_get", (PyCFunction)_wrap_b2Profile_positionIterations_get, METH_O, (char *)"b2Profile_positionIterations_get(b2Profile self) -> int32"},
+	 { (char *)"b2Profile_contactsSolved_set", _wrap_b2Profile_contactsSolved_set, METH_VARARGS, (char *)"b2Profile_contactsSolved_set(b2Profile self, int32 contactsSolved)"},
+	 { (char *)"b2Profile_contactsSolved_get", (PyCFunction)_wrap_b2Profile_contactsSolved_get, METH_O, (char *)"b2Profile_contactsSolved_get(b2Profile self) -> int32"},
 	 { (char *)"new_b2Profile", (PyCFunction)_wrap_new_b2Profile, METH_NOARGS, (char *)"new_b2Profile() -> b2Profile"},
 	 { (char *)"delete_b2Profile", (PyCFunction)_wrap_delete_b2Profile, METH_O, (char *)"delete_b2Profile(b2Profile self)"},
 	 { (char *)"b2Profile_swigregister", b2Profile_swigregister, METH_VARARGS, NULL},
@@ -21791,7 +21855,7 @@ static PyMethodDef SwigMethods[] = {
 		"Register a routine for debug drawing. The debug draw functions are called inside with  b2World::DrawDebugDatamethod. The debug draw object is owned by you and must remain in scope.\n"
 		""},
 	 { (char *)"b2World_Step", (PyCFunction) _wrap_b2World_Step, METH_VARARGS | METH_KEYWORDS, (char *)"\n"
-		"b2World_Step(b2World self, float32 timeStep, int32 velocityIterations, int32 positionIterations)\n"
+		"b2World_Step(b2World self, float32 timeStep, int32 velocityIterations, int32 positionIterations, float32 velocityThreshold, float32 positionThreshold)\n"
 		"\n"
 		"Take a time step. This performs collision detection, integration, and constraint solution.\n"
 		"\n"
