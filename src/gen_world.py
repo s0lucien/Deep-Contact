@@ -65,7 +65,7 @@ class GenRandomCirclesWorld:
                             + " out of " + str(n) + " circles could fit")
 
 
-class GenCenteredAroundCenterCirclesWorld:
+class GenClusteredCirclesWorld:
     def __init__(self, world: b2World, sigma=None, mu=None):
         self.world = world
         self.sigma = sigma

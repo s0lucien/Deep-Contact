@@ -20,13 +20,13 @@
 # misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-from pgu.settings import uiSettings
+from .pgu.settings import uiSettings
 
 class fwSettings(uiSettings):
 
     # Physics options
-    timeStep = 1e-4
-    hz=1/timeStep
+    d_t = 1e-3
+    hz=1/d_t
     velocityIterations = 1000
     positionIterations = 1000
     # Makes physics results more accurate (see Box2D wiki)

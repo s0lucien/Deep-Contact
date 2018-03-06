@@ -18,9 +18,9 @@ checkboxes = (("Warm Starting", "enableWarmStarting"),
               ("Single Step", "singleStep"))
 
 sliders = [
-    {'name': 'hz', 'text': 'Hertz', 'min': 5, 'max': 200},
-    {'name': 'positionIterations', 'text': 'Pos Iters', 'min': 0, 'max': 100},
-    {'name': 'velocityIterations', 'text': 'Vel Iters', 'min': 1, 'max': 500},
+    {'name': 'hz', 'text': 'Hertz', 'min': 5, 'max': 10000},
+    {'name': 'positionIterations', 'text': 'Pos Iters', 'min': 0, 'max': 10000},
+    {'name': 'velocityIterations', 'text': 'Vel Iters', 'min': 1, 'max': 50000},
 ]
 
 class uiSettings(object):
