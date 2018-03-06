@@ -93,8 +93,6 @@ class FrameworkBase(b2ContactListener):
     TEXTLINE_START = 30
     colors = {
         'mouse_point': b2Color(0, 1, 0),
-        'bomb_center': b2Color(0, 0, 1.0),
-        'bomb_line': b2Color(0, 1.0, 1.0),
         'joint_line': b2Color(0.8, 0.8, 0.8),
         'contact_add': b2Color(0.3, 0.95, 0.3),
         'contact_persist': b2Color(0.3, 0.3, 0.95),
@@ -107,11 +105,8 @@ class FrameworkBase(b2ContactListener):
         # Box2D-related
         self.points = []
         self.world = None
-        self.bomb = None
         self.mouseJoint = None
         self.settings = fwSettings
-        self.bombSpawning = False
-        self.bombSpawnPoint = None
         self.mouseWorld = None
         self.using_contacts = False
         self.stepCount = 0
@@ -200,12 +195,8 @@ class FrameworkBase(b2ContactListener):
 
         self.world.DrawDebugData()
 
-        # If the bomb is frozen, get rid of it.
-        if self.bomb and not self.bomb.awake:
-            self.world.DestroyBody(self.bomb)
-            self.bomb = None
 
-        # Take care of additional drawing (fps, mouse joint, slingshot bomb,
+        # Take care of additional drawing (fps, mouse joint,
         # contact points)
 
         if renderer:
@@ -221,13 +212,6 @@ class FrameworkBase(b2ContactListener):
                                    self.colors['mouse_point'])
                 renderer.DrawSegment(p1, p2, self.colors['joint_line'])
 
-            # Draw the slingshot bomb
-            if self.bombSpawning:
-                renderer.DrawPoint(renderer.to_screen(self.bombSpawnPoint),
-                                   settings.pointSize, self.colors['bomb_center'])
-                renderer.DrawSegment(renderer.to_screen(self.bombSpawnPoint),
-                                     renderer.to_screen(self.mouseWorld),
-                                     self.colors['bomb_line'])
 
             # Draw each of the contact points in different colors.
             if self.settings.drawContactPoints:
@@ -294,8 +278,6 @@ class FrameworkBase(b2ContactListener):
         """
         self.mouseWorld = p
 
-        if not self.mouseJoint:
-            self.SpawnBomb(p)
 
     def MouseDown(self, p):
         """
@@ -331,8 +313,6 @@ class FrameworkBase(b2ContactListener):
             self.world.DestroyJoint(self.mouseJoint)
             self.mouseJoint = None
 
-        if self.bombSpawning:
-            self.CompleteBombSpawn(p)
 
     def MouseMove(self, p):
         """
@@ -342,56 +322,6 @@ class FrameworkBase(b2ContactListener):
         if self.mouseJoint:
             self.mouseJoint.target = p
 
-    def SpawnBomb(self, worldPt):
-        """
-        Begins the slingshot bomb by recording the initial position.
-        Once the user drags the mouse and releases it, then
-        CompleteBombSpawn will be called and the actual bomb will be
-        released.
-        """
-        self.bombSpawnPoint = worldPt.copy()
-        self.bombSpawning = True
-
-    def CompleteBombSpawn(self, p):
-        """
-        Create the slingshot bomb based on the two points
-        (from the worldPt passed to SpawnBomb to p passed in here)
-        """
-        if not self.bombSpawning:
-            return
-        multiplier = 30.0
-        vel = self.bombSpawnPoint - p
-        vel *= multiplier
-        self.LaunchBomb(self.bombSpawnPoint, vel)
-        self.bombSpawning = False
-
-    def LaunchBomb(self, position, velocity):
-        """
-        A bomb is a simple circle which has the specified position and velocity.
-        position and velocity must be b2Vec2's.
-        """
-        if self.bomb:
-            self.world.DestroyBody(self.bomb)
-            self.bomb = None
-
-        self.bomb = self.world.CreateDynamicBody(
-            allowSleep=True,
-            position=position,
-            linearVelocity=velocity,
-            fixtures=b2FixtureDef(
-                shape=b2CircleShape(radius=0.3),
-                density=20,
-                restitution=0.1)
-
-        )
-
-    def LaunchRandomBomb(self):
-        """
-        Create a new bomb and launch it at the testbed.
-        """
-        p = b2Vec2(b2Random(-15.0, 15.0), 30.0)
-        v = -5.0 * p
-        self.LaunchBomb(p, v)
 
     def SimulationLoop(self):
         """
