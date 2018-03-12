@@ -1,5 +1,7 @@
 build/*
 dist/*
+library/*
+Box2D/Box2D_wrap.*
 *.py[oc]
 *.swo
 *.swp

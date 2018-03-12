@@ -49,6 +49,9 @@ b2World::b2World(const b2Vec2& gravity)
 	m_continuousPhysics = true;
 	m_subStepping = false;
 
+    m_velocityThreshold = 0.0;
+    m_positionThreshold = FLT_MAX;
+
 	m_stepComplete = true;
 
 	m_allowSleep = true;
@@ -903,8 +906,7 @@ void b2World::SolveTOI(const b2TimeStep& step)
 	}
 }
 
-void b2World::Step(float32 dt, int32 velocityIterations, int32 positionIterations,
-                   float32 velocityThreshold, float32 positionThreshold)
+void b2World::Step(float32 dt, int32 velocityIterations, int32 positionIterations)
 {
 	b2Timer stepTimer;
 
@@ -921,8 +923,8 @@ void b2World::Step(float32 dt, int32 velocityIterations, int32 positionIteration
 	step.dt = dt;
 	step.velocityIterations	= velocityIterations;
 	step.positionIterations = positionIterations;
-    step.velocityThreshold = velocityThreshold;
-    step.positionThreshold = positionThreshold;
+    step.velocityThreshold = m_velocityThreshold;
+    step.positionThreshold = m_positionThreshold;
 	if (dt > 0.0f)
 	{
 		step.inv_dt = 1.0f / dt;

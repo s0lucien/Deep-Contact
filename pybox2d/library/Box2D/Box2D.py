@@ -5549,6 +5549,9 @@ class b2Profile(object):
     solvePosition = _swig_property(_Box2D.b2Profile_solvePosition_get, _Box2D.b2Profile_solvePosition_set)
     broadphase = _swig_property(_Box2D.b2Profile_broadphase_get, _Box2D.b2Profile_broadphase_set)
     solveTOI = _swig_property(_Box2D.b2Profile_solveTOI_get, _Box2D.b2Profile_solveTOI_set)
+    velocityIterations = _swig_property(_Box2D.b2Profile_velocityIterations_get, _Box2D.b2Profile_velocityIterations_set)
+    positionIterations = _swig_property(_Box2D.b2Profile_positionIterations_get, _Box2D.b2Profile_positionIterations_set)
+    contactsSolved = _swig_property(_Box2D.b2Profile_contactsSolved_get, _Box2D.b2Profile_contactsSolved_set)
 
     def __init__(self):
         """__init__(b2Profile self) -> b2Profile"""

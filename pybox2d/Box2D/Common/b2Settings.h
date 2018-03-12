@@ -72,7 +72,7 @@ typedef double float64;
 
 /// A small length used as a collision and constraint tolerance. Usually it is
 /// chosen to be numerically significant, but visually insignificant.
-#define b2_linearSlop			0.005f
+#define b2_linearSlop			0.0005f
 
 /// A small angle used as a collision and constraint tolerance. Usually it is
 /// chosen to be numerically significant, but visually insignificant.

@@ -95,9 +95,7 @@ public:
     /// @param positionThreshold for the position constraint solver.
 	void Step(	float32 timeStep,
 				int32 velocityIterations,
-				int32 positionIterations,
-                float32 velocityThreshold,
-                float32 positionThreshold);
+				int32 positionIterations);
 
 	/// Manually clear the force buffer on all bodies. By default, forces are cleared automatically
 	/// after each call to Step. The default behavior is modified by calling SetAutoClearForces.
@@ -189,6 +187,14 @@ public:
 	/// Get the global gravity vector.
 	b2Vec2 GetGravity() const;
 
+	/// Get/set the velocity threshold
+	void SetVelocityThreshold(float32 velocityThreshold){ m_velocityThreshold = velocityThreshold; };
+    float32 GetVelocityThreshold() const { return m_velocityThreshold; }
+
+    /// Get/set the position threshold
+	void SetPositionThreshold(float32 positionThreshold){ m_positionThreshold = positionThreshold; };
+    float32 GetPositionThreshold() const { return m_positionThreshold; }
+
 	/// Is the world locked (in the middle of a time step).
 	bool IsLocked() const;
 
@@ -261,6 +267,10 @@ private:
 	bool m_warmStarting;
 	bool m_continuousPhysics;
 	bool m_subStepping;
+
+    // These are used for early stopping
+    float32 m_velocityThreshold;
+    float32 m_positionThreshold;
 
 	bool m_stepComplete;
 
