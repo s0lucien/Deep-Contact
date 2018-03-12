@@ -66,7 +66,8 @@ class GenRandomCirclesWorld:
 
 
 class GenClusteredCirclesWorld:
-    def __init__(self, world: b2World, sigma=None, mu=None):
+    def __init__(self, world: b2World, sigma=None, mu=None, seed=None):
+        np.random.seed(seed) # Might misbehave if running multiple world generators simultaneously
         self.world = world
         self.sigma = sigma
         self.max_consec_tries = 100
