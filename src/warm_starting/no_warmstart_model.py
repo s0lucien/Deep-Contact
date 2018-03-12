@@ -1,14 +1,13 @@
-from model import Model
+from .model import Model
 
-class VanillaModel (Model):
+class NoWarmStartModel (Model):
     def __init__(self):
         pass
 
-    def Step(self, world, timeStep, velocityIterations, positionIterations,
-             velocityThreshold, positionThreshold):
+    def Step(self, world, timeStep, velocityIterations, positionIterations):
         pass
 
-    # Set all starting iterates to 0
+    # Set all starting iterates to 0, effectively disabling warmstart
     def Predict(self, contact):
         predictions = []
 

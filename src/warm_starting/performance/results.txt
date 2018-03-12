@@ -1,0 +1,82 @@
+----- No WarmStart -----
+Velocity:
+Total   = 1166457
+Average = 1166.46
+Median  = 568
+Std     = 1641.85
+
+Position:
+Total   = 334407
+Average = 334.41
+Median  = 3
+Std     = 1641.85
+
+
+----- Builtin -----
+Velocity:
+Total   = 316858
+Average = 316.86
+Median  = 228
+Std     = 847.31
+
+Position:
+Total   = 401306
+Average = 401.31
+Median  = 6
+Std     = 847.31
+
+
+----- Bad -----
+Velocity:
+Total   = 2642839
+Average = 2642.84
+Median  = 2030
+Std     = 2776.01
+
+Position:
+Total   = 281918
+Average = 281.92
+Median  = 5
+Std     = 2776.01
+
+
+----- Random -----
+Velocity:
+Total   = 961548
+Average = 961.55
+Median  = 713
+Std     = 1165.33
+
+Position:
+Total   = 266077
+Average = 266.08
+Median  = 4
+Std     = 1165.33
+
+
+----- Parallel -----
+Velocity:
+Total   = 695123
+Average = 695.12
+Median  = 480
+Std     = 935.40
+
+Position:
+Total   = 360606
+Average = 360.61
+Median  = 6
+Std     = 935.40
+
+
+----- Copy -----
+Velocity:
+Total   = 108995
+Average = 109.00
+Median  = 72
+Std     = 779.39
+
+Position:
+Total   = 267825
+Average = 267.82
+Median  = 3
+Std     = 779.39

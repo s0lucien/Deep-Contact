@@ -1,5 +1,5 @@
-from model import Model
-from util import copyWorld
+from .model import Model
+from .util import copyWorld
 
 class CopyWorldModel (Model):
     def __init__(self):
@@ -7,12 +7,10 @@ class CopyWorldModel (Model):
 
     # Creates a copy of the world, tells it to take a step
     # and prepares a dictionary with impulse-results for use by Predict
-    def Step(self, world, timeStep, velocityIterations, positionIterations,
-             velocityThreshold, positionThreshold):
+    def Step(self, world, timeStep, velocityIterations, positionIterations):
         copy = copyWorld(world)
-        copy.enableContinuous = False
 
-        copy.Step(timeStep, velocityIterations, positionIterations, velocityThreshold, positionThreshold)
+        copy.Step(timeStep, velocityIterations, positionIterations)
 
         self.predictions = {}
         for c in copy.contacts:

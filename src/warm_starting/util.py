@@ -4,7 +4,12 @@ from Box2D import (b2Vec2)
 
 # Creates a copy of the given world by creating copies of all bodies
 def copyWorld(world):
-    copy = b2World(world.gravity)
+    copy = b2World(gravity=world.gravity, doSleep=world.allowSleeping)
+
+    copy.enableContinuous  = world.enableContinuous
+
+    copy.velocityThreshold = world.velocityThreshold
+    copy.positionThreshold = world.positionThreshold
 
     for body in world.bodies:
         fixtures = []

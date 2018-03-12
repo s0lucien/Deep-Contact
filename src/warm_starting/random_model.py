@@ -1,4 +1,4 @@
-from model import Model
+from .model import Model
 
 import random
 
@@ -8,8 +8,7 @@ class RandomModel (Model):
         random.seed(seed)
         pass
 
-    def Step(self, world, timeStep, velocityIterations, positionIterations,
-             velocityThreshold, positionThreshold):
+    def Step(self, world, timeStep, velocityIterations, positionIterations):
         pass
 
     # Predicts a random, some-what 'reasonable' set of impulses

@@ -1,74 +1,59 @@
 import time
 import numpy as np
 
-from vanilla_model import VanillaModel
-from bad_model import BadModel
-from random_model import RandomModel
-from parallel_world_model import ParallelWorldModel
-from copy_world_model import CopyWorldModel
+from .no_warmstart_model import NoWarmStartModel
+from .builtin_warmstart_model import BuiltinWarmStartModel
+from .bad_model import BadModel
+from .random_model import RandomModel
+from .parallel_world_model import ParallelWorldModel
+from .copy_world_model import CopyWorldModel
 
 from Box2D import (b2World)
-from Box2D import (b2_dynamicBody)
-from Box2D import (b2FixtureDef)
-from Box2D import (b2PolygonShape, b2CircleShape)
+from Box2D import (b2LoopShape)
 from Box2D import (b2ContactListener)
+from Box2D import (b2Vec2)
 
-
+from ..gen_world import GenClusteredCirclesWorld
+from ..sim_types import BodyData
 
 # ----- World Creation -----
 # Create world
-world = b2World(gravity=(0, -10), doSleep=True)
+world = b2World(gravity=(0, -10), doSleep=False)
 
 world.enableContinuous   = False
 world.subStepping        = False
 world.enableWarmStarting = True
 
 # Create static box
-width = 30
-world.CreateStaticBody(
-    position=(0, 0),
-    shapes=[
-        b2PolygonShape(box=(0.5, width, (width, 0), 0)),
-        b2PolygonShape(box=(0.5, width, (-width, 0), 0)),
-        b2PolygonShape(box=(width, 0.5, (0, -width), 0)),
-    ],
-    userData="0"
+xlow, xhi = -30, 30
+ylow, yhi = 0, 60
+
+ground = world.CreateBody(
+    shapes=b2LoopShape(
+        vertices=[(xhi, ylow), (xhi, yhi), (xlow, yhi), (xlow, ylow)]
+    )
 )
 
-# Create 'N' objects in world of type 'shape'
-circle = b2CircleShape(radius=0.8)
-box = b2PolygonShape(box=(0.6, 0.6))
-shape = circle
+# Populate the world
+N = 100
+seed = 100
+gen = GenClusteredCirclesWorld(world, seed=seed)
+sigma_coef = 1.2
+gen.new(N, b2Vec2(xlow,ylow),  b2Vec2(xhi,yhi), 1, 1, sigma_coef)
 
-fixture = b2FixtureDef(shape=shape, density=1, restitution=0, friction=0.5)
-
-N = 200 # Number of bodies in simulation
-layers = min(2*width, N // (width-2) + (0 if N%width==0 else 1))
-count = 1
-for y in range(layers):
-    for x in range(width-2):
-        if count > N:
-            break
-        world.CreateBody(type=b2_dynamicBody, fixtures=fixture, userData=str(count),
-                         position=(width-4-2*x + (1 if y%2==0 else 0), 2*y))
-        count += 1
+b_ix = 0
+for b in world.bodies:
+    b.userData = BodyData(b_ix)
+    b_ix += 1
 
 
 
-# ----- Warm-Starting -----
+# ----- Warm-Starting Listener -----
 class WarmStartListener(b2ContactListener):
     def __init__(self, model):
         super(WarmStartListener, self).__init__()
 
         self.model = model
-
-    def BeginContact(self, contact):
-        #print("Begin")
-        pass
-
-    def EndContact(self, contact):
-        #print("End")
-        pass
 
     def PreSolve(self, contact, old_manifold):
         #print("Pre")
@@ -83,45 +68,43 @@ class WarmStartListener(b2ContactListener):
                     point.normalImpulse = normal
                     point.tangentImpulse = tangent
 
-    def PostSolve(self, contact, impulse):
-        #print("Post")
-        pass
-
 
 
 # ----- Run -----
+timeStep = 1.0 / 100
+velocityIterations = 20000
+positionIterations = 10000
+world.velocityThreshold = 10**-5
+world.positionThreshold = 10**-6
+steps = 1000
+
 # Choose a model
-#model = VanillaModel()
+#model = NoWarmStartModel()
+#model = BuiltinWarmStartModel()
 #model = BadModel()
 #model = RandomModel(0)
-model = ParallelWorldModel(world)
-#model = CopyWorldModel()
+#model = ParallelWorldModel(world)
+model = CopyWorldModel()
 
 # Create and attach listener
 world.contactListener = WarmStartListener(model)
 
-# Run the simulation
-timeStep = 1.0 / 100
-velocityIterations = 20000
-positionIterations = 10000
-velocityThreshold = 10**-5
-positionThreshold = 10**-6
 
+# Run the simulation
 totalVelocityIterations = []
 totalPositionIterations = []
 contactsSolved = []
 totalContacts = []
 times = []
-steps = 800
 for i in range(steps):
     print("step", i)
 
     # Tell the model to take a step
     step = time.time()
-    model.Step(world, timeStep, velocityIterations, positionIterations, velocityThreshold, positionThreshold)
+    model.Step(world, timeStep, velocityIterations, positionIterations)
 
     # Tell the world to take a step
-    world.Step(timeStep, velocityIterations, positionIterations, velocityThreshold, positionThreshold)
+    world.Step(timeStep, velocityIterations, positionIterations)
     world.ClearForces()
     step = time.time() - step
 
@@ -142,6 +125,8 @@ for i in range(steps):
 
     print("Contacts: %d, solved: %d, vel_iter: %d, pos_iter: %d" % (nc, profile.contactsSolved, profile.velocityIterations, profile.positionIterations))
 
+
+# Process stuff
 velocityIterationsPerContact = [0 if c == 0 else v / c for c, v in zip(contactsSolved, totalVelocityIterations)]
 positionIterationsPerContact = [0 if c == 0 else p / c for c, p in zip(contactsSolved, totalPositionIterations)]
 
@@ -158,16 +143,17 @@ positionStd    = np.std(totalPositionIterations)
 print("\nVelocity: \nTotal   = %d \nAverage = %.2f \nMedian  = %d \nStd     = %.2f" % (velocityTotal, velocityMean, velocityMedian, velocityStd))
 print("\nPosition: \nTotal   = %d \nAverage = %.2f \nMedian  = %d \nStd     = %.2f" % (positionTotal, positionMean, positionMedian, velocityStd))
 
+
 # Plot stuff
 import matplotlib.pyplot as plt
 
-start = 200
+start = 0
 
 def pretty(s):
     return '{0:.0E}'.format(s)
 
 fig = plt.figure()
-title = "N = " + str(N) + ", dt = " + pretty(timeStep) + ", vel_iter = " + pretty(velocityIterations) + ", pos_iter = " + pretty(positionIterations) + ", vel_thres = " + pretty(velocityThreshold) + ", pos_thres = " + pretty(positionThreshold)
+title = "N = " + str(N) + ", dt = " + pretty(timeStep) + ", vel_iter = " + pretty(velocityIterations) + ", pos_iter = " + pretty(positionIterations) + ", vel_thres = " + pretty(world.velocityThreshold) + ", pos_thres = " + pretty(world.positionThreshold)
 fig.suptitle(title)
 
 # Velocity iterations

@@ -1,11 +1,10 @@
-from model import Model
+from .model import Model
 
 class BadModel (Model):
     def __init__(self):
         pass
 
-    def Step(self, world, timeStep, velocityIterations, positionIterations,
-             velocityThreshold, positionThreshold):
+    def Step(self, world, timeStep, velocityIterations, positionIterations):
         pass
 
     # Provides a bad prediction irregardless of input

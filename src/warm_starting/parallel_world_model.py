@@ -1,5 +1,5 @@
-from model import Model
-from util import copyWorld
+from .model import Model
+from .util import copyWorld
 
 from Box2D import (b2World)
 from Box2D import (b2FixtureDef)
@@ -9,13 +9,11 @@ class ParallelWorldModel (Model):
     # Creates a copy of the given world by creating copies of all bodies
     def __init__(self, world):
         self.world = copyWorld(world)
-        self.world.enableContinuous = False
         self.world.enableWarmStarting = True
 
     # Takes a step and prepares a dictionary with impulse-results for use by Predict
-    def Step(self, world, timeStep, velocityIterations, positionIterations,
-             velocityThreshold, positionThreshold):
-        self.world.Step(timeStep, velocityIterations, positionIterations, velocityThreshold, positionThreshold)
+    def Step(self, world, timeStep, velocityIterations, positionIterations):
+        self.world.Step(timeStep, velocityIterations, positionIterations)
 
         self.predictions = {}
         for c in self.world.contacts:
