@@ -101,6 +101,7 @@ class XMLExporter:
         cfg = Element('configuration')
         cfg.set("name",str(self.simData.name))
         cfg.set("time",str(self.simData.sim_t))
+        cfg.set("dt",str(self.simData.dt))
         for b in self.world.bodies:
             xb = body_2_xml(b)
             if xb is not None:
@@ -128,6 +129,6 @@ class XMLExporter:
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
-        file = os.path.join(directory,str(self.simData.step)+".xml")
+        file = os.path.join(directory,self.simData.name+"_"+str(self.simData.step)+".xml")
         with open(file,"w") as f:
             f.write(xml)

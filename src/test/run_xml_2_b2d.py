@@ -1,7 +1,5 @@
-from sim_types import BodyData, dcCircleShape , dcLoopShape
-
 XML = r"""<?xml version="1.0" ?>
-<configuration name="xml_config" time="0.05">
+<configuration dt="0.01" name="xml_config" time="0.05">
   <body index="0" type="fixed">
     <mass value="0.0"/>
     <position x="0.0" y="0.0"/>
@@ -41,6 +39,7 @@ XML = r"""<?xml version="1.0" ?>
   </contact>
 </configuration>"""
 
+from sim_types import BodyData, dcCircleShape , dcLoopShape
 import xml.etree.ElementTree as ET
 from Box2D import b2World, b2FixtureDef, b2CircleShape, b2Vec2, b2ChainShape
 
@@ -48,6 +47,9 @@ world = b2World(doSleep=True)
 world.gravity = (0, -9.81)
 
 tree = ET.ElementTree(ET.fromstring(XML))
+
+name = tree.getroot().attrib['name']
+time = tree.getroot().attrib['time']
 for body in tree.getroot().findall("body"):
     id = int(body.attrib["index"])
     type = body.attrib["type"]
@@ -79,4 +81,4 @@ for body in tree.getroot().findall("body"):
     bod.inertia = inertia
     bod.angularVelocity = spin
 
-print(tree)
+print("no error")

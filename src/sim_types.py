@@ -15,14 +15,14 @@ class SimData:
         self.sim_t=0
         self.wall_t=0
         self.step = 0
-        self.d_t = d_t
+        self.dt = d_t
         self.ticking=False
 
 
     def tick(self,s=1):
         self.ticking=True
         self.step += s
-        self.sim_t += s * self.d_t
+        self.sim_t += s * self.dt
         self.init_t = time()
 
     def tock(self):
