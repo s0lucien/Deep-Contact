@@ -39,7 +39,7 @@ def body_2_xml(body: b2Body):
 
         # shape
         shape = SubElement(body_xml, 'shape')
-        shape.set('value', ' '.join(str(body.fixtures[0].shape).split()).replace('\n', ' ').replace('\r', ''))
+        shape.set('value', str(body.userData.shape))
         return body_xml
     except AttributeError:
         print("body without id encountered")

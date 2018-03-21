@@ -1,8 +1,7 @@
 
 
 from ..framework import (Framework, main)
-from ..sim_types import BodyData
-from ..gen_world import GenClusteredCirclesWorld
+from ..gen_world import new_confined_clustered_circles_world
 from Box2D import (b2LoopShape, b2Vec2)
 
 
@@ -13,24 +12,15 @@ class Confined(Framework):
         self.name = "Random balls centre falling"
         xlow, xhi = -20, 20
         ylow, yhi = 0, 40
+        n_circles = 100
+        sigma_coef = 1.3
 
-        # The ground
-        ground = self.world.CreateBody(
-            shapes=b2LoopShape(
-                vertices=[(xhi, ylow), (xhi, yhi), (xlow, yhi), (xlow, ylow)]
-            )
-        )
-
-        gen = GenClusteredCirclesWorld(self.world)
-        sigma_coef = 1.2
-        gen.new(100, b2Vec2(xlow,ylow),  b2Vec2(xhi,yhi), 1, 1, sigma_coef)
-        self.world.gravity = (0, -9.81)
-
-        b_ix = 0
-        for b in self.world.bodies:
-            b.userData = BodyData(b_ix)
-            b_ix += 1
-
+        new_confined_clustered_circles_world(self.world, n_circles,
+                                             p_ll=b2Vec2(xlow,ylow),
+                                             p_hr=b2Vec2(xhi,yhi),
+                                             radius_range=(1,1), sigma=sigma_coef,
+                                             seed=None)
+        print("finished world generation -- break here if you need to :)")
 
     def Step(self, settings):
         super(Confined, self).Step(settings)

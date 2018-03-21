@@ -13,7 +13,7 @@ from Box2D import (b2LoopShape)
 from Box2D import (b2ContactListener)
 from Box2D import (b2Vec2)
 
-from ..gen_world import GenClusteredCirclesWorld
+from ..gen_world import GenClusteredCirclesRegion
 from ..sim_types import BodyData
 
 # ----- World Creation -----
@@ -37,7 +37,7 @@ ground = world.CreateBody(
 # Populate the world
 N = 100
 seed = 100
-gen = GenClusteredCirclesWorld(world, seed=seed)
+gen = GenClusteredCirclesRegion(world, seed=seed)
 sigma_coef = 1.2
 gen.new(N, b2Vec2(xlow,ylow),  b2Vec2(xhi,yhi), 1, 1, sigma_coef)
 
