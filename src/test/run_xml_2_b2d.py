@@ -1,3 +1,5 @@
+from sim_types import BodyData, dcCircleShape , dcLoopShape
+
 XML = r"""<?xml version="1.0" ?>
 <configuration name="xml_config" time="0.05">
   <body index="0" type="fixed">
@@ -42,16 +44,39 @@ XML = r"""<?xml version="1.0" ?>
 import xml.etree.ElementTree as ET
 from Box2D import b2World, b2FixtureDef, b2CircleShape, b2Vec2, b2ChainShape
 
+world = b2World(doSleep=True)
+world.gravity = (0, -9.81)
+
 tree = ET.ElementTree(ET.fromstring(XML))
 for body in tree.getroot().findall("body"):
+    id = int(body.attrib["index"])
+    type = body.attrib["type"]
     p = body.find("position")
-    px,py = p.attrib['x'],p.attrib['y']
+    px,py = float(p.attrib['x']),float(p.attrib['y'])
     v = body.find("velocity")
-    vx,vy = v.attrib['vx'],v.attrib['vy']
+    vx,vy = float(v.attrib['vx']),float(v.attrib['vy'])
     shape=body.find("shape").attrib['value']
-    spin =body.find("spin").attrib['omega']
-    mass = body.find("mass").attrib['value']
-    orientation = body.find("orientation").attrib['theta']
-    inertia = body.find("inertia").attrib['value']
+    spin = float(body.find("spin").attrib['omega'])
+    mass = float(body.find("mass").attrib['value'])
+    orientation = float(body.find("orientation").attrib['theta'])
+    inertia = float(body.find("inertia").attrib['value'])
+
+    if type == "free":
+        bod = world.CreateDynamicBody(
+                        position= b2Vec2(px,py),
+                        fixtures=eval(shape).fixture,
+                    )
+    elif type == "fixed":
+        bod = world.CreateStaticBody(
+            position=b2Vec2(px, py),
+            fixtures=eval(shape).fixture,
+        )
+
+    bod.userData = BodyData(b_id=id, shape=shape)
+    bod.mass = mass
+    bod.linearVelocity = b2Vec2(vx,vy)
+    bod.angle = orientation
+    bod.inertia = inertia
+    bod.angularVelocity = spin
 
 print(tree)

@@ -3,9 +3,9 @@ from Box2D import b2FixtureDef, b2CircleShape, b2LoopShape, b2World
 
 
 class BodyData:
-    def __init(self, b_id=None, shape=None):
+    def __init__(self, b_id=None, shape=None):
         self.id = b_id
-        self.shape= shape
+        self.shape = shape
 
 
 class SimData:

@@ -9,8 +9,13 @@ def body_2_xml(body: b2Body):
     try:
         body_xml = Element('body')
         body_xml.set('index', str(body.userData.id))
-
-        body_xml.set('type', 'free' if body.type is b2_dynamicBody else 'fixed')
+        if body.type is b2_dynamicBody :
+            type  = 'free'
+        elif body.type is 0:
+            type = 'fixed'
+        else :
+            raise Exception("unidentified body type encountered")
+        body_xml.set('type', type)
 
         # mass
         mass = SubElement(body_xml, 'mass')
