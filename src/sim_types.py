@@ -9,7 +9,7 @@ class BodyData:
 
 
 class SimData:
-    def __init__(self, name,d_t=10e-3):
+    def __init__(self, name="dcSim2D",d_t=10e-3):
         self.init_t=time()
         self.name = name
         self.sim_t=0

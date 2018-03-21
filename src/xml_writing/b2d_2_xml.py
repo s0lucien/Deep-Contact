@@ -5,6 +5,7 @@ from xml.dom import minidom
 import os, errno
 from sim_types import SimData
 
+
 def body_2_xml(body: b2Body):
     try:
         body_xml = Element('body')

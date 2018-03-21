@@ -39,46 +39,29 @@ XML = r"""<?xml version="1.0" ?>
   </contact>
 </configuration>"""
 
-from sim_types import BodyData, dcCircleShape , dcLoopShape
-import xml.etree.ElementTree as ET
-from Box2D import b2World, b2FixtureDef, b2CircleShape, b2Vec2, b2ChainShape
+def _unidiff_output(expected, actual):
+    """
+    Helper function. Returns a string containing the unified diff of two multiline strings.
+    """
 
-world = b2World(doSleep=True)
-world.gravity = (0, -9.81)
+    import difflib
+    expected=expected.splitlines(1)
+    actual=actual.splitlines(1)
 
-tree = ET.ElementTree(ET.fromstring(XML))
+    diff=difflib.unified_diff(expected, actual)
 
-name = tree.getroot().attrib['name']
-time = tree.getroot().attrib['time']
-for body in tree.getroot().findall("body"):
-    id = int(body.attrib["index"])
-    type = body.attrib["type"]
-    p = body.find("position")
-    px,py = float(p.attrib['x']),float(p.attrib['y'])
-    v = body.find("velocity")
-    vx,vy = float(v.attrib['vx']),float(v.attrib['vy'])
-    shape=body.find("shape").attrib['value']
-    spin = float(body.find("spin").attrib['omega'])
-    mass = float(body.find("mass").attrib['value'])
-    orientation = float(body.find("orientation").attrib['theta'])
-    inertia = float(body.find("inertia").attrib['value'])
+    return ''.join(diff)
 
-    if type == "free":
-        bod = world.CreateDynamicBody(
-                        position= b2Vec2(px,py),
-                        fixtures=eval(shape).fixture,
-                    )
-    elif type == "fixed":
-        bod = world.CreateStaticBody(
-            position=b2Vec2(px, py),
-            fixtures=eval(shape).fixture,
-        )
 
-    bod.userData = BodyData(b_id=id, shape=shape)
-    bod.mass = mass
-    bod.linearVelocity = b2Vec2(vx,vy)
-    bod.angle = orientation
-    bod.inertia = inertia
-    bod.angularVelocity = spin
+from xml_writing.xml_2_b2d import XMLImporter
+from xml_writing.b2d_2_xml import XMLExporter, prettify
 
-print("no error")
+loader = XMLImporter(XML)
+world = loader.world
+loader.load()
+exporter = XMLExporter(world,export_root=".")
+snap = exporter.snapshot()
+re_exported = prettify(snap)
+
+print ("diff should only be the contacts:\n",_unidiff_output(XML, re_exported))
+print("\n\n",re_exported)
