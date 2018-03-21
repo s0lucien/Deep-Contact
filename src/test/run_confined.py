@@ -1,11 +1,10 @@
 from ..framework import (
     Framework,
-    Keys,
     main,
 )
-from Box2D import (b2LoopShape)
+from Box2D import (b2Vec2)
 from sim_types import BodyData
-from gen_world import create_circle
+from gen_world import create_circle, create_fixed_box
 
 
 class Confined(Framework):
@@ -17,11 +16,7 @@ class Confined(Framework):
         ylow, yhi = 0, 40
 
         # The ground
-        ground = self.world.CreateBody(
-            shapes=b2LoopShape(
-                vertices=[(xhi, ylow), (xhi, yhi), (xlow, yhi), (xlow, ylow)]
-            )
-        )
+        ground = create_fixed_box(self.world,p_ll=b2Vec2(xlow,ylow), p_hr=b2Vec2(xhi,yhi))
 
         # The bodies
         radius = 1
@@ -40,7 +35,7 @@ class Confined(Framework):
         b_ix = -1
         for b in self.world.bodies:
             b_ix += 1
-            b.userData = BodyData(b_ix)
+            b.userData.id=b_ix
 
     def Step(self, settings):
         super(Confined, self).Step(settings)
