@@ -11,3 +11,11 @@ A3D = np.asarray([[1, 3, 5, 7 ],
 print("3D poly6:\n",W_poly6_3D(A3D,6))
 print("3D poly6 gradient:\n",nablaW_poly6_3D(A3D,6))
 print("3D poly6 Laplacian:\n",nabla2W_poly6_3D(A3D,6))
+
+h=10
+import matplotlib.pyplot as plt
+Xnorms = np.mgrid[-h:h:0.1]
+X = np.c_[Xnorms.T, np.zeros(Xnorms.T.shape)]
+
+plt.plot (X,  W_poly6_2D(X.T,h))
+plt.show()
