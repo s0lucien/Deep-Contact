@@ -33,6 +33,7 @@ def create_fixed_box(world,p_ll:b2Vec2, p_hr:b2Vec2,pos=(0,0)):
 def new_confined_clustered_circles_world(world, n_bodies, p_ll , p_hr, radius_range, sigma, seed=None):
     '''
     Use this as the entry point generator. This uses the others classes in this file to generate a world
+    radius_range = 2d tuple/array that holds minimum and maximum range for the circles
     '''
     create_fixed_box(world,p_ll,p_hr)
     GenClusteredCirclesRegion(world, seed).fill(n_bodies,p_ll,p_hr,radius_range, sigma_coef=sigma)
