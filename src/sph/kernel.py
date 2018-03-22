@@ -27,7 +27,7 @@ def W_poly6_2D(r, h):
 
 # ref : https://www.youtube.com/watch?v=SQPCXzqH610
 def W_poly6_3D(r, h):
-    #assert r.shape[0]==3 # we will use this in 2D as well
+    assert r.shape[0]==3
     r_norm = np.linalg.norm(r,axis=0)
     W = np.zeros(r_norm.shape)
     W_i = np.where(h >= r_norm)[0]
