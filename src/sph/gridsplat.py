@@ -2,7 +2,7 @@ import numpy as np
 from Box2D import b2World, b2_dynamicBody
 from scipy import spatial
 from .kernel import W_poly6_2D
-
+import pandas as pd
 
 def W_grid_poly6(world:b2World, h, p_ll, p_hr, xRes, yRes):
     '''
@@ -41,3 +41,22 @@ def W_grid_poly6(world:b2World, h, p_ll, p_hr, xRes, yRes):
                 Ws.append(tup)
             W_grid[xi, yi] += Ws  # to merge the 2 lists we don't use append
     return W_grid
+
+def body_properties(world:b2World):
+    B = np.asarray([[b.userData.id,
+                     # b.position.x,
+                     # b.position.y, # do we need positions or just the values?
+                     b.mass,
+                     b.linearVelocity.x,
+                     b.linearVelocity.y,
+                     b.inertia,
+                     b.angle,
+                     b.angularVelocity
+                     ] for b in world.bodies if b.type is b2_dynamicBody])
+
+    df = pd.DataFrame(data=B, columns=["id",
+                                       # "px","py",
+                                       "mass", "vx", "vy", "inertia", "angle", "spin"])
+    df.id = df.id.astype(int)
+    df = df.set_index("id")
+    return df
