@@ -16,6 +16,10 @@ h=10
 import matplotlib.pyplot as plt
 Xnorms = np.mgrid[-h:h:0.1]
 X = np.c_[Xnorms.T, np.zeros(Xnorms.T.shape)]
+W = W_poly6_2D(X.T,h)
 
-plt.plot (X,  W_poly6_2D(X.T,h))
+
+print("2d sum of W coefficients: ", np.sum(W))
+
+plt.plot (X,  W)
 plt.show()
