@@ -10,7 +10,7 @@ if __name__ == "__main__":
     # np.random.seed(None);st0 = np.random.get_state();print(st0);np.random.set_state(st0)
     xlow, xhi = -5, 2
     ylow, yhi = 0, 15
-    n_circles = 3
+    n_circles = 4
     sigma_coef = 1.3
     world = b2World(doSleep=False)
     world.userData=SimData("sim2grid")
@@ -19,7 +19,7 @@ if __name__ == "__main__":
                                          p_hr=b2Vec2(xhi,yhi),
                                          radius_range=(1,1), sigma=sigma_coef,
                                          seed=None)
-    while world.contactCount <2 :
+    while world.contactCount <3 :
         world.Step(0.01, 100, 100)
         logging.debug("stepped 0.1")
     df = contact_properties(world)

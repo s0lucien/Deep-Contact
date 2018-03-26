@@ -4,7 +4,8 @@ from scipy import spatial
 from .kernel import W_poly6_2D
 import pandas as pd
 
-def W_grid_poly6(world:b2World, h, p_ll, p_hr, xRes, yRes):
+
+def W_grid_poly6(world: b2World, h, p_ll, p_hr, xRes, yRes):
     '''
     splatters the points onto a grid , resulting in coefficients for every point
     :param world: b2world that contins SimData information
@@ -42,7 +43,8 @@ def W_grid_poly6(world:b2World, h, p_ll, p_hr, xRes, yRes):
             W_grid[xi, yi] += Ws  # to merge the 2 lists we don't use append
     return W_grid
 
-def body_properties(world:b2World):
+
+def body_properties(world: b2World):
     B = np.asarray([[b.userData.id,
                      # b.position.x,
                      # b.position.y, # do we need positions or just the values?
@@ -61,11 +63,32 @@ def body_properties(world:b2World):
     df = df.set_index("id")
     return df
 
-def contact_properties(world:b2World):
-    C = np.asarray([c for c in world.contacts ])
-    df = pd.DataFrame(data=B, columns=["id",
-                                       # "px","py",
-                                       "mass", "vx", "vy", "inertia", "angle", "spin"])
-    df.id = df.id.astype(int)
-    df = df.set_index("id")
+
+def contact_properties(world: b2World):
+    cs = []
+    for i in range(world.contactCount):
+        c = world.contacts[i]
+        for ii in range(c.manifold.pointCount):
+            point = c.worldManifold.points[ii]
+            manifold_point = c.manifold.points[ii]
+            normal = c.worldManifold.normal
+            normal_impulse = manifold_point.normalImpulse
+            tangent_impulse = manifold_point.tangentImpulse
+            master = c.fixtureA.body.userData.id
+            slave = c.fixtureB.body.userData.id
+            px = point[0]
+            py = point[1]
+            nx = normal[0]
+            ny = normal[1]
+            assert master != slave
+            cs.append([master, slave, px, py, nx, ny, normal_impulse, tangent_impulse])
+    C = np.asarray(cs)
+
+    if C.size == 0:
+        raise ValueError("Contacts should not be empty !!")
+    df = pd.DataFrame(data=C, columns=["master", "slave", "px", "py", "nx", "ny", "normal_impulse", "tangent_impulse"])
+    # perform some formatting on the columns
+    df.master = df.master.astype(int)
+    df.slave = df.slave.astype(int)
+    # df = df.set_index("master")  # TODO: change to composite
     return df
