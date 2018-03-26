@@ -60,3 +60,12 @@ def body_properties(world:b2World):
     df.id = df.id.astype(int)
     df = df.set_index("id")
     return df
+
+def contact_properties(world:b2World):
+    C = np.asarray([c for c in world.contacts ])
+    df = pd.DataFrame(data=B, columns=["id",
+                                       # "px","py",
+                                       "mass", "vx", "vy", "inertia", "angle", "spin"])
+    df.id = df.id.astype(int)
+    df = df.set_index("id")
+    return df
