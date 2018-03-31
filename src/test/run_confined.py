@@ -3,8 +3,8 @@ from ..framework import (
     main,
 )
 from Box2D import (b2Vec2)
-from sim_types import BodyData
-from gen_world import create_circle, create_fixed_box
+from ..sim_types import BodyData
+from ..gen_world import create_circle, create_fixed_box
 
 
 class Confined(Framework):

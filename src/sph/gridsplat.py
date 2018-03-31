@@ -3,6 +3,7 @@ from Box2D import b2World, b2_dynamicBody
 from scipy import spatial
 from .kernel import W_poly6_2D
 import pandas as pd
+import networkx as nx
 
 
 def W_grid_poly6(world: b2World, h, p_ll, p_hr, xRes, yRes):
@@ -62,6 +63,80 @@ def body_properties(world: b2World):
     df.id = df.id.astype(int)
     df = df.set_index("id")
     return df
+
+
+def contact_2_graph(world: b2World):
+    c_graph = nx.MultiDiGraph()
+    c_graph.add_nodes_from([
+        body.userData.id
+        for body in world.bodies
+    ])
+
+    index = 0
+
+    for contact in world.contacts:
+        master = contact.fixtureA.userData.id
+        slave = contact.fixtureB.userData.id
+
+        for manifold_point in contact.manifold.points:
+            index += 1
+            c_graph.add_edge(
+                master,
+                slave,
+                id=index,
+                position_x=manifold_point.position[0],
+                position_y=manifold_point.position[1],
+                normalImpuls=manifold_point.normalImpulse,
+                tangentImpulse=manifold_point.tangentImpulse,
+            )
+
+    return c_graph
+
+
+def C_grid_poly6(world: b2World, h, p_ll, p_hr, xRes, yRes):
+    '''
+    splatters the points onto a grid , resulting in coefficients for every point
+    :param world: b2world that contins SimData information
+    :param h: support radius
+    :param p_ll: lower left point of the grid
+    :param p_hr: upper right point of the grid
+    :param xRes: resolution on the horizontal axis
+    :param yRes: resolution on the vertical axis
+    :return:
+    '''
+    c_graph = contact_2_graph(world)
+
+    xlow, ylow = p_ll
+    xhi, yhi = p_hr
+    Pxy = np.asarray(
+        [
+            [contact['position_x'], contact['position_y'], contact['id']]
+            for _, contact in contacts.items()
+            for master, contacts in c_graph.adjacency()
+    ])
+
+    X, Y = np.mgrid[xlow:xhi:xRes, ylow:yhi:yRes]
+    Xsz, Ysz = X.shape
+    P_grid = np.c_[X.ravel(), Y.ravel()]
+    KDTree = spatial.cKDTree(Pxy[:, 0:2])
+    # nn contains all neighbors within range h for every grid point
+    NN = KDTree.query_ball_point(P_grid, h)
+    C_grid = np.zeros((Xsz, Ysz), dtype=object)  # TODO: change to sparse
+    for i in range(NN.shape[0]):
+        if len(NN[i]) > 0:
+            xi, yi = np.unravel_index(i, (Xsz, Ysz))
+            g_nn = NN[i]  # grid nearest neighbors
+            r = P_grid[i] - Pxy[g_nn, 0:2]  # the 3rd column is the body id
+            W = W_poly6_2D(r.T, h)
+            if W_grid[xi, yi] == 0:
+                W_grid[xi, yi] = []
+            Ws = []
+            for nni in range(len(g_nn)):
+                body_id = int(Pxy[g_nn[nni], 2])
+                tup = (body_id, W[nni])  # we store the values as tuples (body_id, W) at each grid point
+                Ws.append(tup)
+            W_grid[xi, yi] += Ws  # to merge the 2 lists we don't use append
+    return c_graph, W_grid
 
 
 def contact_properties(world: b2World):

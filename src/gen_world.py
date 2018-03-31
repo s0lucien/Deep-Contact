@@ -2,6 +2,7 @@ from Box2D import b2World, b2FixtureDef, b2CircleShape, b2Vec2
 import numpy as np
 import logging
 from .sim_types import dcCircleShape, GenWorld, dcLoopShape , BodyData
+
 logging.basicConfig(level=logging.INFO)
 
 
