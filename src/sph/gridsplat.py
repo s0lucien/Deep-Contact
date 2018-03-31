@@ -84,13 +84,26 @@ def contact_2_graph(world: b2World):
                 master,
                 slave,
                 id=index,
+                # FIXME: Not sure here, fix later if necessary
                 position_x=manifold_point.position[0],
                 position_y=manifold_point.position[1],
                 normalImpuls=manifold_point.normalImpulse,
                 tangentImpulse=manifold_point.tangentImpulse,
             )
 
-    return c_graph
+    # Translate the id to edges
+    g_dict = {}
+    for _, contacts in c_graph.adjacency():
+        for internal_id, contact in contacts.items():
+            g_dict.update({
+                contact['id']: {
+                    'master': contact['master'],
+                    'slave': contact['slave'],
+                    'internal_id': internal_id,
+                }
+            })
+
+    return c_graph, g_dict
 
 
 def C_grid_poly6(world: b2World, h, p_ll, p_hr, xRes, yRes):
@@ -104,7 +117,7 @@ def C_grid_poly6(world: b2World, h, p_ll, p_hr, xRes, yRes):
     :param yRes: resolution on the vertical axis
     :return:
     '''
-    c_graph = contact_2_graph(world)
+    c_graph, g_dict = contact_2_graph(world)
 
     xlow, ylow = p_ll
     xhi, yhi = p_hr
@@ -136,7 +149,7 @@ def C_grid_poly6(world: b2World, h, p_ll, p_hr, xRes, yRes):
                 tup = (body_id, W[nni])  # we store the values as tuples (body_id, W) at each grid point
                 Ws.append(tup)
             W_grid[xi, yi] += Ws  # to merge the 2 lists we don't use append
-    return c_graph, W_grid
+    return g_dict, W_grid
 
 
 def contact_properties(world: b2World):
