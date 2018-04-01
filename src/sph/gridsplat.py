@@ -74,6 +74,10 @@ def contact_2_graph(world: b2World):
 
     index = 0
 
+    if world.contacts is None:
+        print('No contacts.')
+        return None, None
+
     for contact in world.contacts:
         master = contact.fixtureA.userData.id
         slave = contact.fixtureB.userData.id
@@ -124,13 +128,14 @@ def C_grid_poly6(world: b2World, h, p_ll, p_hr, xRes, yRes):
     Pxy = np.asarray(
         [
             [contact['position_x'], contact['position_y'], contact['id']]
-            for _, contact in contacts.items()
             for master, contacts in c_graph.adjacency()
+            for _, contact in contacts.items()
     ])
 
     X, Y = np.mgrid[xlow:xhi:xRes, ylow:yhi:yRes]
     Xsz, Ysz = X.shape
     P_grid = np.c_[X.ravel(), Y.ravel()]
+    print(Pxy)
     KDTree = spatial.cKDTree(Pxy[:, 0:2])
     # nn contains all neighbors within range h for every grid point
     NN = KDTree.query_ball_point(P_grid, h)
@@ -140,16 +145,17 @@ def C_grid_poly6(world: b2World, h, p_ll, p_hr, xRes, yRes):
             xi, yi = np.unravel_index(i, (Xsz, Ysz))
             g_nn = NN[i]  # grid nearest neighbors
             r = P_grid[i] - Pxy[g_nn, 0:2]  # the 3rd column is the body id
-            W = W_poly6_2D(r.T, h)
-            if W_grid[xi, yi] == 0:
-                W_grid[xi, yi] = []
-            Ws = []
+            C = W_poly6_2D(r.T, h)
+            if C_grid[xi, yi] == 0:
+                C_grid[xi, yi] = []
+            Cs = []
             for nni in range(len(g_nn)):
                 body_id = int(Pxy[g_nn[nni], 2])
-                tup = (body_id, W[nni])  # we store the values as tuples (body_id, W) at each grid point
-                Ws.append(tup)
-            W_grid[xi, yi] += Ws  # to merge the 2 lists we don't use append
-    return g_dict, W_grid
+                tup = (body_id, C[nni])
+                # we store the values as tuples (contact_id, W) at each grid point
+                Cs.append(tup)
+            C_grid[xi, yi] += Cs  # to merge the 2 lists we don't use append
+    return g_dict, C_grid
 
 
 def contact_properties(world: b2World):
