@@ -16,11 +16,13 @@ new parameter, 'positionThreshold', similarly determines what threshold to
 use for early stopping when solving the position constraints.
 These two new parameters does not need to be set manually, and will by default
 be set such that the simulator behaves in the same way as the unmodified version.
-Note that the thresholds only consider positions and velocities. Angles and
-angular velocities are currently not considered.
+
+Another new per-world parameter is 'convergenceRates', by default set to false,
+which determines whether or not the simulator will store convergence rates in
+the profiling data.
 
 Another change is that the b2Profile class, of which an instance is created
-after each step, now has three additional attributes.
+after each step, now has several new attributes.
 'velocityIterations' is the total number of iterations performed solving the
 velocity constraints.
 'positionIterations' is the total number of iterations performed solving the
@@ -29,3 +31,5 @@ position constraints.
 constraints. Note that this number will often be different from the total
 number of contacts in the world, and might even be different from the total
 number of contacts in the world for which 'touching' is true.
+'velocityLambdaTwoNorms', 'velocityLambdaInfNorms' and 'positionLambdas' contains
+the convergence rate numbers, if 'convergenceRates' was set.

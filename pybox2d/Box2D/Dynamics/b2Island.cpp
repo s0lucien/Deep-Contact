@@ -225,7 +225,11 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 
 	timer.Reset();
 
-	// Solver data
+    // Solver profiles - stores solver results
+    b2SolverVelocityProfile solverVelocityProfile;
+    b2SolverPositionProfile solverPositionProfile;
+
+	// Solver data - used only for joints
 	b2SolverData solverData;
 	solverData.step = step;
 	solverData.positions = m_positions;
@@ -253,7 +257,7 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 		m_joints[i]->InitVelocityConstraints(solverData);
 	}
 
-	profile->solveInit = timer.GetMilliseconds();
+	profile->solveInit += timer.GetMilliseconds();
 
 	// Solve velocity constraints
 	timer.Reset();
@@ -265,18 +269,27 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 			m_joints[j]->SolveVelocityConstraints(solverData);
 		}
 
-		bool contactsOkay = contactSolver.SolveVelocityConstraints();
+		contactSolver.SolveVelocityConstraints(&solverVelocityProfile);
 
-        if (contactsOkay)
+        if (step.convergenceRates){
+            profile->velocityLambdaTwoNorms[i] = b2Max(profile->velocityLambdaTwoNorms[i],
+                                                      solverVelocityProfile.lambdaTwoNorm);
+            profile->velocityLambdaInfNorms[i] = b2Max(profile->velocityLambdaInfNorms[i],
+                                                      solverVelocityProfile.lambdaInfNorm);
+        }
+
+        if (solverVelocityProfile.lambdaTwoNorm <= step.velocityThreshold)
         {
             break;
         }
 	}
-    profile->velocityIterations = b2Min(i+1, step.velocityIterations);
+    int32 velocityIterations = b2Min(i+1, step.velocityIterations);
+    profile->velocityIterations += velocityIterations;
+    profile->maxVelocityIterations = b2Max(profile->maxVelocityIterations, velocityIterations);
 
 	// Store impulses for warm starting
 	contactSolver.StoreImpulses();
-	profile->solveVelocity = timer.GetMilliseconds();
+	profile->solveVelocity += timer.GetMilliseconds();
 
 	// Integrate positions
 	for (int32 i = 0; i < m_bodyCount; ++i)
@@ -313,26 +326,37 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 
 	// Solve position constraints
 	timer.Reset();
-	bool positionSolved = false;
+	bool positionSolved = false; // Used for putting bodies to sleep
 	for (i = 0; i < step.positionIterations; ++i)
 	{
-		bool contactsOkay = contactSolver.SolvePositionConstraints();
+		contactSolver.SolvePositionConstraints(&solverPositionProfile);
 
 		bool jointsOkay = true;
-		for (int32 i = 0; i < m_jointCount; ++i)
+		for (int32 j = 0; j < m_jointCount; ++j)
 		{
-			bool jointOkay = m_joints[i]->SolvePositionConstraints(solverData);
+			bool jointOkay = m_joints[j]->SolvePositionConstraints(solverData);
 			jointsOkay = jointsOkay && jointOkay;
 		}
 
-		if (contactsOkay && jointsOkay)
+        if (step.convergenceRates){
+            profile->positionLambdas[i] = b2Max(profile->positionLambdas[i],
+                                                solverPositionProfile.lambda);
+        }
+
+        // We can't expect minSpeparation >= -b2_linearSlop because we don't
+        // push the separation above -b2_linearSlop.
+		if (solverPositionProfile.minSeparation >= -3.0f * b2_linearSlop &&
+            solverPositionProfile.lambda <= step.positionThreshold &&
+            jointsOkay)
 		{
 			// Exit early if the position errors are small.
 			positionSolved = true;
 			break;
 		}
 	}
-  profile->positionIterations = b2Min(i+1, step.positionIterations);
+    int32 positionIterations = b2Min(i+1, step.positionIterations);
+    profile->positionIterations += positionIterations;
+    profile->maxPositionIterations = b2Max(profile->maxPositionIterations, positionIterations);
 
 	// Copy state buffers back to the bodies
 	for (int32 i = 0; i < m_bodyCount; ++i)
@@ -345,7 +369,7 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 		body->SynchronizeTransform();
 	}
 
-	profile->solvePosition = timer.GetMilliseconds();
+	profile->solvePosition += timer.GetMilliseconds();
 
 	Report(contactSolver.m_velocityConstraints);
 
@@ -403,6 +427,8 @@ void b2Island::SolveTOI(const b2TimeStep& subStep, int32 toiIndexA, int32 toiInd
 		m_velocities[i].v = b->m_linearVelocity;
 		m_velocities[i].w = b->m_angularVelocity;
 	}
+
+    b2SolverVelocityProfile solverVelocityProfile;
 
 	b2ContactSolverDef contactSolverDef;
 	contactSolverDef.contacts = m_contacts;
@@ -469,7 +495,7 @@ void b2Island::SolveTOI(const b2TimeStep& subStep, int32 toiIndexA, int32 toiInd
 	// Solve velocity constraints.
 	for (int32 i = 0; i < subStep.velocityIterations; ++i)
 	{
-		contactSolver.SolveVelocityConstraints();
+		contactSolver.SolveVelocityConstraints(&solverVelocityProfile);
 	}
 
 	// Don't store the TOI contact forces for warm starting

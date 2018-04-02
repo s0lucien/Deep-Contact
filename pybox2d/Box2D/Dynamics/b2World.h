@@ -159,6 +159,10 @@ public:
 	void SetSubStepping(bool flag) { m_subStepping = flag; }
 	bool GetSubStepping() const { return m_subStepping; }
 
+    /// Enable/disable outputting convergence rates. For testing.
+	void SetConvergenceRates(bool flag) { m_convergenceRates = flag; }
+	bool GetConvergenceRates() const { return m_convergenceRates; }
+
 	/// Get the number of broad-phase proxies.
 	int32 GetProxyCount() const;
 
@@ -267,6 +271,7 @@ private:
 	bool m_warmStarting;
 	bool m_continuousPhysics;
 	bool m_subStepping;
+    bool m_convergenceRates;
 
     // These are used for early stopping
     float32 m_velocityThreshold;

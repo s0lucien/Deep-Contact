@@ -286,9 +286,10 @@ void b2ContactSolver::WarmStart()
 	}
 }
 
-bool b2ContactSolver::SolveVelocityConstraints()
+void b2ContactSolver::SolveVelocityConstraints(b2SolverVelocityProfile* velocityProfile)
 {
-    float32 maxVelocityChange = 0.0f;
+    float32 maxLambdaTwoNorm = 0.0f;
+    float32 maxLambdaInfNorm = 0.0f;
 
 	for (int32 i = 0; i < m_count; ++i)
 	{
@@ -315,6 +316,7 @@ bool b2ContactSolver::SolveVelocityConstraints()
 
 		// Solve tangent constraints first because non-penetration is more important
 		// than friction.
+        float32 tangentLambda;
 		for (int32 j = 0; j < pointCount; ++j)
 		{
 			b2VelocityConstraintPoint* vcp = vc->points + j;
@@ -340,9 +342,12 @@ bool b2ContactSolver::SolveVelocityConstraints()
 
 			vB += mB * P;
 			wB += iB * b2Cross(vcp->rB, P);
+
+            tangentLambda = lambda;
 		}
 
 		// Solve normal constraints
+        float32 normalLambda;
 		if (vc->pointCount == 1)
 		{
 			b2VelocityConstraintPoint* vcp = vc->points + 0;
@@ -366,6 +371,8 @@ bool b2ContactSolver::SolveVelocityConstraints()
 
 			vB += mB * P;
 			wB += iB * b2Cross(vcp->rB, P);
+
+            normalLambda = lambda;
 		}
 		else
 		{
@@ -591,18 +598,21 @@ bool b2ContactSolver::SolveVelocityConstraints()
 			}
 		}
 
-        float32 changeA = b2Distance(vA, m_velocities[indexA].v);
-        maxVelocityChange = b2Max(maxVelocityChange, changeA);
 		m_velocities[indexA].v = vA;
 		m_velocities[indexA].w = wA;
 
-        float32 changeB = b2Distance(vB, m_velocities[indexB].v);
-        maxVelocityChange = b2Max(maxVelocityChange, changeB);
         m_velocities[indexB].v = vB;
 		m_velocities[indexB].w = wB;
+
+        float32 lambdaTwoNorm = b2Sqrt(normalLambda*normalLambda + tangentLambda*tangentLambda);
+        float32 lambdaInfNorm = b2Max(normalLambda, tangentLambda);
+
+        maxLambdaTwoNorm = b2Max(maxLambdaTwoNorm, lambdaTwoNorm);
+        maxLambdaInfNorm = b2Max(maxLambdaInfNorm, lambdaInfNorm);
 	}
 
-	return maxVelocityChange <= m_step.velocityThreshold;
+    velocityProfile->lambdaTwoNorm = maxLambdaTwoNorm;
+    velocityProfile->lambdaInfNorm = maxLambdaInfNorm;
 }
 
 void b2ContactSolver::StoreImpulses()
@@ -672,10 +682,10 @@ struct b2PositionSolverManifold
 };
 
 // Sequential solver.
-bool b2ContactSolver::SolvePositionConstraints()
+void b2ContactSolver::SolvePositionConstraints(b2SolverPositionProfile* positionProfile)
 {
 	float32 minSeparation = 0.0f;
-    float32 maxPositionChange = 0.0f;
+    float32 maxLambda = 0.0f;
 
 	for (int32 i = 0; i < m_count; ++i)
 	{
@@ -698,6 +708,7 @@ bool b2ContactSolver::SolvePositionConstraints()
 		float32 aB = m_positions[indexB].a;
 
 		// Solve normal constraints
+        float32 normalLambda;
 		for (int32 j = 0; j < pointCount; ++j)
 		{
 			b2Transform xfA, xfB;
@@ -737,22 +748,21 @@ bool b2ContactSolver::SolvePositionConstraints()
 
 			cB += mB * P;
 			aB += iB * b2Cross(rB, P);
+
+            normalLambda = impulse; // best I could find
 		}
 
-        float32 changeA = b2Distance(cA, m_positions[indexA].c);
-        maxPositionChange = b2Max(maxPositionChange, changeA);
 		m_positions[indexA].c = cA;
 		m_positions[indexA].a = aA;
 
-        float32 changeB = b2Distance(cB, m_positions[indexB].c);
-        maxPositionChange = b2Max(maxPositionChange, changeB);
 		m_positions[indexB].c = cB;
 		m_positions[indexB].a = aB;
+
+        maxLambda = b2Max(maxLambda, normalLambda);
 	}
 
-	// We can't expect minSpeparation >= -b2_linearSlop because we don't
-	// push the separation above -b2_linearSlop.
-	return (minSeparation >= -3.0f * b2_linearSlop) && (maxPositionChange <= m_step.positionThreshold);
+    positionProfile->minSeparation = minSeparation;
+    positionProfile->lambda = maxLambda;
 }
 
 // Sequential position solver for position constraints.

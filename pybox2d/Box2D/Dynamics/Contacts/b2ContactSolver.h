@@ -75,10 +75,10 @@ public:
 	void InitializeVelocityConstraints();
 
 	void WarmStart();
-	bool SolveVelocityConstraints();
+	void SolveVelocityConstraints(b2SolverVelocityProfile* velocityProfile);
 	void StoreImpulses();
 
-	bool SolvePositionConstraints();
+	void SolvePositionConstraints(b2SolverPositionProfile* positionProfile);
 	bool SolveTOIPositionConstraints(int32 toiIndexA, int32 toiIndexB);
 
 	b2TimeStep m_step;

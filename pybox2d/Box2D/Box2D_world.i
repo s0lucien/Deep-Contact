@@ -312,6 +312,7 @@ public:
         continuousPhysics = property(__GetContinuousPhysics, __SetContinuousPhysics)
         warmStarting = property(__GetWarmStarting, __SetWarmStarting)
         subStepping = property(__GetSubStepping, __SetSubStepping)
+        convergenceRates = property(__GetConvergenceRates, __SetConvergenceRates)
 
         velocityThreshold = property(__GetVelocityThreshold, __SetVelocityThreshold)
         positionThreshold = property(__GetPositionThreshold, __SetPositionThreshold)
@@ -369,6 +370,8 @@ public:
 %rename (__SetWarmStarting) b2World::SetWarmStarting;
 %rename (__GetSubStepping) b2World::GetSubStepping;
 %rename (__SetSubStepping) b2World::SetSubStepping;
+%rename (__GetConvergenceRates) b2World::GetConvergenceRates;
+%rename (__SetConvergenceRates) b2World::SetConvergenceRates;
 
 %rename (__GetVelocityThreshold) b2World::GetVelocityThreshold;
 %rename (__SetVelocityThreshold) b2World::SetVelocityThreshold;

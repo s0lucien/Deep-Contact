@@ -48,6 +48,7 @@ b2World::b2World(const b2Vec2& gravity)
 	m_warmStarting = true;
 	m_continuousPhysics = true;
 	m_subStepping = false;
+    m_convergenceRates = false;
 
     m_velocityThreshold = 0.0;
     m_positionThreshold = FLT_MAX;
@@ -391,9 +392,15 @@ void b2World::Solve(const b2TimeStep& step)
 	m_profile.solveInit = 0.0f;
 	m_profile.solveVelocity = 0.0f;
 	m_profile.solvePosition = 0.0f;
+
     m_profile.velocityIterations = 0;
     m_profile.positionIterations = 0;
     m_profile.contactsSolved = 0;
+
+    m_profile.maxVelocityIterations = 0;
+    m_profile.maxPositionIterations = 0;
+
+    m_profile.convergenceRates = step.convergenceRates;
 
 	// Size the island for the worst case.
 	b2Island island(m_bodyCount,
@@ -415,6 +422,19 @@ void b2World::Solve(const b2TimeStep& step)
 	{
 		j->m_islandFlag = false;
 	}
+
+    // If set, allocate memory for convergence rates
+    if (m_convergenceRates)
+    {
+        // Free arrays from last iteration if any
+        free(m_profile.velocityLambdaTwoNorms);
+        free(m_profile.velocityLambdaInfNorms);
+        free(m_profile.positionLambdas);
+
+        m_profile.velocityLambdaTwoNorms = (float32*)malloc(step.velocityIterations * sizeof(float32));
+        m_profile.velocityLambdaInfNorms = (float32*)malloc(step.velocityIterations * sizeof(float32));
+        m_profile.positionLambdas = (float32*)malloc(step.positionIterations * sizeof(float32));
+    }
 
 	// Build and simulate all awake islands.
 	int32 stackSize = m_bodyCount;
@@ -533,17 +553,8 @@ void b2World::Solve(const b2TimeStep& step)
 			}
 		}
 
-		b2Profile profile;
-		island.Solve(&profile, step, m_gravity, m_allowSleep);
-		m_profile.solveInit += profile.solveInit;
-		m_profile.solveVelocity += profile.solveVelocity;
-		m_profile.solvePosition += profile.solvePosition;
-        if (island.m_bodyCount > 1) // If the island has only 1 body, there is nothing to solve
-        {
-            m_profile.velocityIterations += profile.velocityIterations;
-            m_profile.positionIterations += profile.positionIterations;
-            m_profile.contactsSolved += island.m_contactCount;
-        }
+		island.Solve(&m_profile, step, m_gravity, m_allowSleep);
+        m_profile.contactsSolved += island.m_contactCount;
 
 		// Post solve cleanup.
 		for (int32 i = 0; i < island.m_bodyCount; ++i)
@@ -937,6 +948,7 @@ void b2World::Step(float32 dt, int32 velocityIterations, int32 positionIteration
 	step.dtRatio = m_inv_dt0 * dt;
 
 	step.warmStarting = m_warmStarting;
+    step.convergenceRates = m_convergenceRates;
 
 	// Update contacts. This is where some contacts are destroyed.
 	{

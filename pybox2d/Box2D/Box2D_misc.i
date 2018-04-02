@@ -2,7 +2,7 @@
 * pybox2d -- http://pybox2d.googlecode.com
 *
 * Copyright (c) 2010 Ken Lauer / sirkne at gmail dot com
-* 
+*
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
 * arising from the use of this software.
@@ -34,7 +34,7 @@ public:
     }
 
     %pythoncode %{
-    __iter__ = lambda self: iter((self.r, self.g, self.b)) 
+    __iter__ = lambda self: iter((self.r, self.g, self.b))
     __eq__ = lambda self, other: self.__equ(other)
     __ne__ = lambda self,other: not self.__equ(other)
     def __repr__(self):
@@ -61,22 +61,22 @@ public:
     %}
 
     float32 __getitem__(int i) {
-        if (i==0) 
+        if (i==0)
             return $self->r;
-        else if (i==1) 
+        else if (i==1)
             return $self->g;
-        else if (i==2) 
+        else if (i==2)
             return $self->b;
 
         PyErr_SetString(PyExc_IndexError, "Index must be in (0,1,2)");
         return 0.0f;
     }
     void __setitem__(int i, float32 value) {
-        if (i==0) 
+        if (i==0)
             $self->r=value;
-        else if (i==1) 
+        else if (i==1)
             $self->g=value;
-        else if (i==2) 
+        else if (i==2)
             $self->b=value;
         else
             PyErr_SetString(PyExc_IndexError, "Index must be in (0,1,2)");
@@ -127,7 +127,7 @@ public:
     bool __equ(b2Color& b) {
         return ($self->r == b.r && $self->g==b.g && $self->b==b.b);
     }
-     
+
 }
 
 %feature("shadow") b2Color::__iadd {
@@ -226,7 +226,7 @@ public:
 %pythoncode %{
     import collections
 
-    b2DistanceResult = collections.namedtuple('b2DistanceResult', 
+    b2DistanceResult = collections.namedtuple('b2DistanceResult',
                                               'pointA pointB distance iterations')
 
     def b2Distance(shapeA=None, idxA=0, shapeB=None, idxB=0, transformA=None, transformB=None, useRadii=True):
@@ -241,7 +241,7 @@ public:
         Or more conveniently using kwargs:
         + b2Distance(shapeA=.., idxA=0, shapeB=.., idxB=0, transformA=..,
                      transformB=.., useRadii=True)
-        
+
         Returns a namedtuple in the form:
             b2DistanceResult(pointA=(ax, ay), pointB=(bx, by), distance,
                              iterations)
@@ -291,3 +291,56 @@ public:
 %ignore b2BroadPhase::GetUserData;
 %ignore b2BroadPhase::CreateProxy;
 %ignore b2BroadPhase::DestroyProxy;
+
+
+/**** Convergence Rates ****/
+%extend b2Profile {
+public:
+    PyObject* __GetVelocityLambdaTwoNorms() {
+        if ($self->convergenceRates) {
+            PyObject* list = PyList_New($self->maxVelocityIterations);
+            int i;
+            for (i = 0; i < $self->maxVelocityIterations; i++) {
+                PyObject* o = PyFloat_FromDouble((double) $self->velocityLambdaTwoNorms[i]);
+                PyList_SetItem(list, i, o);
+            }
+            return list;
+        } else
+            return PyList_New(0);
+    }
+
+    PyObject* __GetVelocityLambdaInfNorms() {
+        if ($self->convergenceRates) {
+            PyObject* list = PyList_New($self->maxVelocityIterations);
+            int i;
+            for (i = 0; i < $self->maxVelocityIterations; i++) {
+                PyObject* o = PyFloat_FromDouble((double) $self->velocityLambdaInfNorms[i]);
+                PyList_SetItem(list, i, o);
+            }
+            return list;
+        } else
+            return PyList_New(0);
+    }
+
+    PyObject* __GetPositionLambdas() {
+        PyObject* list = PyList_New($self->maxPositionIterations);
+        int i;
+        for (i = 0; i < $self->maxPositionIterations; i++) {
+            PyObject* o = PyFloat_FromDouble((double) $self->positionLambdas[i]);
+            PyList_SetItem(list, i, o);
+        }
+        return list;
+    }
+
+    %pythoncode %{
+        # Ready-only
+        velocityLambdaTwoNorms = property(__GetVelocityLambdaTwoNorms, None)
+        velocityLambdaInfNorms = property(__GetVelocityLambdaInfNorms, None)
+        positionLambdas = property(__GetPositionLambdas, None)
+    %}
+}
+
+%ignore b2Profile::velocityLambdaTwoNorms;
+%ignore b2Profile::velocityLambdaInfNorms;
+%ignore b2Profile::positionLambdas;
+%ignore b2Profile::convergenceRates;

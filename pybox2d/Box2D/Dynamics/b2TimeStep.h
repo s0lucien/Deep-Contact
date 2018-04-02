@@ -32,9 +32,20 @@ struct b2Profile
 	float32 solvePosition;
 	float32 broadphase;
 	float32 solveTOI;
+
     int32 velocityIterations;
     int32 positionIterations;
     int32 contactsSolved;
+
+    // Denotes the maximum number of iterations performed by a single island
+    int32 maxVelocityIterations;
+    int32 maxPositionIterations;
+
+    // Convergence rates - optional
+    bool convergenceRates;
+    float32* velocityLambdaTwoNorms;
+    float32* velocityLambdaInfNorms;
+    float32* positionLambdas;
 };
 
 /// This is an internal structure.
@@ -43,11 +54,15 @@ struct b2TimeStep
 	float32 dt;			// time step
 	float32 inv_dt;		// inverse time step (0 if dt == 0).
 	float32 dtRatio;	// dt * inv_dt0
+
 	int32 velocityIterations;
 	int32 positionIterations;
+
     float32 velocityThreshold;
     float32 positionThreshold;
-	bool warmStarting;
+
+    bool warmStarting;
+    bool convergenceRates;
 };
 
 /// This is an internal structure.
@@ -70,6 +85,20 @@ struct b2SolverData
 	b2TimeStep step;
 	b2Position* positions;
 	b2Velocity* velocities;
+};
+
+// Internal solver results struct
+struct b2SolverVelocityProfile
+{
+    float32 lambdaTwoNorm;
+    float32 lambdaInfNorm;
+};
+
+// Internal solver results struct
+struct b2SolverPositionProfile
+{
+    float32 minSeparation;
+    float32 lambda;
 };
 
 #endif
