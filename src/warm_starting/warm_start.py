@@ -8,10 +8,7 @@ from .random_model import RandomModel
 from .parallel_world_model import ParallelWorldModel
 from .copy_world_model import CopyWorldModel
 
-from Box2D import (b2World)
-from Box2D import (b2LoopShape)
-from Box2D import (b2ContactListener)
-from Box2D import (b2Vec2)
+from Box2D import (b2World, b2LoopShape, b2Vec2, b2ContactListener)
 
 from ..gen_world import GenClusteredCirclesWorld
 from ..sim_types import BodyData
@@ -28,7 +25,7 @@ world.enableWarmStarting = True
 xlow, xhi = -30, 30
 ylow, yhi = 0, 60
 
-ground = world.CreateBody(
+ground = world.CreateStaticBody(
     shapes=b2LoopShape(
         vertices=[(xhi, ylow), (xhi, yhi), (xlow, yhi), (xlow, ylow)]
     )
@@ -74,28 +71,30 @@ class WarmStartListener(b2ContactListener):
 timeStep = 1.0 / 100
 velocityIterations = 20000
 positionIterations = 10000
-world.velocityThreshold = 10**-5
-world.positionThreshold = 10**-6
+world.velocityThreshold = 10**-4
+world.positionThreshold = 10**-5
 steps = 1000
+convergenceRates = True
 
 # Choose a model
-#model = NoWarmStartModel()
+model = NoWarmStartModel()
 #model = BuiltinWarmStartModel()
 #model = BadModel()
 #model = RandomModel(0)
 #model = ParallelWorldModel(world)
-model = CopyWorldModel()
+#model = CopyWorldModel()
 
 # Create and attach listener
 world.contactListener = WarmStartListener(model)
 
 
 # Run the simulation
+world.convergenceRates = convergenceRates
 totalVelocityIterations = []
 totalPositionIterations = []
 contactsSolved = []
-totalContacts = []
 times = []
+velocityLambdaTwoNorms = []
 for i in range(steps):
     print("step", i)
 
@@ -115,15 +114,12 @@ for i in range(steps):
     totalPositionIterations.append(profile.positionIterations)
     contactsSolved.append(profile.contactsSolved)
 
+    if convergenceRates:
+        velocityLambdaTwoNorms.append(profile.velocityLambdaTwoNorms)
+
     times.append(step)
 
-    nc = 0
-    for c in world.contacts:
-        if c.touching:
-            nc += 1
-    totalContacts.append(nc)
-
-    print("Contacts: %d, solved: %d, vel_iter: %d, pos_iter: %d" % (nc, profile.contactsSolved, profile.velocityIterations, profile.positionIterations))
+    print("Contacts: %d, vel_iter: %d, pos_iter: %d" % (profile.contactsSolved, profile.velocityIterations, profile.positionIterations))
 
 
 # Process stuff
@@ -141,8 +137,19 @@ positionMedian = np.median(totalPositionIterations)
 positionStd    = np.std(totalPositionIterations)
 
 print("\nVelocity: \nTotal   = %d \nAverage = %.2f \nMedian  = %d \nStd     = %.2f" % (velocityTotal, velocityMean, velocityMedian, velocityStd))
-print("\nPosition: \nTotal   = %d \nAverage = %.2f \nMedian  = %d \nStd     = %.2f" % (positionTotal, positionMean, positionMedian, velocityStd))
+print("\nPosition: \nTotal   = %d \nAverage = %.2f \nMedian  = %d \nStd     = %.2f" % (positionTotal, positionMean, positionMedian, positionStd))
 
+if convergenceRates:
+    data = velocityLambdaTwoNorms
+    pad = len(max(data, key=len))
+    dataArray = np.array([i + [np.NaN]*(pad-len(i)) for i in data])
+    zerothQuantiles = np.nanpercentile(dataArray, 10, axis=0)
+    firstQuantiles  = np.nanpercentile(dataArray, 25, axis=0)
+    secondQuantiles = np.nanpercentile(dataArray, 50, axis=0)
+    thirdQuantiles  = np.nanpercentile(dataArray, 75, axis=0)
+    fourthQuantiles = np.nanpercentile(dataArray, 90, axis=0)
+
+    counts = np.abs(np.sum(np.isnan(dataArray), axis=0) - steps)
 
 # Plot stuff
 import matplotlib.pyplot as plt
@@ -152,8 +159,60 @@ start = 0
 def pretty(s):
     return '{0:.0E}'.format(s)
 
-fig = plt.figure()
 title = "N = " + str(N) + ", dt = " + pretty(timeStep) + ", vel_iter = " + pretty(velocityIterations) + ", pos_iter = " + pretty(positionIterations) + ", vel_thres = " + pretty(world.velocityThreshold) + ", pos_thres = " + pretty(world.positionThreshold)
+
+
+# ---Convergence rate plots---
+if convergenceRates:
+    fig = plt.figure()
+    fig.suptitle(title)
+
+    # Full convergence rates
+    ax1 = fig.add_subplot(221)
+    ax1.semilogy(firstQuantiles)
+    ax1.semilogy(secondQuantiles)
+    ax1.semilogy(thirdQuantiles)
+    ax1.set_ylim([10**-4, 10**1])
+    ax1.legend(["25", "50", "75"])
+    ax1.set_xlabel("Iterations")
+    ax1.set_ylabel("Value")
+    ax1.set_title("Convergence Rate - All iterations")
+
+    # Counters
+    ax1 = fig.add_subplot(222)
+    ax1.plot(counts)
+    ax1.set_xlabel("Iterations")
+    ax1.set_ylabel("Remaining")
+    ax1.set_title("Number of iterators left for each iteration")
+
+    # Limited convergence rates
+    ax1 = fig.add_subplot(223)
+    ax1.semilogy(firstQuantiles)
+    ax1.semilogy(secondQuantiles)
+    ax1.semilogy(thirdQuantiles)
+    ax1.set_xlim([0, 500])
+    ax1.set_ylim([10**-4, 10**1])
+    ax1.legend(["25", "50", "75"])
+    ax1.set_xlabel("Iterations")
+    ax1.set_ylabel("Value")
+    ax1.set_title("Convergence Rate - First iterations")
+
+    # Limited convergence rates
+    ax1 = fig.add_subplot(224)
+    ax1.semilogy(zerothQuantiles)
+    ax1.semilogy(secondQuantiles)
+    ax1.semilogy(fourthQuantiles)
+    ax1.set_xlim([0, 500])
+    ax1.set_ylim([10**-4, 10**1])
+    ax1.legend(["10", "50", "90"])
+    ax1.set_xlabel("Iterations")
+    ax1.set_ylabel("Value")
+    ax1.set_title("Convergence Rate - First iterations, different quantiles")
+
+
+
+# ---Iteration plots---
+fig = plt.figure()
 fig.suptitle(title)
 
 # Velocity iterations
@@ -206,20 +265,10 @@ ax1.set_title("Time taken for each step")
 
 # Contacts
 ax1 = fig.add_subplot(222)
-ln1 = ax1.plot(range(steps), totalContacts, 'c', label="total")
+ax1.plot(range(steps), contactsSolved)
 ax1.set_xlim([start, steps])
 ax1.set_xlabel("Step")
 ax1.set_ylabel("Total number of contacts")
-ax1.tick_params('y', colors='c')
-
-ax2 = ax1.twinx()
-ln2 = ax2.plot(range(steps), contactsSolved, 'm', label="solved")
-ax2.set_ylabel('Number of solved contacts')
-ax2.tick_params('y', colors='m')
-
-lns = ln1 + ln2
-labs = [l.get_label() for l in lns]
-ax1.legend(lns, labs, loc="lower center")
 ax1.set_title("Contact numbers for each step")
 
 
