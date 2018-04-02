@@ -520,7 +520,7 @@ def _b2Distance(*args):
 
 import collections
 
-b2DistanceResult = collections.namedtuple('b2DistanceResult', 
+b2DistanceResult = collections.namedtuple('b2DistanceResult',
                                           'pointA pointB distance iterations')
 
 def b2Distance(shapeA=None, idxA=0, shapeB=None, idxB=0, transformA=None, transformB=None, useRadii=True):
@@ -2326,7 +2326,7 @@ class b2Color(object):
         return _Box2D.b2Color___get_bytes(self)
 
 
-    __iter__ = lambda self: iter((self.r, self.g, self.b)) 
+    __iter__ = lambda self: iter((self.r, self.g, self.b))
     __eq__ = lambda self, other: self.__equ(other)
     __ne__ = lambda self,other: not self.__equ(other)
     def __repr__(self):
@@ -5552,11 +5552,37 @@ class b2Profile(object):
     velocityIterations = _swig_property(_Box2D.b2Profile_velocityIterations_get, _Box2D.b2Profile_velocityIterations_set)
     positionIterations = _swig_property(_Box2D.b2Profile_positionIterations_get, _Box2D.b2Profile_positionIterations_set)
     contactsSolved = _swig_property(_Box2D.b2Profile_contactsSolved_get, _Box2D.b2Profile_contactsSolved_set)
+    maxVelocityIterations = _swig_property(_Box2D.b2Profile_maxVelocityIterations_get, _Box2D.b2Profile_maxVelocityIterations_set)
+    maxPositionIterations = _swig_property(_Box2D.b2Profile_maxPositionIterations_get, _Box2D.b2Profile_maxPositionIterations_set)
+
+    def __GetVelocityLambdaTwoNorms(self):
+        """__GetVelocityLambdaTwoNorms(b2Profile self) -> PyObject *"""
+        return _Box2D.b2Profile___GetVelocityLambdaTwoNorms(self)
+
+
+    def __GetVelocityLambdaInfNorms(self):
+        """__GetVelocityLambdaInfNorms(b2Profile self) -> PyObject *"""
+        return _Box2D.b2Profile___GetVelocityLambdaInfNorms(self)
+
+
+    def __GetPositionLambdas(self):
+        """__GetPositionLambdas(b2Profile self) -> PyObject *"""
+        return _Box2D.b2Profile___GetPositionLambdas(self)
+
+
+            # Ready-only
+    velocityLambdaTwoNorms = property(__GetVelocityLambdaTwoNorms, None)
+    velocityLambdaInfNorms = property(__GetVelocityLambdaInfNorms, None)
+    positionLambdas = property(__GetPositionLambdas, None)
+
 
     def __init__(self):
         """__init__(b2Profile self) -> b2Profile"""
         _Box2D.b2Profile_swiginit(self, _Box2D.new_b2Profile())
     __swig_destroy__ = _Box2D.delete_b2Profile
+b2Profile.__GetVelocityLambdaTwoNorms = new_instancemethod(_Box2D.b2Profile___GetVelocityLambdaTwoNorms, None, b2Profile)
+b2Profile.__GetVelocityLambdaInfNorms = new_instancemethod(_Box2D.b2Profile___GetVelocityLambdaInfNorms, None, b2Profile)
+b2Profile.__GetPositionLambdas = new_instancemethod(_Box2D.b2Profile___GetPositionLambdas, None, b2Profile)
 b2Profile_swigregister = _Box2D.b2Profile_swigregister
 b2Profile_swigregister(b2Profile)
 
@@ -5575,6 +5601,36 @@ class b2SolverData(object):
     __swig_destroy__ = _Box2D.delete_b2SolverData
 b2SolverData_swigregister = _Box2D.b2SolverData_swigregister
 b2SolverData_swigregister(b2SolverData)
+
+class b2SolverVelocityProfile(object):
+    """Proxy of C++ b2SolverVelocityProfile class."""
+
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    lambdaTwoNorm = _swig_property(_Box2D.b2SolverVelocityProfile_lambdaTwoNorm_get, _Box2D.b2SolverVelocityProfile_lambdaTwoNorm_set)
+    lambdaInfNorm = _swig_property(_Box2D.b2SolverVelocityProfile_lambdaInfNorm_get, _Box2D.b2SolverVelocityProfile_lambdaInfNorm_set)
+
+    def __init__(self):
+        """__init__(b2SolverVelocityProfile self) -> b2SolverVelocityProfile"""
+        _Box2D.b2SolverVelocityProfile_swiginit(self, _Box2D.new_b2SolverVelocityProfile())
+    __swig_destroy__ = _Box2D.delete_b2SolverVelocityProfile
+b2SolverVelocityProfile_swigregister = _Box2D.b2SolverVelocityProfile_swigregister
+b2SolverVelocityProfile_swigregister(b2SolverVelocityProfile)
+
+class b2SolverPositionProfile(object):
+    """Proxy of C++ b2SolverPositionProfile class."""
+
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    minSeparation = _swig_property(_Box2D.b2SolverPositionProfile_minSeparation_get, _Box2D.b2SolverPositionProfile_minSeparation_set)
+    _lambda = _swig_property(_Box2D.b2SolverPositionProfile__lambda_get, _Box2D.b2SolverPositionProfile__lambda_set)
+
+    def __init__(self):
+        """__init__(b2SolverPositionProfile self) -> b2SolverPositionProfile"""
+        _Box2D.b2SolverPositionProfile_swiginit(self, _Box2D.new_b2SolverPositionProfile())
+    __swig_destroy__ = _Box2D.delete_b2SolverPositionProfile
+b2SolverPositionProfile_swigregister = _Box2D.b2SolverPositionProfile_swigregister
+b2SolverPositionProfile_swigregister(b2SolverPositionProfile)
 
 class b2ContactManager(object):
     """Proxy of C++ b2ContactManager class."""
@@ -5642,7 +5698,7 @@ class b2World(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
 
-    def __init__(self, gravity=(0, -10), doSleep=True, **kwargs): 
+    def __init__(self, gravity=(0, -10), doSleep=True, **kwargs):
         """__init__(self, gravity=(0, -10), doSleep=True, **kwargs) -> b2World
 
         Additional kwargs like contactListener will be passed after the world is created.
@@ -5869,6 +5925,16 @@ class b2World(object):
         return _Box2D.b2World___GetSubStepping(self)
 
 
+    def __SetConvergenceRates(self, flag):
+        """__SetConvergenceRates(b2World self, bool flag)"""
+        return _Box2D.b2World___SetConvergenceRates(self, flag)
+
+
+    def __GetConvergenceRates(self):
+        """__GetConvergenceRates(b2World self) -> bool"""
+        return _Box2D.b2World___GetConvergenceRates(self)
+
+
     def __GetProxyCount(self):
         """
         __GetProxyCount(b2World self) -> int32
@@ -5936,6 +6002,26 @@ class b2World(object):
         Get the global gravity vector.
         """
         return _Box2D.b2World___GetGravity(self)
+
+
+    def __SetVelocityThreshold(self, velocityThreshold):
+        """__SetVelocityThreshold(b2World self, float32 velocityThreshold)"""
+        return _Box2D.b2World___SetVelocityThreshold(self, velocityThreshold)
+
+
+    def __GetVelocityThreshold(self):
+        """__GetVelocityThreshold(b2World self) -> float32"""
+        return _Box2D.b2World___GetVelocityThreshold(self)
+
+
+    def __SetPositionThreshold(self, positionThreshold):
+        """__SetPositionThreshold(b2World self, float32 positionThreshold)"""
+        return _Box2D.b2World___SetPositionThreshold(self, positionThreshold)
+
+
+    def __GetPositionThreshold(self):
+        """__GetPositionThreshold(b2World self) -> float32"""
+        return _Box2D.b2World___GetPositionThreshold(self)
 
 
     def __IsLocked(self):
@@ -6075,11 +6161,11 @@ class b2World(object):
         """
         Create a body in the world.
         Takes a single b2BodyDef argument, or kwargs to pass to a temporary b2BodyDef.
-        world.CreateBody(position=(1,2), angle=1) 
+        world.CreateBody(position=(1,2), angle=1)
         is short for:
         world.CreateBody(b2BodyDef(position=(1,2), angle=1))
 
-        If the definition (or kwargs) sets 'fixtures', they will be created on the 
+        If the definition (or kwargs) sets 'fixtures', they will be created on the
         newly created body. A single fixture is also accepted.
 
         CreateBody(..., fixtures=[])
@@ -6100,7 +6186,7 @@ class b2World(object):
             if not isinstance(defn, b2BodyDef):
                 raise TypeError('Expected b2BodyDef')
         else:
-            defn = b2BodyDef(**kwargs) 
+            defn = b2BodyDef(**kwargs)
 
         body=self.__CreateBody(defn)
 
@@ -6260,7 +6346,7 @@ class b2World(object):
             else:
                 raise TypeError('Expected "type" to be a b2Joint or b2JointDef')
 
-            defn = class_type(**kwargs) 
+            defn = class_type(**kwargs)
 
         if isinstance(defn, b2GearJointDef):
             if not defn.joint1 or not defn.joint2:
@@ -6290,9 +6376,9 @@ class b2World(object):
     gravity   = property(__GetGravity, __SetGravity)
     autoClearForces = property(__GetAutoClearForces, __SetAutoClearForces)
     __data = {} # holds the listeners so they can be properly destroyed, and buffer other data
-    destructionListener = property(lambda self: self.__GetData('destruction'), 
+    destructionListener = property(lambda self: self.__GetData('destruction'),
                                    lambda self, fcn: self.__SetData('destruction', fcn, self.__SetDestructionListener_internal))
-    contactListener= property(lambda self: self.__GetData('contact'), 
+    contactListener= property(lambda self: self.__GetData('contact'),
                               lambda self, fcn: self.__SetData('contact', fcn, self.__SetContactListener_internal))
     contactFilter= property(lambda self: self.__GetData('contactfilter'),
                             lambda self, fcn: self.__SetData('contactfilter', fcn, self.__SetContactFilter_internal))
@@ -6302,8 +6388,12 @@ class b2World(object):
     continuousPhysics = property(__GetContinuousPhysics, __SetContinuousPhysics)
     warmStarting = property(__GetWarmStarting, __SetWarmStarting)
     subStepping = property(__GetSubStepping, __SetSubStepping)
+    convergenceRates = property(__GetConvergenceRates, __SetConvergenceRates)
 
-    # Read-only 
+    velocityThreshold = property(__GetVelocityThreshold, __SetVelocityThreshold)
+    positionThreshold = property(__GetPositionThreshold, __SetPositionThreshold)
+
+    # Read-only
     contactManager= property(__GetContactManager, None)
     contactCount  = property(__GetContactCount, None)
     bodyCount     = property(__GetBodyCount, None)
@@ -6347,6 +6437,8 @@ b2World.__SetContinuousPhysics = new_instancemethod(_Box2D.b2World___SetContinuo
 b2World.__GetContinuousPhysics = new_instancemethod(_Box2D.b2World___GetContinuousPhysics, None, b2World)
 b2World.__SetSubStepping = new_instancemethod(_Box2D.b2World___SetSubStepping, None, b2World)
 b2World.__GetSubStepping = new_instancemethod(_Box2D.b2World___GetSubStepping, None, b2World)
+b2World.__SetConvergenceRates = new_instancemethod(_Box2D.b2World___SetConvergenceRates, None, b2World)
+b2World.__GetConvergenceRates = new_instancemethod(_Box2D.b2World___GetConvergenceRates, None, b2World)
 b2World.__GetProxyCount = new_instancemethod(_Box2D.b2World___GetProxyCount, None, b2World)
 b2World.__GetBodyCount = new_instancemethod(_Box2D.b2World___GetBodyCount, None, b2World)
 b2World.__GetJointCount = new_instancemethod(_Box2D.b2World___GetJointCount, None, b2World)
@@ -6356,6 +6448,10 @@ b2World.GetTreeBalance = new_instancemethod(_Box2D.b2World_GetTreeBalance, None,
 b2World.GetTreeQuality = new_instancemethod(_Box2D.b2World_GetTreeQuality, None, b2World)
 b2World.__SetGravity = new_instancemethod(_Box2D.b2World___SetGravity, None, b2World)
 b2World.__GetGravity = new_instancemethod(_Box2D.b2World___GetGravity, None, b2World)
+b2World.__SetVelocityThreshold = new_instancemethod(_Box2D.b2World___SetVelocityThreshold, None, b2World)
+b2World.__GetVelocityThreshold = new_instancemethod(_Box2D.b2World___GetVelocityThreshold, None, b2World)
+b2World.__SetPositionThreshold = new_instancemethod(_Box2D.b2World___SetPositionThreshold, None, b2World)
+b2World.__GetPositionThreshold = new_instancemethod(_Box2D.b2World___GetPositionThreshold, None, b2World)
 b2World.__IsLocked = new_instancemethod(_Box2D.b2World___IsLocked, None, b2World)
 b2World.__SetAutoClearForces = new_instancemethod(_Box2D.b2World___SetAutoClearForces, None, b2World)
 b2World.__GetAutoClearForces = new_instancemethod(_Box2D.b2World___GetAutoClearForces, None, b2World)
