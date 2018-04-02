@@ -10,7 +10,7 @@ from .copy_world_model import CopyWorldModel
 
 from Box2D import (b2World, b2LoopShape, b2Vec2, b2ContactListener)
 
-from ..gen_world import GenClusteredCirclesWorld
+from ..gen_world import GenClusteredCirclesRegion, create_fixed_box
 from ..sim_types import BodyData
 
 # ----- World Creation -----
@@ -25,22 +25,18 @@ world.enableWarmStarting = True
 xlow, xhi = -30, 30
 ylow, yhi = 0, 60
 
-ground = world.CreateStaticBody(
-    shapes=b2LoopShape(
-        vertices=[(xhi, ylow), (xhi, yhi), (xlow, yhi), (xlow, ylow)]
-    )
-)
+ground = create_fixed_box(world, p_ll=b2Vec2(xlow, ylow), p_hr=b2Vec2(xhi, yhi))
 
 # Populate the world
 N = 100
 seed = 100
-gen = GenClusteredCirclesWorld(world, seed=seed)
+gen = GenClusteredCirclesRegion(world, seed=seed)
 sigma_coef = 1.2
-gen.new(N, b2Vec2(xlow,ylow),  b2Vec2(xhi,yhi), 1, 1, sigma_coef)
+gen.fill(N, b2Vec2(xlow,ylow),  b2Vec2(xhi,yhi), (1, 1), sigma_coef)
 
 b_ix = 0
 for b in world.bodies:
-    b.userData = BodyData(b_ix)
+    b.userData.id = b_ix
     b_ix += 1
 
 

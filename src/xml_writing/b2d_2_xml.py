@@ -5,12 +5,18 @@ from xml.dom import minidom
 import os, errno
 from sim_types import SimData
 
+
 def body_2_xml(body: b2Body):
     try:
         body_xml = Element('body')
         body_xml.set('index', str(body.userData.id))
-
-        body_xml.set('type', 'free' if body.type is b2_dynamicBody else 'fixed')
+        if body.type is b2_dynamicBody :
+            type  = 'free'
+        elif body.type is 0:
+            type = 'fixed'
+        else :
+            raise Exception("unidentified body type encountered")
+        body_xml.set('type', type)
 
         # mass
         mass = SubElement(body_xml, 'mass')
@@ -39,7 +45,7 @@ def body_2_xml(body: b2Body):
 
         # shape
         shape = SubElement(body_xml, 'shape')
-        shape.set('value', ' '.join(str(body.fixtures[0].shape).split()).replace('\n', ' ').replace('\r', ''))
+        shape.set('value', str(body.userData.shape))
         return body_xml
     except AttributeError:
         print("body without id encountered")
@@ -96,6 +102,7 @@ class XMLExporter:
         cfg = Element('configuration')
         cfg.set("name",str(self.simData.name))
         cfg.set("time",str(self.simData.sim_t))
+        cfg.set("dt",str(self.simData.dt))
         for b in self.world.bodies:
             xb = body_2_xml(b)
             if xb is not None:
@@ -123,6 +130,6 @@ class XMLExporter:
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
-        file = os.path.join(directory,str(self.simData.step)+".xml")
+        file = os.path.join(directory,self.simData.name+"_"+str(self.simData.step)+".xml")
         with open(file,"w") as f:
             f.write(xml)

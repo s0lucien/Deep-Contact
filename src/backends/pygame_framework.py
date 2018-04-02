@@ -272,7 +272,6 @@ class PygameFramework(FrameworkBase):
             self.gui_app.init(container)
 
         self.viewCenter = (0, 20.0)
-        self.groundbody = self.world.CreateBody()
 
     def setCenter(self, value):
         """
