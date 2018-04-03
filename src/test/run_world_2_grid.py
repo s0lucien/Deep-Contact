@@ -1,11 +1,11 @@
 import numpy as np
 from Box2D import b2Vec2, b2World, b2_dynamicBody
-from gen_world import new_confined_clustered_circles_world
-from sim_types import SimData
-from sph.gridsplat import W_grid_poly6
+from ..gen_world import new_confined_clustered_circles_world
+from ..sim_types import SimData
+from ..sph.gridsplat import W_grid_poly6
+from ..sph.kernel import W_poly6_2D
 import matplotlib.pyplot as plt
 
-from sph.kernel import W_poly6_2D
 
 if __name__ == "__main__":
     #uncomment to get the seed of a specific (working) configuration

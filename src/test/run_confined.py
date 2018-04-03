@@ -38,6 +38,7 @@ class Confined(Framework):
             b.userData.id=b_ix
 
     def Step(self, settings):
+        print(len(self.world.contacts))
         super(Confined, self).Step(settings)
 
 if __name__ == "__main__":

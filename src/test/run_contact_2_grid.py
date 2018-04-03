@@ -3,9 +3,10 @@ from Box2D import b2Vec2, b2World, b2_dynamicBody
 from ..gen_world import new_confined_clustered_circles_world
 from ..sim_types import SimData
 from ..sph.gridsplat import C_grid_poly6
-import matplotlib.pyplot as plt
-
 from ..sph.kernel import W_poly6_2D
+from .run_confined import Confined
+import matplotlib.pyplot as plt
+import sys
 
 if __name__ == "__main__":
     xlow, xhi = -5, 2
@@ -19,16 +20,20 @@ if __name__ == "__main__":
                                          p_hr=b2Vec2(xhi,yhi),
                                          radius_range=(1,1), sigma=sigma_coef,
                                          seed=None)
+
+    while len(world.contacts) == 0:
+        world.Step(0.01, 100, 100)
+        print(len(world.contacts))
     h=3
     xspace, yspace= 1,1
-    g_dict, W_grid = C_grid_poly6(world,h,(xlow,ylow),(xhi,yhi), xspace, yspace)
+    g_dict, C_grid = C_grid_poly6(world,h,(xlow,ylow),(xhi,yhi), xspace, yspace)
 
-# visualize the sparsity pattern
-Wspy = np.copy(W_grid)
-Xsz, Ysz = Wspy.shape
-for i in range(Xsz):
-    for j in range(Ysz):
-        if Wspy[i,j] != 0:
-            Wspy[i,j] = len(Wspy[i,j])
-plt.spy(Wspy)
-plt.show()
+    # visualize the sparsity pattern
+    Cspy = np.copy(C_grid)
+    Xsz, Ysz = Cspy.shape
+    for i in range(Xsz):
+        for j in range(Ysz):
+            if Cspy[i,j] != 0:
+                Cspy[i,j] = len(Wspy[i,j])
+    plt.spy(Cspy)
+    plt.show()
