@@ -29,7 +29,7 @@ ground = create_fixed_box(world, p_ll=b2Vec2(xlow, ylow), p_hr=b2Vec2(xhi, yhi))
 
 # Populate the world
 N = 100
-seed = 100
+seed = 101
 gen = GenClusteredCirclesRegion(world, seed=seed)
 sigma_coef = 1.2
 gen.fill(N, b2Vec2(xlow,ylow),  b2Vec2(xhi,yhi), (1, 1), sigma_coef)
@@ -91,6 +91,7 @@ totalPositionIterations = []
 contactsSolved = []
 times = []
 velocityLambdaTwoNorms = []
+start = -1
 for i in range(steps):
     print("step", i)
 
@@ -109,6 +110,9 @@ for i in range(steps):
     totalVelocityIterations.append(profile.velocityIterations)
     totalPositionIterations.append(profile.positionIterations)
     contactsSolved.append(profile.contactsSolved)
+
+    if (start < 0) & (profile.contactsSolved > 0):
+        start = i
 
     if convergenceRates:
         velocityLambdaTwoNorms.append(profile.velocityLambdaTwoNorms)
@@ -147,10 +151,11 @@ if convergenceRates:
 
     counts = np.abs(np.sum(np.isnan(dataArray), axis=0) - steps)
 
+
 # Plot stuff
 import matplotlib.pyplot as plt
 
-start = 0
+#start = 0
 
 def pretty(s):
     return '{0:.0E}'.format(s)
@@ -160,6 +165,11 @@ title = "N = " + str(N) + ", dt = " + pretty(timeStep) + ", vel_iter = " + prett
 
 # ---Convergence rate plots---
 if convergenceRates:
+    end = 0
+    limit = 0.2
+    while counts[end] > steps * limit:
+        end += 1
+
     fig = plt.figure()
     fig.suptitle(title)
 
@@ -186,24 +196,24 @@ if convergenceRates:
     ax1.semilogy(firstQuantiles)
     ax1.semilogy(secondQuantiles)
     ax1.semilogy(thirdQuantiles)
-    ax1.set_xlim([0, 500])
+    ax1.set_xlim([0, end])
     ax1.set_ylim([10**-4, 10**1])
     ax1.legend(["25", "50", "75"])
     ax1.set_xlabel("Iterations")
     ax1.set_ylabel("Value")
-    ax1.set_title("Convergence Rate - First iterations")
+    ax1.set_title("Convergence Rate - " + str(int(limit*100)) + "% cutoff")
 
     # Limited convergence rates
     ax1 = fig.add_subplot(224)
     ax1.semilogy(zerothQuantiles)
     ax1.semilogy(secondQuantiles)
     ax1.semilogy(fourthQuantiles)
-    ax1.set_xlim([0, 500])
+    ax1.set_xlim([0, end])
     ax1.set_ylim([10**-4, 10**1])
     ax1.legend(["10", "50", "90"])
     ax1.set_xlabel("Iterations")
     ax1.set_ylabel("Value")
-    ax1.set_title("Convergence Rate - First iterations, different quantiles")
+    ax1.set_title("Convergence Rate - " + str(int(limit*100)) + "% cutoff, different quantiles")
 
 
 
@@ -214,7 +224,7 @@ fig.suptitle(title)
 # Velocity iterations
 ax1 = fig.add_subplot(223)
 ln1 = ax1.plot(range(steps), totalVelocityIterations, 'c', label="total_iter")
-ax1.set_xlim([start, steps])
+ax1.set_xlim([start-5, steps])
 ax1.set_xlabel("Step")
 ax1.set_ylabel("Total number of iterations")
 ax1.tick_params('y', colors='c')
@@ -234,7 +244,7 @@ ax1.set_title("Velocity iterations numbers")
 # Position iterations
 ax1 = fig.add_subplot(224)
 ln1 = ax1.plot(range(steps), totalPositionIterations, 'c', label="total_iter")
-ax1.set_xlim([start, steps])
+ax1.set_xlim([start-5, steps])
 ax1.set_xlabel("Step")
 ax1.set_ylabel("Total number of iterations")
 ax1.tick_params('y', colors='c')
@@ -253,7 +263,7 @@ ax1.set_title("Position iterations numbers")
 # Times
 ax1 = fig.add_subplot(221)
 ax1.plot(range(steps), times)
-ax1.set_xlim([start, steps])
+ax1.set_xlim([start-5, steps])
 ax1.set_xlabel("Step")
 ax1.set_ylabel("Step time")
 ax1.set_title("Time taken for each step")
@@ -262,7 +272,7 @@ ax1.set_title("Time taken for each step")
 # Contacts
 ax1 = fig.add_subplot(222)
 ax1.plot(range(steps), contactsSolved)
-ax1.set_xlim([start, steps])
+ax1.set_xlim([start-5, steps])
 ax1.set_xlabel("Step")
 ax1.set_ylabel("Total number of contacts")
 ax1.set_title("Contact numbers for each step")
