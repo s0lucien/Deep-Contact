@@ -1,10 +1,12 @@
 import numpy as np
 from Box2D import b2Vec2, b2World, b2_dynamicBody
-from ..gen_world import new_confined_clustered_circles_world
-from ..sim_types import SimData
-from ..sph.gridsplat import W_grid_poly6
-from ..sph.kernel import W_poly6_2D
+from gen_world import new_confined_clustered_circles_world
+from sim_types import SimData
+from sph.gridsplat import Wgrid
 import matplotlib.pyplot as plt
+import logging
+logging.basicConfig(level=logging.DEBUG)
+from sph.gridsplat import contact_properties
 
 
 if __name__ == "__main__":
@@ -21,9 +23,17 @@ if __name__ == "__main__":
                                          p_hr=b2Vec2(xhi,yhi),
                                          radius_range=(1,1), sigma=sigma_coef,
                                          seed=None)
+    while world.contactCount <5 :
+        world.Step(0.01, 100, 100)
+        logging.debug("stepped 0.1")
     h=3
-    xspace, yspace= 1,1
-    W_grid = W_grid_poly6(world,h,(xlow,ylow),(xhi,yhi), xspace, yspace)
+    xRes, yRes= 1,1
+    df = contact_properties(world)
+
+    Px, Py,ID = df.px[:,np.newaxis], df.py[:,np.newaxis], list(zip(df.master,df.slave))
+    X, Y = np.mgrid[xlow:xhi:xRes, ylow:yhi:yRes]
+
+    W_grid = Wgrid(X,Y,Px,Py,ID,h)
 
 # visualize the sparsity pattern
 Wspy = np.copy(W_grid)

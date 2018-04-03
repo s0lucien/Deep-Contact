@@ -1,7 +1,7 @@
 
 
-from ..framework import (Framework, main)
-from ..gen_world import new_confined_clustered_circles_world
+from framework import (Framework, main)
+from gen_world import new_confined_clustered_circles_world
 from Box2D import (b2LoopShape, b2Vec2)
 
 
