@@ -134,12 +134,15 @@ def C_grid_poly6(world: b2World, h, p_ll, p_hr, xRes, yRes):
 
     X, Y = np.mgrid[xlow:xhi:xRes, ylow:yhi:yRes]
     Xsz, Ysz = X.shape
+    C_grid = np.zeros((Xsz, Ysz), dtype=object)  # TODO: change to sparse
+    if len(Pxy) == 0:
+        print('There is no contact points now')
+        return g_dict, C_grid
+
     P_grid = np.c_[X.ravel(), Y.ravel()]
-    print(Pxy)
     KDTree = spatial.cKDTree(Pxy[:, 0:2])
     # nn contains all neighbors within range h for every grid point
     NN = KDTree.query_ball_point(P_grid, h)
-    C_grid = np.zeros((Xsz, Ysz), dtype=object)  # TODO: change to sparse
     for i in range(NN.shape[0]):
         if len(NN[i]) > 0:
             xi, yi = np.unravel_index(i, (Xsz, Ysz))
