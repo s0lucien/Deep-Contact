@@ -1,4 +1,4 @@
-from ..framework import (
+from framework import (
     Framework,
     main,
 )
