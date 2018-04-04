@@ -2,7 +2,7 @@ import numpy as np
 from Box2D import b2Vec2, b2World, b2_dynamicBody
 from gen_world import new_confined_clustered_circles_world
 from sim_types import SimData
-from sph.gridsplat import Wgrid
+from sph.gridsplat import Wgrid , W_value, body_properties
 import matplotlib.pyplot as plt
 
 
@@ -25,15 +25,12 @@ if __name__ == "__main__":
     Pxy = np.asarray([[b.position.x, b.position.y, b.userData.id] for b in world.bodies if b.type is b2_dynamicBody])
     Px, Py,ID = Pxy[:, 0][:,np.newaxis], Pxy[:, 1][:,np.newaxis], Pxy[:,2]
     X, Y = np.mgrid[xlow:xhi:xRes, ylow:yhi:yRes]
+    df = body_properties(world)
 
     W_grid = Wgrid(X,Y,Px,Py,ID,h)
 
-# visualize the sparsity pattern
-Wspy = np.copy(W_grid)
-Xsz, Ysz = Wspy.shape
-for i in range(Xsz):
-    for j in range(Ysz):
-        if Wspy[i,j] != 0:
-            Wspy[i,j] = len(Wspy[i,j])
-plt.spy(Wspy)
-plt.show()
+    W = W_value(W_grid, df, "mass")
+    assert W.shape == W_grid.shape
+    plt.spy(W)
+    plt.show()
+

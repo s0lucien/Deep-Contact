@@ -6,7 +6,7 @@ from sph.gridsplat import Wgrid, W_value, contact_graph
 import matplotlib.pyplot as plt
 import logging
 logging.basicConfig(level=logging.DEBUG)
-from sph.gridsplat import contact_properties
+from sph.gridsplat import SPHGridWorld
 import networkx as nx
 
 if __name__ == "__main__":
@@ -16,6 +16,8 @@ if __name__ == "__main__":
     ylow, yhi = 0, 15
     n_circles = 3
     sigma_coef = 1.3
+    h = 3
+    xRes, yRes = 1, 1
     world = b2World(doSleep=False)
     world.userData=SimData("sim2grid")
     new_confined_clustered_circles_world(world, n_circles,
@@ -23,26 +25,19 @@ if __name__ == "__main__":
                                          p_hr=b2Vec2(xhi,yhi),
                                          radius_range=(1,1), sigma=sigma_coef,
                                          seed=None)
+    gw = SPHGridWorld(world,(xlow, ylow),(xhi,yhi),xRes,yRes,h)
+
     while world.contactCount <5 :
         world.Step(0.01, 100, 100)
+        gw.Step()
         logging.debug("stepped 0.1")
-    h=3
-    xRes, yRes= 1,1
-    df = contact_properties(world)
 
-    Px, Py,ID = df.px[:,np.newaxis], df.py[:,np.newaxis], list(zip(df.master,df.slave))
-    X, Y = np.mgrid[xlow:xhi:xRes, ylow:yhi:yRes]
 
-    W_grid = Wgrid(X,Y,Px,Py,ID,h)
-    df = contact_properties(world)
-
-    W = W_value(W_grid, df, "nx")
-    assert W.shape == W_grid.shape
     # visualize the sparsity pattern
     fig = plt.figure()
     fig.show()
     f1 = fig.add_subplot(121)
-    f1.spy(W)
+    f1.spy()
     G = contact_graph(world)
     print("contacts converted to graph:\n", G.edges(), "\n\n")
     print(G.edges())

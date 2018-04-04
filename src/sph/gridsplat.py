@@ -4,6 +4,20 @@ from scipy import spatial
 from .kernel import W_poly6_2D
 import pandas as pd
 import networkx as nx
+from scipy import interpolate
+
+
+def W_value(W_grid, data, channel_name):
+    Xsz, Ysz = W_grid.shape
+    Z = np.zeros(W_grid.shape)
+    for i in range(Xsz):
+        for j in range(Ysz):
+            if W_grid[i,j] != 0:
+                z = 0
+                for (body_id,w) in W_grid[i,j]:
+                    z += data.loc[body_id][channel_name]*w
+                Z[i,j] = z
+    return Z
 
 
 def Wgrid(X, Y, Px, Py, ID, h, f_krn=W_poly6_2D):
@@ -19,9 +33,9 @@ def Wgrid(X, Y, Px, Py, ID, h, f_krn=W_poly6_2D):
     :return:
     '''
     # sanity check
-    assert Px.shape[1] == Py.shape[1] == 1
-    assert Px.shape[0] == Py.shape[0]
-    assert X.shape == Y.shape
+    # assert Px.shape[1] == Py.shape[1] == 1
+    # assert Px.shape[0] == Py.shape[0]
+    # assert X.shape == Y.shape
     Xsz, Ysz = X.shape
     P_grid = np.c_[X.ravel(), Y.ravel()]
     Pxy = np.c_[Px, Py]  # stack the points as row-vectors
@@ -48,8 +62,8 @@ def Wgrid(X, Y, Px, Py, ID, h, f_krn=W_poly6_2D):
 
 def body_properties(world: b2World):
     B = np.asarray([[b.userData.id,
-                     # b.position.x,
-                     # b.position.y, # do we need positions or just the values?
+                     b.position.x,
+                     b.position.y, # do we need positions or just the values?
                      b.mass,
                      b.linearVelocity.x,
                      b.linearVelocity.y,
@@ -87,11 +101,16 @@ def contact_properties(world: b2World):
     C = np.asarray(cs)
 
     if C.size == 0:
-        raise ValueError("Contacts should not be empty !!")
+        return pd.DataFrame(columns=["master", "slave", "px", "py", "nx", "ny", "normal_impulse", "tangent_impulse","e"])
+        # raise ValueError("Contacts should not be empty !!")
     df = pd.DataFrame(data=C, columns=["master", "slave", "px", "py", "nx", "ny", "normal_impulse", "tangent_impulse"])
     # perform some formatting on the columns
     df.master = df.master.astype(int)
     df.slave = df.slave.astype(int)
+    edges = [tuple(row[col] for col in ['master', 'slave']) for _, row in df.iterrows()]
+    e_ix = pd.MultiIndex.from_tuples(edges, names=["master","slave"])
+    #a = pd.concat([df, edges], axis=1)
+    df = df.set_index(e_ix)
     return df
 
 
@@ -103,3 +122,44 @@ def contact_graph(world: b2World):
                        attr_dict={"px": row.px, "py": row.py, "nx": row.nx, "ny": row.ny,
                                   "normal_impulse": row.normal_impulse, "tangent_impulse": row.tangent_impulse})
     return G
+
+
+class SPHGridWorld:
+    def __init__(self, world:b2World, p_ll, p_hr, xRes, yRes, h):
+        self.world = world
+        self.h = h
+        xlo, ylo = p_ll
+        xhi, yhi = p_hr
+        self.X,self.Y =  np.mgrid[xlo:xhi:xRes, ylo:yhi:yRes]
+        self.grids = {}
+        self.f_interp = {}
+
+
+    def Step(self):
+        self.df_b = body_properties(self.world)
+        self.df_c = contact_properties(self.world)
+        bPx = self.df_b.px
+        bPy = self.df_b.py
+        bID = self.df_b.index.values
+        self.W_bodies = Wgrid(self.X, self.Y, bPx, bPy, bID, self.h, f_krn=W_poly6_2D)
+        b_channels = self.df_b.columns.tolist()
+        for b in b_channels:
+            if b not in ["px", "py", "id"]:
+                self.grids[b] = W_value(self.W_bodies, self.df_b, b)
+        c_channels = self.df_c.columns.tolist()
+        if not self.df_c.empty:
+            cPx = self.df_c.px
+            cPy = self.df_c.py
+            cID = self.df_c.index.values
+            self.W_contacts = Wgrid(self.X, self.Y, cPx, cPy, cID, self.h, f_krn=W_poly6_2D)
+            for c in c_channels:
+                if c not in ["px", "py", "e", "master", "slave"]:
+                    self.grids[c] = W_value(self.W_contacts, self.df_b, c)
+        else :
+            for c in c_channels:
+                self.grids.pop(c,None)
+        for chan in self.grids.keys():
+            self.f_interp[chan] = interpolate.interp2d(self.X, self.Y, self.grids[chan], kind="linear")
+
+    def query(self, Px, Py, channel):
+        return self.f_interp[channel](Px,Py)
