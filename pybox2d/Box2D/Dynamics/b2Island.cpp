@@ -273,9 +273,9 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 
         if (step.convergenceRates){
             profile->velocityLambdaTwoNorms[i] = b2Max(profile->velocityLambdaTwoNorms[i],
-                                                      solverVelocityProfile.lambdaTwoNorm);
+                                                       solverVelocityProfile.lambdaTwoNorm);
             profile->velocityLambdaInfNorms[i] = b2Max(profile->velocityLambdaInfNorms[i],
-                                                      solverVelocityProfile.lambdaInfNorm);
+                                                       solverVelocityProfile.lambdaInfNorm);
         }
 
         if (solverVelocityProfile.lambdaTwoNorm <= step.velocityThreshold)
@@ -285,7 +285,7 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 	}
     int32 velocityIterations = b2Min(i+1, step.velocityIterations);
     profile->velocityIterations += velocityIterations;
-    profile->maxVelocityIterations = b2Max(profile->maxVelocityIterations, velocityIterations);
+    profile->maxIslandVelocityIterations = b2Max(profile->maxIslandVelocityIterations, velocityIterations);
 
 	// Store impulses for warm starting
 	contactSolver.StoreImpulses();
@@ -356,7 +356,7 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 	}
     int32 positionIterations = b2Min(i+1, step.positionIterations);
     profile->positionIterations += positionIterations;
-    profile->maxPositionIterations = b2Max(profile->maxPositionIterations, positionIterations);
+    profile->maxIslandPositionIterations = b2Max(profile->maxIslandPositionIterations, positionIterations);
 
 	// Copy state buffers back to the bodies
 	for (int32 i = 0; i < m_bodyCount; ++i)

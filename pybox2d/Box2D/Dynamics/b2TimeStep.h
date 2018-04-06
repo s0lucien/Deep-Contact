@@ -38,8 +38,8 @@ struct b2Profile
     int32 contactsSolved;
 
     // Denotes the maximum number of iterations performed by a single island
-    int32 maxVelocityIterations;
-    int32 maxPositionIterations;
+    int32 maxIslandVelocityIterations;
+    int32 maxIslandPositionIterations;
 
     // Convergence rates - optional
     bool convergenceRates;

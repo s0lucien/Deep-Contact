@@ -298,9 +298,8 @@ public:
 public:
     PyObject* __GetVelocityLambdaTwoNorms() {
         if ($self->convergenceRates) {
-            PyObject* list = PyList_New($self->maxVelocityIterations);
-            int i;
-            for (i = 0; i < $self->maxVelocityIterations; i++) {
+            PyObject* list = PyList_New($self->maxIslandVelocityIterations);
+            for (int i = 0; i < $self->maxIslandVelocityIterations; i++) {
                 PyObject* o = PyFloat_FromDouble((double) $self->velocityLambdaTwoNorms[i]);
                 PyList_SetItem(list, i, o);
             }
@@ -311,9 +310,8 @@ public:
 
     PyObject* __GetVelocityLambdaInfNorms() {
         if ($self->convergenceRates) {
-            PyObject* list = PyList_New($self->maxVelocityIterations);
-            int i;
-            for (i = 0; i < $self->maxVelocityIterations; i++) {
+            PyObject* list = PyList_New($self->maxIslandVelocityIterations);
+            for (int i = 0; i < $self->maxIslandVelocityIterations; i++) {
                 PyObject* o = PyFloat_FromDouble((double) $self->velocityLambdaInfNorms[i]);
                 PyList_SetItem(list, i, o);
             }
@@ -323,9 +321,8 @@ public:
     }
 
     PyObject* __GetPositionLambdas() {
-        PyObject* list = PyList_New($self->maxPositionIterations);
-        int i;
-        for (i = 0; i < $self->maxPositionIterations; i++) {
+        PyObject* list = PyList_New($self->maxIslandPositionIterations);
+        for (int i = 0; i < $self->maxIslandPositionIterations; i++) {
             PyObject* o = PyFloat_FromDouble((double) $self->positionLambdas[i]);
             PyList_SetItem(list, i, o);
         }
@@ -336,7 +333,7 @@ public:
         # Ready-only
         velocityLambdaTwoNorms = property(__GetVelocityLambdaTwoNorms, None)
         velocityLambdaInfNorms = property(__GetVelocityLambdaInfNorms, None)
-        positionLambdas = property(__GetPositionLambdas, None)
+        positionLambdas        = property(__GetPositionLambdas, None)
     %}
 }
 

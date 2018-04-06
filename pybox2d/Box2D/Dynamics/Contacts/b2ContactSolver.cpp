@@ -316,7 +316,7 @@ void b2ContactSolver::SolveVelocityConstraints(b2SolverVelocityProfile* velocity
 
 		// Solve tangent constraints first because non-penetration is more important
 		// than friction.
-        float32 tangentLambda;
+        float32 tangentLambda = 0.0f;
 		for (int32 j = 0; j < pointCount; ++j)
 		{
 			b2VelocityConstraintPoint* vcp = vc->points + j;
@@ -343,11 +343,12 @@ void b2ContactSolver::SolveVelocityConstraints(b2SolverVelocityProfile* velocity
 			vB += mB * P;
 			wB += iB * b2Cross(vcp->rB, P);
 
-            tangentLambda = lambda;
+            // Store lambda
+            tangentLambda = b2Max(tangentLambda, lambda);
 		}
 
 		// Solve normal constraints
-        float32 normalLambda;
+        float32 normalLambda = 0.0f;
 		if (vc->pointCount == 1)
 		{
 			b2VelocityConstraintPoint* vcp = vc->points + 0;
@@ -372,6 +373,7 @@ void b2ContactSolver::SolveVelocityConstraints(b2SolverVelocityProfile* velocity
 			vB += mB * P;
 			wB += iB * b2Cross(vcp->rB, P);
 
+            // Store lambda
             normalLambda = lambda;
 		}
 		else

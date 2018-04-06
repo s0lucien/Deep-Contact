@@ -5552,8 +5552,8 @@ class b2Profile(object):
     velocityIterations = _swig_property(_Box2D.b2Profile_velocityIterations_get, _Box2D.b2Profile_velocityIterations_set)
     positionIterations = _swig_property(_Box2D.b2Profile_positionIterations_get, _Box2D.b2Profile_positionIterations_set)
     contactsSolved = _swig_property(_Box2D.b2Profile_contactsSolved_get, _Box2D.b2Profile_contactsSolved_set)
-    maxVelocityIterations = _swig_property(_Box2D.b2Profile_maxVelocityIterations_get, _Box2D.b2Profile_maxVelocityIterations_set)
-    maxPositionIterations = _swig_property(_Box2D.b2Profile_maxPositionIterations_get, _Box2D.b2Profile_maxPositionIterations_set)
+    maxIslandVelocityIterations = _swig_property(_Box2D.b2Profile_maxIslandVelocityIterations_get, _Box2D.b2Profile_maxIslandVelocityIterations_set)
+    maxIslandPositionIterations = _swig_property(_Box2D.b2Profile_maxIslandPositionIterations_get, _Box2D.b2Profile_maxIslandPositionIterations_set)
 
     def __GetVelocityLambdaTwoNorms(self):
         """__GetVelocityLambdaTwoNorms(b2Profile self) -> PyObject *"""
@@ -5573,7 +5573,7 @@ class b2Profile(object):
             # Ready-only
     velocityLambdaTwoNorms = property(__GetVelocityLambdaTwoNorms, None)
     velocityLambdaInfNorms = property(__GetVelocityLambdaInfNorms, None)
-    positionLambdas = property(__GetPositionLambdas, None)
+    positionLambdas        = property(__GetPositionLambdas, None)
 
 
     def __init__(self):

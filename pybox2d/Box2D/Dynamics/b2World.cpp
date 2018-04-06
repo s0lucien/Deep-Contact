@@ -397,8 +397,8 @@ void b2World::Solve(const b2TimeStep& step)
     m_profile.positionIterations = 0;
     m_profile.contactsSolved = 0;
 
-    m_profile.maxVelocityIterations = 0;
-    m_profile.maxPositionIterations = 0;
+    m_profile.maxIslandVelocityIterations = 0;
+    m_profile.maxIslandPositionIterations = 0;
 
     m_profile.convergenceRates = step.convergenceRates;
 
@@ -427,13 +427,17 @@ void b2World::Solve(const b2TimeStep& step)
     if (m_convergenceRates)
     {
         // Free arrays from last iteration if any
-        free(m_profile.velocityLambdaTwoNorms);
-        free(m_profile.velocityLambdaInfNorms);
-        free(m_profile.positionLambdas);
+        b2Free(m_profile.velocityLambdaTwoNorms);
+        b2Free(m_profile.velocityLambdaInfNorms);
+        b2Free(m_profile.positionLambdas);
 
-        m_profile.velocityLambdaTwoNorms = (float32*)malloc(step.velocityIterations * sizeof(float32));
-        m_profile.velocityLambdaInfNorms = (float32*)malloc(step.velocityIterations * sizeof(float32));
-        m_profile.positionLambdas = (float32*)malloc(step.positionIterations * sizeof(float32));
+        m_profile.velocityLambdaTwoNorms = (float32*)b2Alloc(step.velocityIterations * sizeof(float32));
+        m_profile.velocityLambdaInfNorms = (float32*)b2Alloc(step.velocityIterations * sizeof(float32));
+        m_profile.positionLambdas        = (float32*)b2Alloc(step.positionIterations * sizeof(float32));
+
+        memset(m_profile.velocityLambdaTwoNorms, 0, step.velocityIterations * sizeof(float32));
+        memset(m_profile.velocityLambdaInfNorms, 0, step.velocityIterations * sizeof(float32));
+        memset(m_profile.positionLambdas, 0, step.positionIterations * sizeof(float32));
     }
 
 	// Build and simulate all awake islands.
