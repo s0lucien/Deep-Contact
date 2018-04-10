@@ -30,14 +30,17 @@ if __name__ == "__main__":
     xRes, yRes= 1,1
     df = contact_properties(world)
 
-    Px, Py,ID = df.px[:,np.newaxis], df.py[:,np.newaxis], list(zip(df.master,df.slave))
+    Px, Py,ID = df.px[:,np.newaxis], df.py[:,np.newaxis], df.index.values
     X, Y = np.mgrid[xlow:xhi:xRes, ylow:yhi:yRes]
 
     W_grid = Wgrid(X,Y,Px,Py,ID,h)
-    df = contact_properties(world)
 
     W = W_value(W_grid, df, "nx")
     assert W.shape == W_grid.shape
+
+    print(W_grid)
+    print(W)
+
     # visualize the sparsity pattern
     fig = plt.figure()
     fig.show()
@@ -45,7 +48,6 @@ if __name__ == "__main__":
     f1.spy(W)
     G = contact_graph(world)
     print("contacts converted to graph:\n", G.edges(), "\n\n")
-    print(G.edges())
     [print(G[a][b]) for (a, b) in G.edges()]
     f1 = fig.add_subplot(122)
     nx.draw(G)

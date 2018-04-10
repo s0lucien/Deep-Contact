@@ -24,5 +24,3 @@ if __name__ == "__main__":
         logging.debug("stepped 0.1")
     df = contact_properties(world)
     print("contacts converted to dataframe:\n",df,"\n\n")
-    print("indexing into dataframe to query about contact 1's indformation : ",
-          (df.loc[0].master,df.loc[0].slave))

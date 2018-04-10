@@ -27,11 +27,16 @@ if __name__ == "__main__":
                                          seed=None)
     gw = SPHGridWorld(world,(xlow, ylow),(xhi,yhi),xRes,yRes,h)
 
-    while world.contactCount <5 :
+    contactCount = 0
+    while contactCount <3 :
         world.Step(0.01, 100, 100)
         gw.Step()
         logging.debug("stepped 0.1")
 
+        contactCount = 0
+        for c in world.contacts:
+            if c.touching:
+                contactCount += 1
 
     # visualize the sparsity pattern
     fig = plt.figure()

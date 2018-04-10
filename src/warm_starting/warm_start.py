@@ -8,11 +8,12 @@ from .bad_model import BadModel
 from .random_model import RandomModel
 from .parallel_world_model import ParallelWorldModel
 from .copy_world_model import CopyWorldModel
+from .identity_grid_model import IdentityGridModel
 
 from Box2D import (b2World, b2LoopShape, b2Vec2, b2ContactListener)
 
-from ..gen_world import GenClusteredCirclesRegion, create_fixed_box
-from ..sim_types import BodyData
+from gen_world import GenClusteredCirclesRegion, create_fixed_box
+from sim_types import BodyData
 
 
 
@@ -38,13 +39,29 @@ positionThreshold = 10**-5
 # Number of steps
 steps = 1000
 
+# Grid parameters - only relevant for identity grid model
+# World lower left point
+p_ll = (xlow, ylow)
+# World upper right point
+p_hr = (xhi, yhi)
+# Grid x-resolution
+xRes = 0.5
+# Grid y-resolution
+yRes = 0.5
+# Support radius
+h = 3
+
+# Create world in case model needs it
+world = b2World(gravity=(0, -10), doSleep=False)
+
 # Choose a model
 #model = NoWarmStartModel()
 #model = BuiltinWarmStartModel()
 #model = BadModel()
 #model = RandomModel(0)
 #model = ParallelWorldModel(world)
-model = CopyWorldModel()
+#model = CopyWorldModel()
+model = IdentityGridModel(world, p_ll, p_hr, xRes, yRes, h)
 
 # Iteration counter plots
 plotIterationCounters = False
@@ -80,9 +97,6 @@ class WarmStartListener(b2ContactListener):
 
 
 # ----- World Creation -----
-# Create world
-world = b2World(gravity=(0, -10), doSleep=False)
-
 world.enableContinuous   = False
 world.subStepping        = False
 world.enableWarmStarting = True
