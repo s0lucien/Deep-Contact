@@ -40,6 +40,8 @@ class GenWorld:
     def __init__(self, world:b2World):
         self.world = world
         self.world.gravity = (0, -9.81)
+        self.world.enableWarmStarting = True
+        self.world.enableContinous = False
         self.world.allowSleeping = False
         try:
             if self.world.initialized is True:

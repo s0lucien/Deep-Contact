@@ -1,10 +1,10 @@
 from .model import Model
-from sph.gridsplat import SPHGridWorld
+from sph.gridsplat import SPHGridManager
 
 class IdentityGridModel (Model):
-    def __init__(self, world, p_ll, p_hr, xRes, yRes, h):
+    def __init__(self, world, p_ll, p_ur, xRes, yRes, h):
         # Initialize the grid
-        self.grid = SPHGridWorld(world, p_ll, p_hr, xRes, yRes, h)
+        self.grid = SPHGridManager(world, p_ll, p_ur, xRes, yRes, h)
 
 
     def Step(self, world, timeStep, velocityIterations, positionIterations):
@@ -25,5 +25,3 @@ class IdentityGridModel (Model):
 
             predictions.append((id, normalImpulse, tangentImpulse))
         return predictions
-
-#https://scipython.com/book/chapter-8-scipy/examples/two-dimensional-interpolation-with-scipyinterpolaterectbivariatespline/

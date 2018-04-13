@@ -37,7 +37,8 @@ def new_confined_clustered_circles_world(world, n_bodies, p_ll , p_hr, radius_ra
     radius_range = 2d tuple/array that holds minimum and maximum range for the circles
     '''
     create_fixed_box(world,p_ll,p_hr)
-    GenClusteredCirclesRegion(world, seed).fill(n_bodies,p_ll,p_hr,radius_range, sigma_coef=sigma)
+    GenClusteredCirclesRegion(world, seed=seed).fill(n_bodies, p_ll, p_hr, radius_range, sigma)
+
     for i in range(world.bodyCount):
         world.bodies[i].userData.id = i
     world.initialized = True
