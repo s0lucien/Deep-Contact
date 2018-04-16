@@ -6,7 +6,7 @@ from Box2D import (b2Vec2)
 def copyWorld(world):
     copy = b2World(gravity=world.gravity, doSleep=world.allowSleeping)
 
-    copy.enableContinuous  = world.enableContinuous
+    copy.continuousPhysics  = world.continuousPhysics
 
     copy.velocityThreshold = world.velocityThreshold
     copy.positionThreshold = world.positionThreshold
