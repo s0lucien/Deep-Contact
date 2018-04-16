@@ -2,6 +2,10 @@ import time
 import numpy as np
 
 from Box2D import (b2ContactListener)
+import cv2
+import matplotlib.pyplot as plt
+
+from ..opencv_draw import OpencvDrawFuncs
 
 # Warm-Starting Listener
 class WarmStartListener(b2ContactListener):
@@ -40,6 +44,9 @@ def run_world(world, model, timeStep, steps,
     # Create and attach listener
     world.contactListener = WarmStartListener(model)
 
+    # difine a drawer
+    drawer = OpencvDrawFuncs(w=640, h=640, ppm=10)
+    drawer.install()
 
     # ----- Run World -----
     totalStepTimes          = []
@@ -58,6 +65,13 @@ def run_world(world, model, timeStep, steps,
 
         # Tell the model to take a step
         model.Step(world, timeStep, velocityIterations, positionIterations)
+
+        # visiulization
+        drawer.clear_screen()
+        drawer.draw_world(world)
+
+        cv2.imshow('World', drawer.screen)
+        cv2.waitKey(25)
 
         # Tell the world to take a step
         world.Step(timeStep, velocityIterations, positionIterations)
@@ -101,7 +115,6 @@ def run_world(world, model, timeStep, steps,
         # Count the number of contributors for each iteration
         iterations = [len(l) for l in velocityLambdaTwoNorms]
         result["iteratorCounts"] = [np.sum([l >= i for l in iterations]) for i in range(max(iterations))]
-
 
     # Return results
     return result

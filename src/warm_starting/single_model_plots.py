@@ -12,7 +12,7 @@ from .identity_grid_model import IdentityGridModel
 
 from Box2D import (b2World, b2Vec2)
 
-from gen_world import new_confined_clustered_circles_world
+from ..gen_world import new_confined_clustered_circles_world
 from .warm_start import run_world
 
 
@@ -24,8 +24,8 @@ seed = 1337
 # Something about spread of bodies?
 sigma_coef = 1.2
 # Dimension of static box
-xlow, xhi = -30, 30
-ylow, yhi = 0, 60
+xlow, xhi = 10, 60
+ylow, yhi = 10, 60
 
 # Timestep
 timeStep = 1.0 / 100
@@ -57,12 +57,12 @@ new_confined_clustered_circles_world(world, N, b2Vec2(p_ll), b2Vec2(p_ur), (1, 1
 
 # Choose a model
 #model = NoWarmStartModel()
-model = BuiltinWarmStartModel()
+#model = BuiltinWarmStartModel()
 #model = BadModel()
 #model = RandomModel(0)
 #model = ParallelWorldModel(world)
 #model = CopyWorldModel()
-#model = IdentityGridModel(world, p_ll, p_ur, xRes, yRes, h)
+model = IdentityGridModel(world, p_ll, p_ur, xRes, yRes, h)
 
 # Iteration counter plots
 plotIterationCounters = True
