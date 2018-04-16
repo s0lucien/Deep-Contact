@@ -20,7 +20,7 @@ from .warm_start import run_world
 # Number of bodies in world
 N = 100
 # Seed to use for body generator
-seed = 101
+seed = 1337
 # Something about spread of bodies?
 sigma_coef = 1.2
 # Dimension of static box
@@ -44,11 +44,11 @@ p_ll = (xlow, ylow)
 # Grid upper right point
 p_ur = (xhi, yhi)
 # Grid x-resolution
-xRes = 0.5
+xRes = 0.8
 # Grid y-resolution
-yRes = 0.5
+yRes = 0.8
 # Support radius
-h = 3
+h = 1
 
 # Create world in case model needs it
 world = b2World()
@@ -57,12 +57,12 @@ new_confined_clustered_circles_world(world, N, b2Vec2(p_ll), b2Vec2(p_ur), (1, 1
 
 # Choose a model
 #model = NoWarmStartModel()
-#model = BuiltinWarmStartModel()
+model = BuiltinWarmStartModel()
 #model = BadModel()
 #model = RandomModel(0)
 #model = ParallelWorldModel(world)
 #model = CopyWorldModel()
-model = IdentityGridModel(world, p_ll, p_ur, xRes, yRes, h)
+#model = IdentityGridModel(world, p_ll, p_ur, xRes, yRes, h)
 
 # Iteration counter plots
 plotIterationCounters = True

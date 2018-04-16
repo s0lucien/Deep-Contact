@@ -20,7 +20,7 @@ from .warm_start import run_world
 # Number of bodies in world
 nBodies = 100
 # Seed to use for body generator
-seed = 101
+seed = 1337
 # Something about spread of bodies?
 sigma_coef = 1.2
 # Dimension of static box
@@ -44,11 +44,11 @@ p_ll = (xlow, ylow)
 # Grid upper right point
 p_ur = (xhi, yhi)
 # Grid x-resolution
-xRes = 0.5
+xRes = 0.8
 # Grid y-resolution
-yRes = 0.5
+yRes = 0.8
 # Support radius
-h = 3
+h = 1
 
 # Number of models to use
 nModels = 3
