@@ -57,12 +57,12 @@ new_confined_clustered_circles_world(world, N, b2Vec2(p_ll), b2Vec2(p_ur), (1, 1
 
 # Choose a model
 #model = NoWarmStartModel()
-model = BuiltinWarmStartModel()
+#model = BuiltinWarmStartModel()
 #model = BadModel()
 #model = RandomModel(0)
 #model = ParallelWorldModel(world)
 #model = CopyWorldModel()
-#model = IdentityGridModel(world, p_ll, p_ur, xRes, yRes, h)
+model = IdentityGridModel(world, p_ll, p_ur, xRes, yRes, h)
 
 # Iteration counter plots
 plotIterationCounters = True
