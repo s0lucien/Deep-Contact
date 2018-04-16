@@ -45,7 +45,7 @@ def run_world(world, model, timeStep, steps,
     world.contactListener = WarmStartListener(model)
 
     # difine a drawer
-    drawer = OpencvDrawFuncs(w=640, h=480, ppm=20)
+    drawer = OpencvDrawFuncs(w=640, h=640, ppm=10)
     drawer.install()
 
     # ----- Run World -----

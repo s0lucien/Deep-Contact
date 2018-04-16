@@ -24,8 +24,8 @@ seed = 1337
 # Something about spread of bodies?
 sigma_coef = 1.2
 # Dimension of static box
-xlow, xhi = -30, 30
-ylow, yhi = 0, 60
+xlow, xhi = 10, 60
+ylow, yhi = 10, 60
 
 # Timestep
 timeStep = 1.0 / 100
