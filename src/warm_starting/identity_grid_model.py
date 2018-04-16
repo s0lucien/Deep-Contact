@@ -1,5 +1,5 @@
 from .model import Model
-from sph.gridsplat import SPHGridManager
+from ..sph.gridsplat import SPHGridManager
 
 class IdentityGridModel (Model):
     def __init__(self, world, p_ll, p_ur, xRes, yRes, h):

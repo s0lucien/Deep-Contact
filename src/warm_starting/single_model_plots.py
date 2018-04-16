@@ -12,7 +12,7 @@ from .identity_grid_model import IdentityGridModel
 
 from Box2D import (b2World, b2Vec2)
 
-from gen_world import new_confined_clustered_circles_world
+from ..gen_world import new_confined_clustered_circles_world
 from .warm_start import run_world
 
 
