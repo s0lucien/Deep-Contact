@@ -3,7 +3,7 @@ import numpy as np
 from itertools import product
 from Box2D import (b2World, b2Vec2, b2_dynamicBody)
 
-from gen_world import new_confined_clustered_circles_world
+from ..gen_world import new_confined_clustered_circles_world
 
 from .gridsplat import SPHGridManager
 
@@ -39,21 +39,25 @@ attribute = "mass"
 # Grid parameters to try
 # Grid resolution
 res = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2]
+#res = [1]
 # Support radius
 h = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2]
+#h = [1]
 
 # Create all combinations of grid parameters
 parameters = list(product(*[res, h]))
 nParameters = len(parameters)
 
 # Create grid managers, tell them to create grids, and query for all bodies in world
-averages = []
+worldTotalDifferenceAverages = [.0]*nParameters
+bodyDifferenceAverageAverages = [.0]*nParameters
 for i in range(nParameters):
     p = parameters[i]
 
     print("Trying parameter set %d of %d" % (i, nParameters))
 
-    differences = []
+    worldTotalDifferences = [.0]*nWorlds
+    bodyDifferenceAverages = [.0]*nWorlds
     for j in range(nWorlds):
         world = worlds[j]
 
@@ -62,25 +66,33 @@ for i in range(nParameters):
         gm.Step([attribute])
 
         # Query for all bodies and sum
-        total = 0
+        worldTotal = 0
+        bodyDifferences = [.0]*nBodies
+        k = 0
         for b in world.bodies:
             if b.type is b2_dynamicBody:
-                total += gm.query(b.position.x, b.position.y, attribute)
+                value = gm.query(b.position.x, b.position.y, attribute)
+                worldTotal += value
+                bodyDifferences[k] = abs(b.mass - value)
+                k += 1
 
         # Store results
-        differences.append(abs(originals[j] - total))
+        worldTotalDifferences[j] = abs(originals[j] - worldTotal)
+        bodyDifferenceAverages[j] = np.mean(bodyDifferences)
 
     # Averate results and store
-    averages.append(np.mean(differences))
-
+    worldTotalDifferenceAverages[i] = np.mean(worldTotalDifferences)
+    bodyDifferenceAverageAverages[i] = np.mean(bodyDifferenceAverages)
 
 # Combine averages with parameters
-pairs = list(zip(averages, parameters))
+pairs = list(zip(parameters, worldTotalDifferenceAverages, bodyDifferenceAverageAverages))
 
 # Sort pairs
-sortedPairs = sorted(pairs, key=lambda p: p[0])
+sortedPairs = sorted(pairs, key=lambda p: p[1])
 
 # Print results
-print("{0:20s}     ({1:3s}, {2:3s})".format("Absolute differences", "res", "h"))
-for d, p in sortedPairs:
-    print("{0:20f}     ({1:1.1f}, {2:1.1f})".format(d, p[0], p[1]))
+print("Original total: {0:3.2f}".format(originals[0]))
+print("Body mass:      {0:3.2f}".format(worlds[0].bodies[1].mass))
+print("({0:4s}, {1:4s})\t{2:14s}\t{3:13s}".format("res", "h", "Avg total diff", "Avg body diff"))
+for p, t, b in sortedPairs:
+    print("({0:1.2f}, {1:1.2f})\t{2:11.2f}\t{3:10.2f}".format(p[0], p[1], t, b))
