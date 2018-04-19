@@ -18,23 +18,25 @@ from .warm_start import run_world
 
 # ----- Parameters -----
 # Number of bodies in world
-N = 100
+nBodies = 100
 # Seed to use for body generator
-seed = 1337
+seed = 1234
 # Something about spread of bodies?
 sigma_coef = 1.2
 # Dimension of static box
 xlow, xhi = 10, 60
 ylow, yhi = 10, 60
+# body radius min and max
+r = (1, 1)
 
 # Timestep
 timeStep = 1.0 / 100
 # Iteration limits
-velocityIterations = 20000
-positionIterations = 10000
+velocityIterations = 5000
+positionIterations = 2500
 # Iteration thresholds
-velocityThreshold = 10**-4
-positionThreshold = 10**-5
+velocityThreshold = 6*10**-5
+positionThreshold = 2*10**-5
 # Number of steps
 steps = 1000
 
@@ -44,16 +46,16 @@ p_ll = (xlow, ylow)
 # Grid upper right point
 p_ur = (xhi, yhi)
 # Grid x-resolution
-xRes = 0.8
+xRes = 0.75
 # Grid y-resolution
-yRes = 0.8
+yRes = 0.75
 # Support radius
 h = 1
 
 # Create world in case model needs it
 world = b2World()
 # Fill world with static box and circles
-new_confined_clustered_circles_world(world, N, b2Vec2(p_ll), b2Vec2(p_ur), (1, 1), sigma_coef, seed)
+new_confined_clustered_circles_world(world, nBodies, b2Vec2(p_ll), b2Vec2(p_ur), r, sigma_coef, seed)
 
 # Choose a model
 #model = NoWarmStartModel()
@@ -61,61 +63,44 @@ new_confined_clustered_circles_world(world, N, b2Vec2(p_ll), b2Vec2(p_ur), (1, 1
 #model = BadModel()
 #model = RandomModel(0)
 #model = ParallelWorldModel(world)
-#model = CopyWorldModel()
-model = IdentityGridModel(world, p_ll, p_ur, xRes, yRes, h)
+model = CopyWorldModel()
+#model = IdentityGridModel(world, p_ll, p_ur, xRes, yRes, h)
 
 # Iteration counter plots
 plotIterationCounters = True
-
-# Convergence rate plots
-plotConvergenceRates = True
-# Choose convergence rate data
-# 1 for velocity lambda two norms
-# 2 for velocity lambda infinity norms
-# 3 for position lambdas
-convergenceRateData = 1
-# Limit on percentage of contributors left for cutoff (see plot)
+# Velocity convergence rate plots
+plotVelocityConvergenceRates = True
+# Position convergence rate plots
+plotPositionConvergenceRates = True
+# Limit on percentage of contributors left for cutoff (see convergence plots)
 limit = 0.2
+
+# Print numbers as simulation is running
+printing = True
+# Show visualization of world as simulation is running
+# note: significantly slower
+visualize = False
 
 
 
 # ----- Run simulation -----
+conv = plotVelocityConvergenceRates | plotPositionConvergenceRates
+iter = plotIterationCounters
 result = run_world(world, model, timeStep, steps,
                    velocityIterations, positionIterations, velocityThreshold, positionThreshold,
-                   iterations=True, convergenceRates=True, quiet=False)
-
-totalVelocityIterations = result["totalVelocityIterations"]
-totalPositionIterations = result["totalPositionIterations"]
-totalStepTimes = result["totalStepTimes"]
-contactsSolved = result["contactsSolved"]
-iteratorCounts = result["iteratorCounts"]
+                   iterations=iter, convergenceRates=conv, quiet=not printing, visualize=visualize)
 
 
 
 # ----- Process data -----
-velocityTotal  = np.sum(totalVelocityIterations)
-velocityMean   = np.mean(totalVelocityIterations)
-velocityMedian = np.median(totalVelocityIterations)
-velocityStd    = np.std(totalVelocityIterations)
+totalStepTimes = result["totalStepTimes"]
+contactsSolved = result["contactsSolved"]
 
-positionTotal  = np.sum(totalPositionIterations)
-positionMean   = np.mean(totalPositionIterations)
-positionMedian = np.median(totalPositionIterations)
-positionStd    = np.std(totalPositionIterations)
-
-print("\nVelocity:")
-print("Total   = %d"   % velocityTotal)
-print("Average = %.2f" % velocityMean)
-print("Median  = %d"   % velocityMedian)
-print("Std     = %.2f" % velocityStd)
-
-print("\nPosition:")
-print("Total   = %d"   % positionTotal)
-print("Average = %.2f" % positionMean)
-print("Median  = %d"   % positionMedian)
-print("Std     = %.2f" % positionStd)
 
 if plotIterationCounters:
+    totalVelocityIterations = result["totalVelocityIterations"]
+    totalPositionIterations = result["totalPositionIterations"]
+
     # Determine when collissions start happening
     start = 0
     while contactsSolved[start] == 0:
@@ -124,28 +109,56 @@ if plotIterationCounters:
     velocityIterationsPerContact = [0 if c == 0 else v / c for c, v in zip(result["contactsSolved"], result["totalVelocityIterations"])]
     positionIterationsPerContact = [0 if c == 0 else p / c for c, p in zip(result["contactsSolved"], result["totalPositionIterations"])]
 
-if plotConvergenceRates:
-    # Determine when to cutoff convergence rate plots
-    end = 0
-    while iteratorCounts[end] > steps * limit:
-        end += 1
 
-    if convergenceRateData == 1:
-        convergenceData = result["velocityLambdaTwoNorms"]
-    if convergenceRateData == 2:
-        convergenceData = result["velocityLambdaInfNorms"]
-    if convergenceRateData == 3:
-        convergenceData = result["positionLambdas"]
+if plotVelocityConvergenceRates:
+    velocityLambdaTwoNorms = result["velocityLambdaTwoNorms"]
+    velocityLambdaInfNorms = result["velocityLambdaInfNorms"]
+    velocityIteratorCounts = result["velocityIteratorCounts"]
+
+    # Determine when to cutoff convergence rate plots
+    velocityEnd = 0
+    while velocityEnd < len(velocityIteratorCounts) and velocityIteratorCounts[velocityEnd] > steps * limit:
+        velocityEnd += 1
 
     # Pad convergence rates to be same length using NaNs
-    pad = len(max(convergenceData, key=len))
-    convergenceRatesArray = np.array([i + [np.NaN]*(pad-len(i)) for i in convergenceData])
+    pad = len(max(velocityLambdaTwoNorms, key=len))
+    velocityTwoArray = np.array([i + [np.NaN]*(pad-len(i)) for i in velocityLambdaTwoNorms])
+    velocityInfArray = np.array([i + [np.NaN]*(pad-len(i)) for i in velocityLambdaInfNorms])
 
-    tenPercent         = np.nanpercentile(convergenceRatesArray, 10, axis=0)
-    twentyfivePercent  = np.nanpercentile(convergenceRatesArray, 25, axis=0)
-    fiftyPercent       = np.nanpercentile(convergenceRatesArray, 50, axis=0)
-    seventyfivePercent = np.nanpercentile(convergenceRatesArray, 75, axis=0)
-    ninetyPercent      = np.nanpercentile(convergenceRatesArray, 90, axis=0)
+    # Determine quantiles for lambda two-norms
+    velocityTwoMin = np.nanmin(velocityTwoArray, axis=0)
+    velocityTwoFst = np.nanpercentile(velocityTwoArray, 25, axis=0)
+    velocityTwoSnd = np.nanpercentile(velocityTwoArray, 50, axis=0)
+    velocityTwoThr = np.nanpercentile(velocityTwoArray, 75, axis=0)
+    velocityTwoMax = np.nanmax(velocityTwoArray, axis=0)
+
+    # Determine quantiles for lambda inf-norms
+    velocityInfMin = np.nanmin(velocityInfArray, axis=0)
+    velocityInfFst = np.nanpercentile(velocityInfArray, 25, axis=0)
+    velocityInfSnd = np.nanpercentile(velocityInfArray, 50, axis=0)
+    velocityInfThr = np.nanpercentile(velocityInfArray, 75, axis=0)
+    velocityInfMax = np.nanmax(velocityInfArray, axis=0)
+
+
+if plotPositionConvergenceRates:
+    positionLambdas = result["positionLambdas"]
+    positionIteratorCounts = result["positionIteratorCounts"]
+
+    # Determine when to cutoff convergence rate plots
+    positionEnd = 0
+    while positionEnd < len(positionIteratorCounts) and positionIteratorCounts[positionEnd] > steps * limit:
+        positionEnd += 1
+
+    # Pad convergence rates to be same length using NaNs
+    pad = len(max(positionLambdas, key=len))
+    positionArray = np.array([i + [np.NaN]*(pad-len(i)) for i in positionLambdas])
+
+    # Determine quantiles for lambdas
+    positionMin = np.nanmin(positionArray, axis=0)
+    positionFst = np.nanpercentile(positionArray, 25, axis=0)
+    positionSnd = np.nanpercentile(positionArray, 50, axis=0)
+    positionThr = np.nanpercentile(positionArray, 75, axis=0)
+    positionMax = np.nanmax(positionArray, axis=0)
 
 
 
@@ -154,68 +167,15 @@ if plotConvergenceRates:
 def pretty(s):
     return '{0:.0E}'.format(s)
 
-titleStats = "N = " + str(N) + ", dt = " + pretty(timeStep) + "\n"
+titleStats = "nBodies = " + str(nBodies) + ", dt = " + pretty(timeStep) + ", steps = " + pretty(steps) + "\n"
 titleStats += "vel_iter = " + pretty(velocityIterations)
 titleStats += ", vel_thres = " + pretty(world.velocityThreshold) + "\n"
 titleStats += "pos_iter = " + pretty(positionIterations)
 titleStats += ", pos_thres = " + pretty(world.positionThreshold)
 
-
-# Convergence rate plots
-if plotConvergenceRates:
-    if convergenceRateData == 1:
-        title = "Velocity Lambda Two-Norms"
-    if convergenceRateData == 2:
-        title = "Velocity Lambda Inf-Norms"
-    if convergenceRateData == 3:
-        title = "Position Lambdas"
-
-    fig = plt.figure()
-    fig.suptitle(title + "\n" + titleStats)
-
-    # Full convergence rates
-    ax1 = fig.add_subplot(221)
-    ax1.semilogy(twentyfivePercent)
-    ax1.semilogy(fiftyPercent)
-    ax1.semilogy(seventyfivePercent)
-    ax1.legend(["25", "50", "75"])
-    ax1.set_xlabel("Iterations")
-    ax1.set_ylabel(title)
-    ax1.set_title("Convergence Rate - All iterations")
-
-    # Counters
-    ax1 = fig.add_subplot(222)
-    ax1.plot(iteratorCounts)
-    ax1.set_xlabel("Iterations")
-    ax1.set_ylabel("Remaining")
-    ax1.set_title("Number of iterators left for each iteration")
-
-    # Limited convergence rates
-    ax1 = fig.add_subplot(223)
-    ax1.semilogy(twentyfivePercent)
-    ax1.semilogy(fiftyPercent)
-    ax1.semilogy(seventyfivePercent)
-    ax1.set_xlim([0, end])
-    ax1.legend(["25", "50", "75"])
-    ax1.set_xlabel("Iterations")
-    ax1.set_ylabel(title)
-    ax1.set_title("Convergence Rate - " + str(int(limit*100)) + "% cutoff")
-
-    # Limited convergence rates - different quantiles
-    ax1 = fig.add_subplot(224)
-    ax1.semilogy(tenPercent)
-    ax1.semilogy(fiftyPercent)
-    ax1.semilogy(ninetyPercent)
-    ax1.set_xlim([0, end])
-    ax1.legend(["10", "50", "90"])
-    ax1.set_xlabel("Iterations")
-    ax1.set_ylabel(title)
-    ax1.set_title("Convergence Rate - " + str(int(limit*100)) + "% cutoff, different quantiles")
-
-
 # Iteration plots
 if plotIterationCounters:
-    fig = plt.figure()
+    fig = plt.figure("Iterations")
     fig.suptitle("Iteration Counters" + "\n" + titleStats)
 
     # Velocity iterations
@@ -236,7 +196,6 @@ if plotIterationCounters:
     ax1.legend(lns, labs)
     ax1.set_title("Velocity iterations numbers")
 
-
     # Position iterations
     ax1 = fig.add_subplot(224)
     ln1 = ax1.plot(totalPositionIterations, 'c', label="total_iter")
@@ -255,7 +214,6 @@ if plotIterationCounters:
     ax1.legend(lns, labs)
     ax1.set_title("Position iterations numbers")
 
-
     # Times
     ax1 = fig.add_subplot(221)
     ax1.plot(totalStepTimes)
@@ -263,7 +221,6 @@ if plotIterationCounters:
     ax1.set_xlabel("Step")
     ax1.set_ylabel("Step time")
     ax1.set_title("Time taken for each step")
-
 
     # Contacts
     ax1 = fig.add_subplot(222)
@@ -274,5 +231,94 @@ if plotIterationCounters:
     ax1.set_title("Contact numbers for each step")
 
 
-if plotConvergenceRates or plotIterationCounters:
+# Velocity convergence rate plots
+if plotVelocityConvergenceRates:
+    fig = plt.figure("Velocity Convergence")
+    fig.suptitle("Velocity Convergence Rates\n" + titleStats)
+
+    # Full convergence rates
+    ax1 = fig.add_subplot(221)
+    ax1.semilogy(velocityTwoMax, "r")
+    ax1.semilogy(velocityTwoThr, "g")
+    ax1.semilogy(velocityTwoSnd, "b")
+    ax1.semilogy(velocityTwoFst, "g")
+    ax1.semilogy(velocityTwoMin, "r")
+    ax1.legend(["Max", "75", "50", "25", "Min"])
+    ax1.set_xlabel("Iterations")
+    ax1.set_ylabel("Velocity Lambda Two-Norms")
+    ax1.set_title("Lambda Two-Norm Convergence Rate - All iterations")
+
+    # Counters
+    ax1 = fig.add_subplot(222)
+    ax1.plot(velocityIteratorCounts)
+    ax1.set_xlabel("Iterations")
+    ax1.set_ylabel("Remaining")
+    ax1.set_title("Number of iterators left for each iteration")
+
+    # Limited convergence rates - Two-norm
+    ax1 = fig.add_subplot(223)
+    ax1.semilogy(velocityTwoMax, "r")
+    ax1.semilogy(velocityTwoThr, "g")
+    ax1.semilogy(velocityTwoSnd, "b")
+    ax1.semilogy(velocityTwoFst, "g")
+    ax1.semilogy(velocityTwoMin, "r")
+    ax1.set_xlim([0, velocityEnd])
+    ax1.legend(["Max", "75", "50", "25", "Min"])
+    ax1.set_xlabel("Iterations")
+    ax1.set_ylabel("Velocity Lambda Two-Norms")
+    ax1.set_title("Lambda Two-norm Convergence Rate - " + str(int(limit*100)) + "% cutoff")
+
+    # Limited convergence rates - Inf-norm
+    ax1 = fig.add_subplot(224)
+    ax1.semilogy(velocityInfMax, "r")
+    ax1.semilogy(velocityInfThr, "g")
+    ax1.semilogy(velocityInfSnd, "b")
+    ax1.semilogy(velocityInfFst, "g")
+    ax1.semilogy(velocityInfMin, "r")
+    ax1.set_xlim([0, velocityEnd])
+    ax1.legend(["Max", "75", "50", "25", "Min"])
+    ax1.set_xlabel("Iterations")
+    ax1.set_ylabel("Velocity Lambda Inf-Norms")
+    ax1.set_title("Lambda Inf-Norm Convergence Rate - " + str(int(limit*100)) + "% cutoff")
+
+
+# Position convergence rate plots
+if plotPositionConvergenceRates:
+    fig = plt.figure("Position Convergence")
+    fig.suptitle("Position Convergence Rates\n" + titleStats)
+
+    # Full convergence rates
+    ax1 = fig.add_subplot(221)
+    ax1.semilogy(positionMax, "r")
+    ax1.semilogy(positionThr, "g")
+    ax1.semilogy(positionSnd, "b")
+    ax1.semilogy(positionFst, "g")
+    ax1.semilogy(positionMin, "r")
+    ax1.legend(["Max", "75", "50", "25", "Min"])
+    ax1.set_xlabel("Iterations")
+    ax1.set_ylabel("Position Lambdas")
+    ax1.set_title("Lambda Convergence Rate - All iterations")
+
+    # Counters
+    ax1 = fig.add_subplot(222)
+    ax1.plot(positionIteratorCounts)
+    ax1.set_xlabel("Iterations")
+    ax1.set_ylabel("Remaining")
+    ax1.set_title("Number of iterators left for each iteration")
+
+    # Limited convergence rates
+    ax1 = fig.add_subplot(223)
+    ax1.semilogy(positionMax, "r")
+    ax1.semilogy(positionThr, "g")
+    ax1.semilogy(positionSnd, "b")
+    ax1.semilogy(positionFst, "g")
+    ax1.semilogy(positionMin, "r")
+    ax1.set_xlim([0, positionEnd])
+    ax1.legend(["Max", "75", "50", "25", "Min"])
+    ax1.set_xlabel("Iterations")
+    ax1.set_ylabel("Position Lambdas")
+    ax1.set_title("Lambda Convergence Rate - " + str(int(limit*100)) + "% cutoff")
+
+
+if plotIterationCounters or plotVelocityConvergenceRates or plotPositionConvergenceRates:
     plt.show()

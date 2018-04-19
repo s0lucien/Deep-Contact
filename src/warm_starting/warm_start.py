@@ -29,13 +29,13 @@ class WarmStartListener(b2ContactListener):
 #
 def run_world(world, model, timeStep, steps,
               velocityIterations, positionIterations, velocityThreshold, positionThreshold,
-              iterations=False, convergenceRates=False, quiet=True):
+              iterations=False, convergenceRates=False, quiet=True, visualize=False):
     # We store the performance data in a dictionary
     result = {}
 
     # ----- Setup -----
     # Enable/disable convergence rates
-    world.convergenceRates   = convergenceRates
+    world.convergenceRates = convergenceRates
 
     # Set iteration thresholds
     world.velocityThreshold = velocityThreshold
@@ -44,9 +44,10 @@ def run_world(world, model, timeStep, steps,
     # Create and attach listener
     world.contactListener = WarmStartListener(model)
 
-    # difine a drawer
-    drawer = OpencvDrawFuncs(w=640, h=640, ppm=10)
-    drawer.install()
+    # Define a drawer
+    if visualize:
+        drawer = OpencvDrawFuncs(w=640, h=640, ppm=10)
+        drawer.install()
 
     # ----- Run World -----
     totalStepTimes          = []
@@ -66,12 +67,13 @@ def run_world(world, model, timeStep, steps,
         # Tell the model to take a step
         model.Step(world, timeStep, velocityIterations, positionIterations)
 
-        # visiulization
-        drawer.clear_screen()
-        drawer.draw_world(world)
+        # Draw the world
+        if visualize:
+            drawer.clear_screen()
+            drawer.draw_world(world)
 
-        cv2.imshow('World', drawer.screen)
-        cv2.waitKey(25)
+            cv2.imshow('World', drawer.screen)
+            cv2.waitKey(25)
 
         # Tell the world to take a step
         world.Step(timeStep, velocityIterations, positionIterations)
@@ -99,6 +101,23 @@ def run_world(world, model, timeStep, steps,
             print("Contacts: %d, vel_iter: %d, pos_iter: %d" %
                   (profile.contactsSolved, profile.velocityIterations, profile.positionIterations))
 
+
+    # Print results
+    if not quiet:
+        if iterations:
+            print("\nVelocity:")
+            print("Total   = %d"   % np.sum(totalVelocityIterations))
+            print("Average = %.2f" % np.mean(totalVelocityIterations))
+            print("Median  = %d"   % np.median(totalVelocityIterations))
+            print("Std     = %.2f" % np.std(totalVelocityIterations))
+
+            print("\nPosition:")
+            print("Total   = %d"   % np.sum(totalPositionIterations))
+            print("Average = %.2f" % np.mean(totalPositionIterations))
+            print("Median  = %d"   % np.median(totalPositionIterations))
+            print("Std     = %.2f" % np.std(totalPositionIterations))
+
+
     # Store results
     result["totalStepTimes"] = totalStepTimes
     result["contactsSolved"] = contactsSolved
@@ -112,9 +131,13 @@ def run_world(world, model, timeStep, steps,
         result["velocityLambdaInfNorms"] = velocityLambdaInfNorms
         result["positionLambdas"] = positionLambdas
 
-        # Count the number of contributors for each iteration
+        # Count the number of contributors for each velocity iteration
         iterations = [len(l) for l in velocityLambdaTwoNorms]
-        result["iteratorCounts"] = [np.sum([l >= i for l in iterations]) for i in range(max(iterations))]
+        result["velocityIteratorCounts"] = [np.sum([l >= i for l in iterations]) for i in range(max(iterations))]
+
+        # Count the number of contributors for each position iteration
+        iterations = [len(l) for l in positionLambdas]
+        result["positionIteratorCounts"] = [np.sum([l >= i for l in iterations]) for i in range(max(iterations))]
 
     # Return results
     return result
