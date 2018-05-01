@@ -55,15 +55,15 @@ h = 1
 # Create world in case model needs it
 world = b2World()
 # Fill world with static box and circles
-new_confined_clustered_circles_world(world, nBodies, b2Vec2(p_ll), b2Vec2(p_ur), r, sigma_coef, seed)
+new_confined_clustered_circles_world(world, nBodies, b2Vec2(xlow, ylow), b2Vec2(xhi, yhi), r, sigma_coef, seed)
 
 # Choose a model
-#model = NoWarmStartModel()
+model = None
 #model = BuiltinWarmStartModel()
 #model = BadModel()
 #model = RandomModel(0)
 #model = ParallelWorldModel(world)
-model = CopyWorldModel()
+#model = CopyWorldModel()
 #model = IdentityGridModel(world, p_ll, p_ur, xRes, yRes, h)
 
 # Iteration counter plots
@@ -75,7 +75,7 @@ plotPositionConvergenceRates = True
 # Limit on percentage of contributors left for cutoff (see convergence plots)
 limit = 0.2
 
-# Print numbers as simulation is running
+# Print various iteration numbers as simulation is running
 printing = True
 # Show visualization of world as simulation is running
 # note: significantly slower
@@ -86,9 +86,11 @@ visualize = False
 # ----- Run simulation -----
 conv = plotVelocityConvergenceRates | plotPositionConvergenceRates
 iter = plotIterationCounters
-result = run_world(world, model, timeStep, steps,
-                   velocityIterations, positionIterations, velocityThreshold, positionThreshold,
-                   iterations=iter, convergenceRates=conv, quiet=not printing, visualize=visualize)
+result = run_world(world, timeStep, steps,
+                   velocityIterations, positionIterations,
+                   velocityThreshold=velocityThreshold, positionThreshold=positionThreshold,
+                   model=model, iterations=iter, convergenceRates=conv,
+                   quiet=not printing, visualize=visualize)
 
 
 

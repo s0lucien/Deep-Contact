@@ -1,7 +1,7 @@
 from Box2D import b2World, b2FixtureDef, b2CircleShape, b2Vec2
 import numpy as np
 import logging
-from .sim_types import dcCircleShape, GenWorld, dcLoopShape , BodyData
+from .sim_types import dcCircleShape, GenWorld, dcLoopShape, BodyData
 
 logging.basicConfig(level=logging.INFO)
 
@@ -78,7 +78,7 @@ class GenRandomCirclesRegion(GenWorld):
             R=circ[:,2]
             no_overlap=np.all(R+rad<dist)
             if no_overlap ==  False:
-                logging.info("Overlap detected")
+                #logging.info("Overlap detected")
                 failed +=1
                 if failed > self.max_consec_tries:
                     failed = True
@@ -139,7 +139,7 @@ class GenClusteredCirclesRegion(GenWorld):
             R=circ[:,2]
             no_overlap=np.all(R+rad<dist)
             if no_overlap ==  False:
-                logging.info("Overlap detected")
+                #logging.info("Overlap detected")
                 failed +=1
                 if failed > self.max_consec_tries:
                     failed = True

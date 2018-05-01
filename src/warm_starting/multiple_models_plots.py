@@ -59,12 +59,12 @@ worlds = []
 for _ in range(nModels):
     world = b2World()
     # Fill world with static box and circles
-    new_confined_clustered_circles_world(world, nBodies, b2Vec2(p_ll), b2Vec2(p_ur), r, sigma_coef, seed)
+    new_confined_clustered_circles_world(world, nBodies, b2Vec2(xlow, ylow), b2Vec2(xhi, yhi), r, sigma_coef, seed)
     worlds.append(world)
 # Choose the models, each as a pair of a model and a name.
 # In case a model needs inputs, make sure to provide them, and in particular make sure to use the correct world
 models = [
-    (NoWarmStartModel(), "None"),
+    (None, "None")
     (BuiltinWarmStartModel(), "Builtin"),
     (IdentityGridModel(worlds[2], p_ll, p_ur, xRes, yRes, h), "Grid"),
     (CopyWorldModel(), "Copy")
@@ -86,7 +86,7 @@ positionPercentile = 50
 # Cutoff for convergence rate plot
 positionCutoff = 200
 
-# Print numbers as simulation is running
+# Print various iteration numbers as simulation is running
 printing = False
 # Show visualization of world as simulation is running
 # note: significantly slower
@@ -101,9 +101,11 @@ conv = plotVelocityConvergenceRates or plotPositionConvergenceRates
 results = []
 for i in range(nModels):
     print("Running simulation %d of %d" % (i+1, nModels))
-    results.append(run_world(worlds[i], models[i][0], timeStep, steps,
-                             velocityIterations, positionIterations, velocityThreshold, positionThreshold,
-                             iterations=False, convergenceRates=conv, quiet=not printing,visualize=visualize))
+    results.append(run_world(worlds[i], timeStep, steps,
+                             velocityIterations, positionIterations,
+                             velocityThreshold=velocityThreshold, positionThreshold=positionThreshold,
+                             model=models[i][0], iterations=False, convergenceRates=conv,
+                             quiet=not printing,visualize=visualize))
 
 
 

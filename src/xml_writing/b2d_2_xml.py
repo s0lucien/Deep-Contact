@@ -3,7 +3,7 @@ from xml.etree.ElementTree import Element, SubElement
 from xml.etree import ElementTree
 from xml.dom import minidom
 import os, errno
-from sim_types import SimData
+from ..sim_types import SimData
 
 
 def body_2_xml(body: b2Body):
@@ -35,9 +35,6 @@ def body_2_xml(body: b2Body):
         # orientation
         ori = SubElement(body_xml, 'orientation')
         ori.set('theta', str(body.angle))
-
-        inertia = SubElement(body_xml, 'inertia')
-        inertia.set('value', str(body.inertia))
 
         # spin
         spin = SubElement(body_xml, 'spin')
@@ -103,10 +100,12 @@ class XMLExporter:
         cfg.set("name",str(self.simData.name))
         cfg.set("time",str(self.simData.sim_t))
         cfg.set("dt",str(self.simData.dt))
+
         for b in self.world.bodies:
             xb = body_2_xml(b)
             if xb is not None:
                 cfg.append(xb)
+
         c_ix=0
         for c in self.world.contacts:
             xcs = contact_2_xml(c,c_ix)
@@ -114,22 +113,26 @@ class XMLExporter:
                 for xc in xcs:
                     cfg.append(xc)
             c_ix += c.manifold.pointCount
+
         return cfg
 
     def save_snapshot(self):
         xml = self.snapshot()
         xml = prettify(xml)
+
         if not os.path.isabs(self.export_root):
             file_dir=os.path.dirname(os.path.realpath(__file__))
             out_path = os.path.join(file_dir,self.export_root)
         else:
             out_path=self.export_root
+
         directory = os.path.join(out_path,self.simData.name)
         try:
             os.makedirs(directory)
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
+
         file = os.path.join(directory,self.simData.name+"_"+str(self.simData.step)+".xml")
         with open(file,"w") as f:
             f.write(xml)

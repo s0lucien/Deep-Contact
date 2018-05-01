@@ -9,21 +9,24 @@ class BodyData:
 
 
 class SimData:
-    def __init__(self, name="dcSim2D",d_t=10e-3):
-        self.init_t=time()
+    def __init__(self, name="dcSim2D", d_t=0):
         self.name = name
-        self.sim_t=0
-        self.wall_t=0
-        self.step = 0
         self.dt = d_t
+
+        self.step = 0
+        self.sim_t = 0
+        self.wall_t = 0
+
+        self.init_t=time()
         self.ticking=False
 
 
-    def tick(self,s=1):
+    def tick(self, s=1):
         self.ticking=True
         self.step += s
         self.sim_t += s * self.dt
         self.init_t = time()
+
 
     def tock(self):
         if self.ticking:

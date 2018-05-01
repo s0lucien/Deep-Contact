@@ -6,6 +6,7 @@ import cv2
 import matplotlib.pyplot as plt
 
 from ..opencv_draw import OpencvDrawFuncs
+from ..xml_writing.b2d_2_xml import XMLExporter
 
 # Warm-Starting Listener
 class WarmStartListener(b2ContactListener):
@@ -27,11 +28,12 @@ class WarmStartListener(b2ContactListener):
                     point.tangentImpulse = tangent
 
 #
-def run_world(world, model, timeStep, steps,
-              velocityIterations, positionIterations, velocityThreshold, positionThreshold,
-              iterations=False, convergenceRates=False, quiet=True, visualize=False):
-    # We store the performance data in a dictionary
-    result = {}
+def run_world(world, timeStep, steps,
+              velocityIterations, positionIterations,
+              velocityThreshold=0, positionThreshold=1000,
+              model=None, iterations=False, convergenceRates=False,
+              storeAsXML=False, path="",
+              quiet=True, visualize=False):
 
     # ----- Setup -----
     # Enable/disable convergence rates
@@ -41,13 +43,23 @@ def run_world(world, model, timeStep, steps,
     world.velocityThreshold = velocityThreshold
     world.positionThreshold = positionThreshold
 
-    # Create and attach listener
-    world.contactListener = WarmStartListener(model)
+    # Create and attach listener if given a model
+    if model:
+        world.contactListener = WarmStartListener(model)
+    else:
+        world.warmStarting = False
 
-    # Define a drawer
+    # Define a drawer if set
     if visualize:
         drawer = OpencvDrawFuncs(w=640, h=640, ppm=10)
         drawer.install()
+
+    # Initiate the XML exporter if set
+    if storeAsXML:
+        exp = XMLExporter(world, path)
+
+    # We store the performance data in a dictionary
+    result = {}
 
     # ----- Run World -----
     totalStepTimes          = []
@@ -65,7 +77,8 @@ def run_world(world, model, timeStep, steps,
         step = time.time()
 
         # Tell the model to take a step
-        model.Step(world, timeStep, velocityIterations, positionIterations)
+        if model:
+            model.Step(world, timeStep, velocityIterations, positionIterations)
 
         # Draw the world
         if visualize:
@@ -82,6 +95,11 @@ def run_world(world, model, timeStep, steps,
         # Determine total step time
         step = time.time() - step
         totalStepTimes.append(step)
+
+        # Store world as XML if set
+        if storeAsXML:
+            world.userData.tick()
+            exp.save_snapshot()
 
         # Extract and store profiling data
         profile = world.GetProfile()

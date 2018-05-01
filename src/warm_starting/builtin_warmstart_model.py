@@ -7,7 +7,7 @@ class BuiltinWarmStartModel (Model):
     def Step(self, world, timeStep, velocityIterations, positionIterations):
         pass
 
-    # Returns an empty lists, which means the simulator will simply use its normal
+    # Returns an empty list, which means the simulator will simply use its normal
     # warmstart procedure
     def Predict(self, contact):
         return []

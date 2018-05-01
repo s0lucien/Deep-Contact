@@ -1,9 +1,9 @@
 from Box2D import (b2LoopShape, b2FixtureDef, b2World, b2Vec2)
 
-from sim_types import BodyData, SimData
-from gen_world import create_circle, create_fixed_box
+from ..sim_types import BodyData, SimData
+from ..gen_world import create_circle, create_fixed_box
 
-from xml_writing.b2d_2_xml import XMLExporter, prettify
+from ..xml_writing.b2d_2_xml import XMLExporter, prettify
 
 if __name__ == "__main__":
     world = b2World(doSleep=True)
