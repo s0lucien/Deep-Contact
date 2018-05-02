@@ -181,14 +181,17 @@ class FrameworkBase(b2ContactListener):
         self.world.continuousPhysics = settings.enableContinuous
         self.world.subStepping = settings.enableSubStepping
 
+        # Set the thresholds
+        self.world.velocityThreshold = settings.velocityThreshold
+        self.world.positionThreshold = settings.positionThreshold
+
         # Reset the collision points
         self.points = []
 
         # Tell Box2D to step
         t_step = time()
         self.world.Step(timeStep,
-                        settings.velocityIterations, settings.positionIterations,
-                        settings.velocityThreshold, settings.positionThreshold)
+                        settings.velocityIterations, settings.positionIterations)
         self.world.ClearForces()
         t_step = time() - t_step
 
