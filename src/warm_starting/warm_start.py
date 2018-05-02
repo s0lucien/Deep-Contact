@@ -6,7 +6,7 @@ import cv2
 import matplotlib.pyplot as plt
 
 from ..opencv_draw import OpencvDrawFuncs
-from ..xml_writing.b2d_2_xml import XMLExporter
+
 
 # Warm-Starting Listener
 class WarmStartListener(b2ContactListener):
@@ -27,12 +27,12 @@ class WarmStartListener(b2ContactListener):
                     point.normalImpulse = normal
                     point.tangentImpulse = tangent
 
-#
+
+# Run a specific simulation, using the various specified options and values
 def run_world(world, timeStep, steps,
               velocityIterations, positionIterations,
               velocityThreshold=0, positionThreshold=1000,
               model=None, iterations=False, convergenceRates=False,
-              storeAsXML=False, path="",
               quiet=True, visualize=False):
 
     # ----- Setup -----
@@ -53,10 +53,6 @@ def run_world(world, timeStep, steps,
     if visualize:
         drawer = OpencvDrawFuncs(w=640, h=640, ppm=10)
         drawer.install()
-
-    # Initiate the XML exporter if set
-    if storeAsXML:
-        exp = XMLExporter(world, path)
 
     # We store the performance data in a dictionary
     result = {}
@@ -80,14 +76,6 @@ def run_world(world, timeStep, steps,
         if model:
             model.Step(world, timeStep, velocityIterations, positionIterations)
 
-        # Draw the world
-        if visualize:
-            drawer.clear_screen()
-            drawer.draw_world(world)
-
-            cv2.imshow('World', drawer.screen)
-            cv2.waitKey(25)
-
         # Tell the world to take a step
         world.Step(timeStep, velocityIterations, positionIterations)
         world.ClearForces()
@@ -96,10 +84,13 @@ def run_world(world, timeStep, steps,
         step = time.time() - step
         totalStepTimes.append(step)
 
-        # Store world as XML if set
-        if storeAsXML:
-            world.userData.tick()
-            exp.save_snapshot()
+        # Draw the world
+        if visualize:
+            drawer.clear_screen()
+            drawer.draw_world(world)
+
+            cv2.imshow('World', drawer.screen)
+            cv2.waitKey(25)
 
         # Extract and store profiling data
         profile = world.GetProfile()

@@ -2,7 +2,6 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 
-from .no_warmstart_model import NoWarmStartModel
 from .builtin_warmstart_model import BuiltinWarmStartModel
 from .bad_model import BadModel
 from .random_model import RandomModel

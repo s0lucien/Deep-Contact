@@ -49,37 +49,35 @@ def body_2_xml(body: b2Body):
         raise
 
 
-def contact_2_xml(contact: b2Contact,c_ix=None):
+def contact_2_xml(contact: b2Contact, c_ix=None):
     try:
         contact_xmls = []
         for i in range(contact.manifold.pointCount):
-            point = contact.worldManifold.points[i]
-            normal = contact.worldManifold.normal
-            manifold_point = contact.manifold.points[i]
-            impulse = (manifold_point.normalImpulse, manifold_point.tangentImpulse)
-
+            # index
             xml_contact = Element('contact')
-            # master
             xml_contact.set('index', str(c_ix + i))
             xml_contact.set("master", str(contact.fixtureA.body.userData.id))
             xml_contact.set("slave", str(contact.fixtureB.body.userData.id))
 
             # position
+            point = contact.worldManifold.points[i]
             position = SubElement(xml_contact, 'position')
             position.set('x', str(point[0]))
             position.set('y', str(point[1]))
 
+            # normal
+            normal = contact.worldManifold.normal
             xml_normal = SubElement(xml_contact, "normal")
             xml_normal.set("nx", str(normal.x))
             xml_normal.set("ny", str(normal.y))
-            xml_impulse = SubElement(xml_contact, "impulse")
-            xml_impulse.set("n", str(impulse[0]))
-            xml_impulse.set("t", str(impulse[1]))
+
             contact_xmls.append(xml_contact)
+
         return contact_xmls
     except AttributeError:
         print("contact between body without id encountered")
         raise
+
 
 def prettify(elem):
     """Return a pretty-printed XML string for the Element.
@@ -94,31 +92,50 @@ class XMLExporter:
         self.world = world
         self.export_root = export_root
         self.simData=world.userData
+        self.__reset__()
 
-    def snapshot(self):
-        cfg = Element('configuration')
-        cfg.set("name",str(self.simData.name))
-        cfg.set("time",str(self.simData.sim_t))
-        cfg.set("dt",str(self.simData.dt))
+    def __reset__(self):
+        self.cfg = Element("configuration")
+        self.cfg.append(Element("bodies"))
+        self.cfg.append(Element("contacts"))
 
+        self.cfg.set("name",str(self.simData.name))
+        self.cfg.set("time",str(self.simData.sim_t))
+        self.cfg.set("dt",str(self.simData.dt))
+
+
+    def snapshot_bodies(self):
+        bodies = self.cfg.find("bodies")
         for b in self.world.bodies:
             xb = body_2_xml(b)
             if xb is not None:
-                cfg.append(xb)
+                bodies.append(xb)
 
+    def snapshot_contacts(self):
+        contacts = self.cfg.find("contacts")
         c_ix=0
         for c in self.world.contacts:
             xcs = contact_2_xml(c,c_ix)
             if xcs is not None:
                 for xc in xcs:
-                    cfg.append(xc)
+                    contacts.append(xc)
             c_ix += c.manifold.pointCount
 
-        return cfg
+
+    def snapshot_impulses(self, impulses):
+        for contact in self.cfg.find("contacts"):
+            master = int(contact.get("master"))
+            slave  = int(contact.get("slave"))
+
+            imp = impulses.get((master, slave))
+            if imp:
+                impulse = SubElement(contact, "impulse")
+                impulse.set("n", str(imp[0]))
+                impulse.set("t", str(imp[1]))
+
 
     def save_snapshot(self):
-        xml = self.snapshot()
-        xml = prettify(xml)
+        xml = prettify(self.cfg)
 
         if not os.path.isabs(self.export_root):
             file_dir=os.path.dirname(os.path.realpath(__file__))
