@@ -6,6 +6,13 @@ from Box2D import (b2World, b2Vec2)
 
 
 if __name__ == '__main__':
+    from optparse import OptionParser
+
+    parser = OptionParser()
+    parser.add_option('-e', '--export-path', dest='export_path')
+
+    options, _ = parser.parse_args()
+
     # Let's begin with create one world
     world = b2World()
 
@@ -44,8 +51,18 @@ if __name__ == '__main__':
     # Number of steps
     steps = 1000
 
-    result = run_world(world, timeStep, steps,
-                       velocityIterations, positionIterations,
-                       velocityThreshold=velocityThreshold, positionThreshold=positionThreshold,
-                       model=model, iterations=True, convergenceRates=True,
-                       quiet=False, visualize=True)
+    result = run_world(
+        world,
+        timeStep,
+        steps,
+        velocityIterations,
+        positionIterations,
+        velocityThreshold=velocityThreshold,
+        positionThreshold=positionThreshold,
+        model=model,
+        iterations=True,
+        convergenceRates=True,
+        quiet=False,
+        visualize=True,
+        export_path=options.export_path,
+    )

@@ -23,8 +23,8 @@ seed = 1234
 # Something about spread of bodies?
 sigma_coef = 1.2
 # Dimension of static box
-xlow, xhi = 10, 60
-ylow, yhi = 10, 60
+xlow, xhi = 0, 50
+ylow, yhi = 0, 50
 # body radius min and max
 r = (1, 1)
 

@@ -1,5 +1,6 @@
 import time
 import numpy as np
+from os import path, mkdir
 
 from Box2D import (b2ContactListener)
 import cv2
@@ -33,7 +34,7 @@ def run_world(world, timeStep, steps,
               velocityIterations, positionIterations,
               velocityThreshold=0, positionThreshold=1000,
               model=None, iterations=False, convergenceRates=False,
-              quiet=True, visualize=False):
+              quiet=True, visualize=False, export_path=None):
 
     # ----- Setup -----
     # Enable/disable convergence rates
@@ -51,7 +52,7 @@ def run_world(world, timeStep, steps,
 
     # Define a drawer if set
     if visualize:
-        drawer = OpencvDrawFuncs(w=640, h=640, ppm=10)
+        drawer = OpencvDrawFuncs(w=500, h=500, ppm=10)
         drawer.install()
 
     # We store the performance data in a dictionary
@@ -90,6 +91,12 @@ def run_world(world, timeStep, steps,
             drawer.draw_world(world)
 
             cv2.imshow('World', drawer.screen)
+            if export_path:
+                if not path.exists(export_path):
+                    mkdir(export_path)
+                cv2.imwrite(
+                    path.join(export_path, '{}.png'.format(i)),
+                    drawer.screen)
             cv2.waitKey(25)
 
         # Extract and store profiling data
