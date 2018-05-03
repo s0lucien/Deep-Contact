@@ -71,7 +71,7 @@ class OpencvDrawFuncs(object):
         position = self._fix_vertices(
             [body.transform * circle.pos * self._ppm])[0]
         cv2.circle(self.screen, cvcoord(position), int(
-            circle.radius * self._ppm), self._colors[body.type], 1)
+            circle.radius * self._ppm), self._colors[body.type], -1)
 
     def _draw_loop(self, body, fixture):
         loop = fixture.shape
