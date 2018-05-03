@@ -10,6 +10,7 @@ if __name__ == '__main__':
 
     parser = OptionParser()
     parser.add_option('-e', '--export-path', dest='export_path')
+    parser.add_option('-s', '--steps', dest='steps', default='1000')
 
     options, _ = parser.parse_args()
 
@@ -49,7 +50,7 @@ if __name__ == '__main__':
     velocityThreshold = 6*10**-5
     positionThreshold = 2*10**-5
     # Number of steps
-    steps = 1000
+    steps = int(options.steps)
 
     result = run_world(
         world,
