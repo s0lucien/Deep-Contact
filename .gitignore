@@ -329,3 +329,5 @@ venv.bak/
 # End of https://www.gitignore.io/api/c,c++,code,cuda,macos,matlab,opencv,python,pycharm,jupyternotebook
 **/.idea/workspace.xml
 **/tmp/**
+
+training_img/
