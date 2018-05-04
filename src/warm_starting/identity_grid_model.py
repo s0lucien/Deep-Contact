@@ -1,15 +1,19 @@
 from .model import Model
-from ..sph.gridsplat import SPHGridManager
+from ..sph.gridsplat import SPHGridManager, world_body_dataframe, world_contact_dataframe
 
 class IdentityGridModel (Model):
-    def __init__(self, world, p_ll, p_ur, xRes, yRes, h):
+    def __init__(self, p_ll, p_ur, xRes, yRes, h):
         # Initialize the grid
-        self.grid = SPHGridManager(world, p_ll, p_ur, xRes, yRes, h)
+        self.gm = SPHGridManager(p_ll, p_ur, xRes, yRes, h)
 
 
     def Step(self, world, timeStep, velocityIterations, positionIterations):
-        # Tell the grid to update
-        self.grid.Step(["normal_impulse", "tangent_impulse"])
+        # Create the data frames
+        df_b = world_body_dataframe(world)
+        df_c = world_contact_dataframe(world)
+
+        # Tell the gridmanager to create the required grids
+        self.gm.create_grids(df_b, df_c, channels=["ni", "ti"])
 
 
     def Predict(self, contact):
@@ -20,8 +24,8 @@ class IdentityGridModel (Model):
             py = contact.worldManifold.points[i][1]
 
             id = contact.manifold.points[i].id
-            normalImpulse = self.grid.query(px, py, "normal_impulse")
-            tangentImpulse = self.grid.query(px, py, "tangent_impulse")
+            normalImpulse = self.gm.query(px, py, "ni")
+            tangentImpulse = self.gm.query(px, py, "ti")
 
             predictions.append((id, normalImpulse, tangentImpulse))
         return predictions

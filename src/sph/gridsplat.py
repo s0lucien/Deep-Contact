@@ -1,25 +1,107 @@
 import numpy as np
-from Box2D import b2World, b2_dynamicBody
-from scipy import spatial
-from .kernel import W_poly6_2D
 import pandas as pd
 import networkx as nx
-from scipy import interpolate
+
+from scipy import spatial, interpolate
+from xml.etree.ElementTree import Element
+
+from Box2D import b2World, b2_dynamicBody
+from .kernel import W_poly6_2D
 
 
-def W_value(W_grid, data, channel_name):
-    Xsz, Ysz = W_grid.shape
-    Z = np.zeros(W_grid.shape)
-    for i in range(Xsz):
-        for j in range(Ysz):
-            if W_grid[i,j] != 0:
-                z = 0
-                for (id, w) in W_grid[i,j]:
-                    z += data.loc[id][channel_name] * w
-                Z[i,j] = z
-    return Z
+# Creates a dataframe with all bodies and their values given a b2World
+def world_body_dataframe(world:b2World):
+    bs = [[b.userData.id,
+           b.position.x,
+           b.position.y,
+           b.mass,
+           b.linearVelocity.x,
+           b.linearVelocity.y,
+           b.angle,
+           b.angularVelocity
+    ] for b in world.bodies if b.type is b2_dynamicBody]
+
+    df = pd.DataFrame(data=bs, columns=["id", "px", "py", "mass", "vx", "vy", "theta", "omega"])
+    df.id = df.id.astype(int)
+    df = df.set_index("id")
+
+    return df
+
+# Creates a dataframe with all bodies and their values given an xml tree representing a world
+def xml_body_dataframe(world:Element):
+    bodies = world.find("bodies").findall("body")
+    bs = [[int(b.get("index")),
+           float(b.find("position").get("x")),
+           float(b.find("position").get("y")),
+           float(b.find("mass").get("value")),
+           float(b.find("velocity").get("vx")),
+           float(b.find("velocity").get("vy")),
+           float(b.find("angle").get("theta")),
+           float(b.find("angular_velocity").get("omega"))
+    ] for b in bodies if b.get("type") is "free"]
+
+    df = pd.DataFrame(data=bs, columns=["id", "px", "py", "mass", "vx", "vy", "theta", "omega"])
+    df.id = df.id.astype(int)
+    df = df.set_index("id")
+
+    return df
 
 
+# Creates a dataframe with all contacts and their values given a b2World
+def world_contact_dataframe(world:b2World):
+    cs = []
+    for i in range(world.contactCount):
+        c = world.contacts[i]
+        if not c.touching:
+            continue
+
+        for ii in range(c.manifold.pointCount):
+            world_point = c.worldManifold.points[ii]
+            px = world_point[0]
+            py = world_point[1]
+            normal = c.worldManifold.normal
+            nx = normal[0]
+            ny = normal[1]
+
+            manifold_point = c.manifold.points[ii]
+            normal_impulse = manifold_point.normalImpulse    # Wrong impulse, from previous step, only used for warmstarting
+            tangent_impulse = manifold_point.tangentImpulse  # Wrong impulse, from previous step, only used for warmstarting
+
+            master = c.fixtureA.body.userData.id
+            slave = c.fixtureB.body.userData.id
+            assert master != slave
+
+            cs.append([master, slave, px, py, nx, ny, normal_impulse, tangent_impulse])
+
+    df = pd.DataFrame(data=cs, columns=["master", "slave", "px", "py", "nx", "ny", "ni", "ti"])
+    df.master = df.master.astype(int)
+    df.slave = df.slave.astype(int)
+
+    return df
+
+# Creates a dataframe with all contacts and their values given an xml tree representing a world
+def xml_contact_dataframe(world:Element):
+    contacts = world.find("contacts").findall("contact")
+    cs = [[int(c.get("master")),
+           int(c.get("slave")),
+           float(c.find("position").get("x")),
+           float(c.find("position").get("y")),
+           float(c.find("normal").get("nx")),
+           float(c.find("normal").get("ny")),
+           float(c.find("impulse").get("ni")),
+           float(c.find("impulse").get("ti"))
+    ] for c in contacts]
+
+    df = pd.DataFrame(data=cs, columns=["master", "slave", "px", "py", "nx", "ny", "ni", "ti"])
+    df.master = df.master.astype(int)
+    df.slave = df.slave.astype(int)
+
+    return df
+
+
+
+# ----- Original, slow -----
+# Creates grid of coefficients - not used because slow
 def Wgrid(X, Y, Px, Py, ID, h, f_krn=W_poly6_2D):
     '''
     splatters the points onto a grid , resulting in coefficients for every point
@@ -65,67 +147,21 @@ def Wgrid(X, Y, Px, Py, ID, h, f_krn=W_poly6_2D):
     return W_grid
 
 
-def body_properties(world: b2World):
-    bs = [[b.userData.id,
-           b.position.x,
-           b.position.y, # do we need positions or just the values?
-           b.mass,
-           b.linearVelocity.x,
-           b.linearVelocity.y,
-           b.inertia,
-           b.angle,
-           b.angularVelocity
-    ] for b in world.bodies if b.type is b2_dynamicBody]
-
-    df = pd.DataFrame(data=bs, columns=["id", "px","py", "mass", "vx", "vy", "inertia", "angle", "spin"])
-    df.id = df.id.astype(int)
-    df = df.set_index("id")
-
-    return df
+# Creates grid of values given data and grid of coefficients - not used because slow
+def W_value(W_grid, data, channel_name):
+    Xsz, Ysz = W_grid.shape
+    Z = np.zeros(W_grid.shape)
+    for i in range(Xsz):
+        for j in range(Ysz):
+            if W_grid[i,j] != 0:
+                z = 0
+                for (id, w) in W_grid[i,j]:
+                    z += data.loc[id][channel_name] * w
+                Z[i,j] = z
+    return Z
 
 
-def contact_properties(world: b2World):
-    cs = []
-    for i in range(world.contactCount):
-        c = world.contacts[i]
-        if not c.touching:
-            continue
-
-        for ii in range(c.manifold.pointCount):
-            world_point = c.worldManifold.points[ii]
-            px = world_point[0]
-            py = world_point[1]
-            normal = c.worldManifold.normal
-            nx = normal[0]
-            ny = normal[1]
-
-            manifold_point = c.manifold.points[ii]
-            normal_impulse = manifold_point.normalImpulse
-            tangent_impulse = manifold_point.tangentImpulse
-
-            master = c.fixtureA.body.userData.id
-            slave = c.fixtureB.body.userData.id
-            assert master != slave
-
-            cs.append([master, slave, px, py, nx, ny, normal_impulse, tangent_impulse])
-
-    df = pd.DataFrame(data=cs, columns=["master", "slave", "px", "py", "nx", "ny", "normal_impulse", "tangent_impulse"])
-    df.master = df.master.astype(int)
-    df.slave = df.slave.astype(int)
-
-    return df
-
-
-def contact_graph(world: b2World):
-    df = contact_properties(world)
-    G = nx.MultiDiGraph()
-    for i, row in df.iterrows():
-        e = G.add_edge(row.master, row.slave,
-                       attr_dict={"px": row.px, "py": row.py, "nx": row.nx, "ny": row.ny,
-                                  "normal_impulse": row.normal_impulse, "tangent_impulse": row.tangent_impulse})
-    return G
-
-
+# Creates an manages grids using above functions - not used because slow
 class SPHGridWorld:
     def __init__(self, world:b2World, p_ll, p_hr, xRes, yRes, h):
         self.world = world
@@ -146,7 +182,7 @@ class SPHGridWorld:
         self.grids = {}
         self.f_interp = {}
 
-        df_b = body_properties(self.world)
+        df_b = world_body_dataframe(self.world)
         W_bodies = Wgrid(self.X, self.Y, df_b.px, df_b.py, df_b.index.values, self.h, f_krn=W_poly6_2D)
         b_channels = [b for b in df_b.columns.tolist() if b not in ["px", "py"]]
         if channels:
@@ -154,7 +190,7 @@ class SPHGridWorld:
         for b in b_channels:
             self.grids[b] = W_value(W_bodies, df_b, b)
 
-        df_c = contact_properties(self.world)
+        df_c = world_contact_dataframe(self.world)
         W_contacts = Wgrid(self.X, self.Y, df_c.px, df_c.py, df_c.index.values, self.h, f_krn=W_poly6_2D)
         c_channels = [c for c in df_c.columns.tolist() if c not in ["px", "py"]]
         if channels:
@@ -171,14 +207,16 @@ class SPHGridWorld:
 
 
 
+# ----- Modified, faster -----
+# Creates a grid of values for each set of values - faster than using the two above functions
 def create_grids(X, Y, Px, Py, values, h, f_krn=W_poly6_2D):
     '''
     splatters the points and their values onto grids, one grid per value
-    :param X: grid X
-    :param Y: grid Y
+    :param X: grid Xs
+    :param Y: grid Ys
     :param Px: Points X axis
     :param Py: Points Y axis
-    :param id: point values to use
+    :param values: point values to use
     :param h: support radius
     :param f_krn: the SPH kernel to use
     :return:
@@ -222,13 +260,14 @@ def create_grids(X, Y, Px, Py, values, h, f_krn=W_poly6_2D):
 
     return grids
 
-class SPHGridManager:
-    def __init__(self, world:b2World, p_ll, p_ur, xRes, yRes, h):
-        self.world = world
-        self.h = h
 
+# Creates and manages grids given dataframes with body and contact values
+class SPHGridManager:
+    def __init__(self, p_ll, p_ur, xRes, yRes, h):
         xlo, ylo = p_ll
         xhi, yhi = p_ur
+
+        self.h = h
         self.x = np.arange(xlo, xhi, xRes)
         self.y = np.arange(ylo, yhi, yRes)
         self.X, self.Y =  np.mgrid[xlo:xhi:xRes, ylo:yhi:yRes]
@@ -236,14 +275,12 @@ class SPHGridManager:
         self.grids = {}
         self.f_interp = {}
 
-
     # The user can specify a list of "channels" to calculate grids and interpolation for, in case not all are needed
-    def Step(self, channels=[]):
+    def create_grids(self, df_b, df_c, channels=[]):
         self.grids = {}
         self.f_interp = {}
 
         # Body grids
-        df_b = body_properties(self.world)
         b_channels = [b for b in df_b.columns.tolist() if b not in ["px", "py"]]
         if channels:
             b_channels = list(set(b_channels).intersection(channels))
@@ -253,7 +290,6 @@ class SPHGridManager:
             self.grids[b_channels[i]] = b_grids[i]
 
         # Contact grids
-        df_c = contact_properties(self.world)
         c_channels = [c for c in df_c.columns.tolist() if c not in ["px", "py"]]
         if channels:
             c_channels = list(set(c_channels).intersection(channels))
@@ -266,7 +302,18 @@ class SPHGridManager:
         for chan in self.grids.keys():
             self.f_interp[chan] = interpolate.RectBivariateSpline(self.x, self.y, self.grids[chan])
 
-
     # Only intended to be used to query for a single point at a time
     def query(self, Px, Py, channel):
         return self.f_interp[channel](Px,Py)[0][0]
+
+
+
+# Creates a contact graph?
+def contact_graph(world: b2World):
+    df = contact_properties(world)
+    G = nx.MultiDiGraph()
+    for i, row in df.iterrows():
+        e = G.add_edge(row.master, row.slave,
+                       attr_dict={"px": row.px, "py": row.py, "nx": row.nx, "ny": row.ny,
+                                  "normal_impulse": row.ni, "tangent_impulse": row.ti})
+    return G

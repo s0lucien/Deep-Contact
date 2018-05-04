@@ -9,6 +9,7 @@ from ..sim_types import SimData
 def body_2_xml(body: b2Body):
     body_xml = Element('body')
     body_xml.set('index', str(body.userData.id))
+
     if body.type is b2_dynamicBody :
         type  = 'free'
     elif body.type is 0:
@@ -32,11 +33,11 @@ def body_2_xml(body: b2Body):
     v.set('vy', str(body.linearVelocity.y))
 
     # orientation
-    ori = SubElement(body_xml, 'orientation')
-    ori.set('theta', str(body.angle))
+    angle = SubElement(body_xml, 'angle')
+    angle.set('theta', str(body.angle))
 
     # spin
-    spin = SubElement(body_xml, 'spin')
+    spin = SubElement(body_xml, 'angular_velocity')
     spin.set('omega', str(body.angularVelocity))
 
     # shape
@@ -66,6 +67,8 @@ def contact_2_xml(contact: b2Contact, c_ix=None):
         normal_xml = SubElement(ct_xml, "normal")
         normal_xml.set("nx", str(normal.x))
         normal_xml.set("ny", str(normal.y))
+
+        # impulses are added later on due to reasons
 
         contact_xmls.append(ct_xml)
 
@@ -126,8 +129,8 @@ class XMLExporter:
 
             # We add the impulse
             impulse_xml = SubElement(ct_xml, "impulse")
-            impulse_xml.set("n", str(impulse.normalImpulses[i]))
-            impulse_xml.set("t", str(impulse.tangentImpulses[i]))
+            impulse_xml.set("ni", str(impulse.normalImpulses[i]))
+            impulse_xml.set("ti", str(impulse.tangentImpulses[i]))
 
 
     # Save all the stored xml to a file

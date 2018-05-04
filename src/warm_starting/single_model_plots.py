@@ -63,7 +63,7 @@ model = None
 #model = RandomModel(0)
 #model = ParallelWorldModel(world)
 #model = CopyWorldModel()
-#model = IdentityGridModel(world, p_ll, p_ur, xRes, yRes, h)
+#model = IdentityGridModel(p_ll, p_ur, xRes, yRes, h)
 
 # Iteration counter plots
 plotIterationCounters = True

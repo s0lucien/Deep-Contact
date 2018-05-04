@@ -63,9 +63,9 @@ for _ in range(nModels):
 # Choose the models, each as a pair of a model and a name.
 # In case a model needs inputs, make sure to provide them, and in particular make sure to use the correct world
 models = [
-    (None, "None")
+    (None, "None"),
     (BuiltinWarmStartModel(), "Builtin"),
-    (IdentityGridModel(worlds[2], p_ll, p_ur, xRes, yRes, h), "Grid"),
+    (IdentityGridModel(p_ll, p_ur, xRes, yRes, h), "Grid"),
     (CopyWorldModel(), "Copy")
 ]
 

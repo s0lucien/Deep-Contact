@@ -5,7 +5,7 @@ from Box2D import (b2World, b2Vec2, b2_dynamicBody)
 
 from ..gen_world import new_confined_clustered_circles_world
 
-from .gridsplat import SPHGridManager
+from .gridsplat import SPHGridManager, world_body_dataframe, world_contact_dataframe
 
 # Number of worlds to generate
 nWorlds = 25
@@ -61,9 +61,13 @@ for i in range(nParameters):
     for j in range(nWorlds):
         world = worlds[j]
 
-        # Create grid and step
-        gm = SPHGridManager(world, p_ll, p_ur, p[0], p[0], p[1])
-        gm.Step([attribute])
+        # Create data frames
+        df_b = world_body_dataframe(world)
+        df_c = world_contact_dataframe(world)
+
+        # Create gridmanager and grids
+        gm = SPHGridManager(p_ll, p_ur, p[0], p[0], p[1])
+        gm.create_grids(df_b, df_c, channels=[attribute])
 
         # Query for all bodies and sum
         worldTotal = 0
