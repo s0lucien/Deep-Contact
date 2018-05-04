@@ -51,9 +51,8 @@ def run_world(world, timeStep, steps,
         world.warmStarting = False
 
     # Define a drawer if set
-    if visualize:
-        drawer = OpencvDrawFuncs(w=500, h=500, ppm=10)
-        drawer.install()
+    drawer = OpencvDrawFuncs(w=500, h=500, ppm=10)
+    drawer.install()
 
     # We store the performance data in a dictionary
     result = {}
@@ -86,18 +85,19 @@ def run_world(world, timeStep, steps,
         totalStepTimes.append(step)
 
         # Draw the world
-        if visualize:
-            drawer.clear_screen()
-            drawer.draw_world(world)
+        drawer.clear_screen()
+        drawer.draw_world(world)
 
+        if visualize:
             cv2.imshow('World', drawer.screen)
-            if export_path:
-                if not path.exists(export_path):
-                    mkdir(export_path)
-                cv2.imwrite(
-                    path.join(export_path, '{}.png'.format(i)),
-                    drawer.screen)
             cv2.waitKey(25)
+
+        if export_path:
+            if not path.exists(export_path):
+                mkdir(export_path)
+            cv2.imwrite(
+                path.join(export_path, '{}.png'.format(i)),
+                drawer.screen)
 
         # Extract and store profiling data
         profile = world.GetProfile()

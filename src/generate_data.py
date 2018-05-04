@@ -11,6 +11,7 @@ if __name__ == '__main__':
     parser = OptionParser()
     parser.add_option('-e', '--export-path', dest='export_path')
     parser.add_option('-s', '--steps', dest='steps', default='1000')
+    parser.add_option('-v', '--visualize', action='store_true', dest='visualize')
 
     options, _ = parser.parse_args()
 
@@ -64,6 +65,6 @@ if __name__ == '__main__':
         iterations=True,
         convergenceRates=True,
         quiet=False,
-        visualize=True,
+        visualize=options.visualize,
         export_path=options.export_path,
     )
