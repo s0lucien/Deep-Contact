@@ -9,9 +9,15 @@ class BodyData:
 
 
 class SimData:
-    def __init__(self, name="dcSim2D", d_t=0):
+    def __init__(self, name="dcSim2D", d_t=0,
+                 vel_iter=0, pos_iter=0,
+                 vel_thres=0, pos_thres=0):
         self.name = name
         self.dt = d_t
+        self.vel_iter = vel_iter
+        self.pos_iter = pos_iter
+        self.vel_thres = vel_thres
+        self.pos_thres = pos_thres
 
         self.step = 0
         self.sim_t = 0

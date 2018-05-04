@@ -87,7 +87,9 @@ for i in range(len(seeds)):
 
     # Create world
     world = b2World()
-    world.userData = SimData(name=str(seed), d_t=timeStep)
+    world.userData = SimData(name=str(seed), d_t=timeStep,
+                             vel_iter=velocityIterations, pos_iter=positionIterations,
+                             vel_thres=velocityThreshold, pos_thres=positionThreshold)
 
     # Fill world with static box and circles
     new_confined_clustered_circles_world(world, nBodies, b2Vec2(xlow, ylow), b2Vec2(xhi, yhi), r, sigma_coef, seed)

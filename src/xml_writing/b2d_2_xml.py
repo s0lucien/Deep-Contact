@@ -94,9 +94,14 @@ class XMLExporter:
         self.bodies   = SubElement(self.cfg, "bodies")
         self.contacts = SubElement(self.cfg, "contacts")
 
-        self.cfg.set("name",str(self.simData.name))
-        self.cfg.set("time",str(self.simData.sim_t))
-        self.cfg.set("dt",str(self.simData.dt))
+        self.cfg.set("name", str(self.simData.name))
+        self.cfg.set("time", str(self.simData.sim_t))
+        self.cfg.set("dt", str(self.simData.dt))
+
+        self.cfg.set("vel_iter", str(self.simData.vel_iter))
+        self.cfg.set("pos_iter", str(self.simData.pos_iter))
+        self.cfg.set("vel_thres", str(self.simData.vel_thres))
+        self.cfg.set("pos_thres", str(self.simData.pos_thres))
 
 
     # Store all bodies in the world as xml
