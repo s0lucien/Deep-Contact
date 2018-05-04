@@ -18,8 +18,8 @@ seeds = range(1)
 # Something about spread of bodies?
 sigma_coef = 1.2
 # Dimension of static box
-xlow, xhi = 10, 60
-ylow, yhi = 10, 60
+xlow, xhi = 0, 50
+ylow, yhi = 0, 50
 # body radius min and max
 r = (1, 1)
 
@@ -43,34 +43,34 @@ skipContactless = True
 quiet = False
 # Show visualization of world as simulation is running
 # note: significantly slower
-visualize = True
+visualize = False
 
-
-# NOTE: Multiple contacts between objects is currently not supported,
-# meaning that bodies in the corners of the static box, i.e. with two
-# separate contact points with the box, will not be stored correctly.
 
 
 # ----- Misc -----
-# B2ContactListener for recording impulses
-class ImpulseListener(b2ContactListener):
-    def __init__(self):
-        super(ImpulseListener, self).__init__()
-        self.__reset__()
+# B2ContactListener for recording contacts and impulses
+class ContactListener(b2ContactListener):
+    def __init__(self, exporter:XMLExporter):
+        super(ContactListener, self).__init__()
 
-    def __reset__(self):
-        self.impulses = {}
+        self.xml_exp = exporter
+        self.reset()
 
+    # Reset the counter in preparation for a new step
+    def reset(self):
+        self.counter = 0
+
+    # Store all pre-solve contact information
+    def PreSolve(self, contact, _):
+        # We give the contact an index so that we can recognize it later
+        contact.userData = self.counter
+        self.counter += contact.manifold.pointCount
+
+        self.xml_exp.snapshot_contact(contact)
+
+    # Store post-solve impulses
     def PostSolve(self, contact, impulse):
-        pc = contact.manifold.pointCount
-        for i in range(pc):
-            master = contact.fixtureA.body.userData.id
-            slave  = contact.fixtureB.body.userData.id
-
-            normal  = impulse.normalImpulses[i]
-            tangent = impulse.tangentImpulses[i]
-
-            self.impulses[(master, slave)] = (normal, tangent)
+        self.xml_exp.snapshot_impulse(contact, impulse)
 
 
 # Define a drawer if set
@@ -79,8 +79,8 @@ if visualize:
     drawer.install()
 
 
+
 # ----- Data generation -----
-listener = ImpulseListener()
 for i in range(len(seeds)):
     seed = seeds[i]
     print("Running world %d of %d" % (i+1, len(seeds)))
@@ -88,7 +88,6 @@ for i in range(len(seeds)):
     # Create world
     world = b2World()
     world.userData = SimData(name=str(seed), d_t=timeStep)
-    world.contactListener = listener
 
     # Fill world with static box and circles
     new_confined_clustered_circles_world(world, nBodies, b2Vec2(xlow, ylow), b2Vec2(xhi, yhi), r, sigma_coef, seed)
@@ -98,20 +97,23 @@ for i in range(len(seeds)):
     world.positionThreshold = positionThreshold
 
     # Initialize XML exporter
-    exp = XMLExporter(world, path)
+    xml_exp = XMLExporter(world, path)
+
+    # Initialize contact listener
+    listener = ContactListener(xml_exp)
+    world.contactListener = listener
 
     # Run simulation
     for i in range(steps):
         if not quiet:
             print("step", i)
 
-        # Reset the impulse dict
-        listener.__reset__()
+        # Reset the contact listener
+        listener.reset()
 
-        # Save snapshot of current configuration
-        exp.__reset__()
-        exp.snapshot_bodies()
-        exp.snapshot_contacts()
+        # Reset xml exporter and take snapshot of bodies
+        xml_exp.reset()
+        xml_exp.snapshot_bodies()
 
         # Tell the world to take a step
         world.Step(timeStep, velocityIterations, positionIterations)
@@ -126,10 +128,6 @@ for i in range(len(seeds)):
             cv2.imshow('World', drawer.screen)
             cv2.waitKey(25)
 
-        # Store contact impulses
-        exp.snapshot_impulses(listener.impulses)
-        #print(listener.impulses)
-
         # Save the snapshot if wanted
         if not skipContactless or world.GetProfile().contactsSolved > 0:
-            exp.save_snapshot()
+            xml_exp.save_snapshot()
