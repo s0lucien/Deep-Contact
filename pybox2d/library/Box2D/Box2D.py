@@ -162,154 +162,154 @@ def _init_jointdef_kwargs(self, bodyA=None, bodyB=None, **kwargs):
     _init_kwargs(self, **kwargs)
 
 
-_repr_attrs = {'b2AABB': ['center', 'extents', 'lowerBound', 'perimeter', 'upperBound', 
+_repr_attrs = {'b2AABB': ['center', 'extents', 'lowerBound', 'perimeter', 'upperBound',
                           'valid', ],
-               'b2Body': ['active', 'angle', 'angularDamping', 'angularVelocity', 'awake', 
-                          'bullet', 'contacts', 'fixedRotation', 'fixtures', 
-                          'inertia', 'joints', 'linearDamping', 'linearVelocity', 
-                          'localCenter', 'mass', 'massData', 'position', 
-                          'sleepingAllowed', 'transform', 'type', 'userData', 
+               'b2Body': ['active', 'angle', 'angularDamping', 'angularVelocity', 'awake',
+                          'bullet', 'contacts', 'fixedRotation', 'fixtures',
+                          'inertia', 'joints', 'linearDamping', 'linearVelocity',
+                          'localCenter', 'mass', 'massData', 'position',
+                          'sleepingAllowed', 'transform', 'type', 'userData',
                           'worldCenter', ],
-               'b2BodyDef': ['active', 'allowSleep', 'angle', 'angularDamping', 'angularVelocity', 
-                             'awake', 'bullet', 'fixedRotation', 'fixtures', 
-                             'inertiaScale', 'linearDamping', 'linearVelocity', 'position', 
-                             'shapeFixture', 'shapes', 'type', 'userData', 
+               'b2BodyDef': ['active', 'allowSleep', 'angle', 'angularDamping', 'angularVelocity',
+                             'awake', 'bullet', 'fixedRotation', 'fixtures',
+                             'inertiaScale', 'linearDamping', 'linearVelocity', 'position',
+                             'shapeFixture', 'shapes', 'type', 'userData',
                              ],
                'b2BroadPhase': ['proxyCount', ],
                'b2CircleShape': ['childCount', 'pos', 'radius', 'type', ],
                'b2ClipVertex': ['id', 'v', ],
-               'b2Color': ['b', 'bytes', 'g', 'list', 'r', 
+               'b2Color': ['b', 'bytes', 'g', 'list', 'r',
                            ],
-               'b2Contact': ['childIndexA', 'childIndexB', 'enabled', 'fixtureA', 'fixtureB', 
-                             'manifold', 'touching', 'worldManifold', ],
+               'b2Contact': ['childIndexA', 'childIndexB', 'enabled', 'fixtureA', 'fixtureB',
+                             'manifold', 'touching', 'worldManifold', 'userData'],
                'b2ContactEdge': ['contact', 'other', ],
                'b2ContactFeature': ['indexA', 'indexB', 'typeA', 'typeB', ],
                'b2ContactID': ['cf', 'key', ],
                'b2ContactImpulse': ['normalImpulses', 'tangentImpulses', ],
-               'b2ContactManager': ['allocator', 'broadPhase', 'contactCount', 'contactFilter', 'contactList', 
+               'b2ContactManager': ['allocator', 'broadPhase', 'contactCount', 'contactFilter', 'contactList',
                                     'contactListener', ],
-               'b2ContactPoint': ['fixtureA', 'fixtureB', 'normal', 'position', 'state', 
+               'b2ContactPoint': ['fixtureA', 'fixtureB', 'normal', 'position', 'state',
                                   ],
-               'b2DistanceInput': ['proxyA', 'proxyB', 'transformA', 'transformB', 'useRadii', 
+               'b2DistanceInput': ['proxyA', 'proxyB', 'transformA', 'transformB', 'useRadii',
                                    ],
-               'b2DistanceJoint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB', 
-                                   'dampingRatio', 'frequency', 'length', 'type', 
+               'b2DistanceJoint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB',
+                                   'dampingRatio', 'frequency', 'length', 'type',
                                    'userData', ],
-               'b2DistanceJointDef': ['anchorA', 'anchorB', 'bodyA', 'bodyB', 'collideConnected', 
-                                      'dampingRatio', 'frequencyHz', 'length', 'localAnchorA', 
+               'b2DistanceJointDef': ['anchorA', 'anchorB', 'bodyA', 'bodyB', 'collideConnected',
+                                      'dampingRatio', 'frequencyHz', 'length', 'localAnchorA',
                                       'localAnchorB', 'type', 'userData', ],
                'b2DistanceOutput': ['distance', 'iterations', 'pointA', 'pointB', ],
                'b2DistanceProxy': ['m_buffer', 'shape', 'vertices', ],
                'b2Draw': ['flags', ],
-               'b2DrawExtended': ['center', 'convertVertices', 'flags', 'flipX', 'flipY', 
+               'b2DrawExtended': ['center', 'convertVertices', 'flags', 'flipX', 'flipY',
                                   'offset', 'screenSize', 'zoom', ],
-               'b2EdgeShape': ['all_vertices', 'childCount', 'hasVertex0', 'hasVertex3', 'radius', 
-                               'type', 'vertex0', 'vertex1', 'vertex2', 
+               'b2EdgeShape': ['all_vertices', 'childCount', 'hasVertex0', 'hasVertex3', 'radius',
+                               'type', 'vertex0', 'vertex1', 'vertex2',
                                'vertex3', 'vertexCount', 'vertices', ],
                'b2Filter': ['categoryBits', 'groupIndex', 'maskBits', ],
-               'b2Fixture': ['body', 'density', 'filterData', 'friction', 'massData', 
-                             'restitution', 'sensor', 'shape', 'type', 
+               'b2Fixture': ['body', 'density', 'filterData', 'friction', 'massData',
+                             'restitution', 'sensor', 'shape', 'type',
                              'userData', ],
-               'b2FixtureDef': ['categoryBits', 'density', 'filter', 'friction', 'groupIndex', 
-                                'isSensor', 'maskBits', 'restitution', 'shape', 
+               'b2FixtureDef': ['categoryBits', 'density', 'filter', 'friction', 'groupIndex',
+                                'isSensor', 'maskBits', 'restitution', 'shape',
                                 'userData', ],
                'b2FixtureProxy': ['aabb', 'childIndex', 'fixture', 'proxyId', ],
-               'b2FrictionJoint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB', 
-                                   'maxForce', 'maxTorque', 'type', 'userData', 
+               'b2FrictionJoint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB',
+                                   'maxForce', 'maxTorque', 'type', 'userData',
                                    ],
-               'b2FrictionJointDef': ['anchor', 'bodyA', 'bodyB', 'collideConnected', 'localAnchorA', 
-                                      'localAnchorB', 'maxForce', 'maxTorque', 'type', 
+               'b2FrictionJointDef': ['anchor', 'bodyA', 'bodyB', 'collideConnected', 'localAnchorA',
+                                      'localAnchorB', 'maxForce', 'maxTorque', 'type',
                                       'userData', ],
-               'b2GearJoint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB', 
+               'b2GearJoint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB',
                                'ratio', 'type', 'userData', ],
-               'b2GearJointDef': ['bodyA', 'bodyB', 'collideConnected', 'joint1', 'joint2', 
+               'b2GearJointDef': ['bodyA', 'bodyB', 'collideConnected', 'joint1', 'joint2',
                                   'ratio', 'type', 'userData', ],
                'b2Jacobian': ['angularA', 'angularB', 'linearA', 'linearB', ],
-               'b2Joint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB', 
+               'b2Joint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB',
                            'type', 'userData', ],
-               'b2JointDef': ['bodyA', 'bodyB', 'collideConnected', 'type', 'userData', 
+               'b2JointDef': ['bodyA', 'bodyB', 'collideConnected', 'type', 'userData',
                               ],
                'b2JointEdge': ['joint', 'other', ],
-               'b2WheelJoint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB', 
-                                'maxMotorTorque', 'motorEnabled', 'motorSpeed', 'speed', 
-                                'springDampingRatio', 'springFrequencyHz', 'translation', 'type', 
+               'b2WheelJoint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB',
+                                'maxMotorTorque', 'motorEnabled', 'motorSpeed', 'speed',
+                                'springDampingRatio', 'springFrequencyHz', 'translation', 'type',
                                 'userData', ],
-               'b2WheelJointDef': ['anchor', 'axis', 'bodyA', 'bodyB', 'collideConnected', 
-                                   'dampingRatio', 'enableMotor', 'frequencyHz', 'localAnchorA', 
-                                   'localAnchorB', 'localAxisA', 'maxMotorTorque', 'motorSpeed', 
+               'b2WheelJointDef': ['anchor', 'axis', 'bodyA', 'bodyB', 'collideConnected',
+                                   'dampingRatio', 'enableMotor', 'frequencyHz', 'localAnchorA',
+                                   'localAnchorB', 'localAxisA', 'maxMotorTorque', 'motorSpeed',
                                    'type', 'userData', ],
-               'b2ChainShape': ['childCount', 'edges', 'radius', 'type', 'vertexCount', 
+               'b2ChainShape': ['childCount', 'edges', 'radius', 'type', 'vertexCount',
                                 'vertices', ],
-               'b2Manifold': ['localNormal', 'localPoint', 'pointCount', 'points', 'type_', 
+               'b2Manifold': ['localNormal', 'localPoint', 'pointCount', 'points', 'type_',
                               ],
-               'b2ManifoldPoint': ['id', 'isNew', 'localPoint', 'normalImpulse', 'tangentImpulse', 
+               'b2ManifoldPoint': ['id', 'isNew', 'localPoint', 'normalImpulse', 'tangentImpulse',
                                    ],
                'b2MassData': ['I', 'center', 'mass', ],
                'b2Mat22': ['angle', 'col1', 'col2', 'inverse', ],
                'b2Mat33': ['col1', 'col2', 'col3', ],
-               'b2MouseJoint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB', 
-                                'dampingRatio', 'frequency', 'maxForce', 'target', 
+               'b2MouseJoint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB',
+                                'dampingRatio', 'frequency', 'maxForce', 'target',
                                 'type', 'userData', ],
-               'b2MouseJointDef': ['bodyA', 'bodyB', 'collideConnected', 'dampingRatio', 'frequencyHz', 
-                                   'maxForce', 'target', 'type', 'userData', 
+               'b2MouseJointDef': ['bodyA', 'bodyB', 'collideConnected', 'dampingRatio', 'frequencyHz',
+                                   'maxForce', 'target', 'type', 'userData',
                                    ],
                'b2Pair': ['proxyIdA', 'proxyIdB', ],
-               'b2PolygonShape': ['box', 'centroid', 'childCount', 'normals', 'radius', 
-                                  'type', 'valid', 'vertexCount', 'vertices', 
+               'b2PolygonShape': ['box', 'centroid', 'childCount', 'normals', 'radius',
+                                  'type', 'valid', 'vertexCount', 'vertices',
                                   ],
-               'b2PrismaticJoint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB', 
-                                    'limitEnabled', 'limits', 'lowerLimit', 'maxMotorForce', 
-                                    'motorEnabled', 'motorSpeed', 'speed', 'translation', 
+               'b2PrismaticJoint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB',
+                                    'limitEnabled', 'limits', 'lowerLimit', 'maxMotorForce',
+                                    'motorEnabled', 'motorSpeed', 'speed', 'translation',
                                     'type', 'upperLimit', 'userData', ],
-               'b2PrismaticJointDef': ['anchor', 'axis', 'bodyA', 'bodyB', 'collideConnected', 
-                                       'enableLimit', 'enableMotor', 'localAnchorA', 'localAnchorB', 
-                                       'localAxis1', 'lowerTranslation', 'maxMotorForce', 'motorSpeed', 
-                                       'referenceAngle', 'type', 'upperTranslation', 'userData', 
+               'b2PrismaticJointDef': ['anchor', 'axis', 'bodyA', 'bodyB', 'collideConnected',
+                                       'enableLimit', 'enableMotor', 'localAnchorA', 'localAnchorB',
+                                       'localAxis1', 'lowerTranslation', 'maxMotorForce', 'motorSpeed',
+                                       'referenceAngle', 'type', 'upperTranslation', 'userData',
                                        ],
-               'b2PulleyJoint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB', 
-                                 'groundAnchorA', 'groundAnchorB', 'length1', 'length2', 
+               'b2PulleyJoint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB',
+                                 'groundAnchorA', 'groundAnchorB', 'length1', 'length2',
                                  'ratio', 'type', 'userData', ],
-               'b2PulleyJointDef': ['anchorA', 'anchorB', 'bodyA', 'bodyB', 'collideConnected', 
-                                    'groundAnchorA', 'groundAnchorB', 'lengthA', 'lengthB', 
-                                    'localAnchorA', 'localAnchorB', 'maxLengthA', 'maxLengthB', 
+               'b2PulleyJointDef': ['anchorA', 'anchorB', 'bodyA', 'bodyB', 'collideConnected',
+                                    'groundAnchorA', 'groundAnchorB', 'lengthA', 'lengthB',
+                                    'localAnchorA', 'localAnchorB', 'maxLengthA', 'maxLengthB',
                                     'ratio', 'type', 'userData', ],
                'b2RayCastInput': ['maxFraction', 'p1', 'p2', ],
                'b2RayCastOutput': ['fraction', 'normal', ],
-               'b2RevoluteJoint': ['active', 'anchorA', 'anchorB', 'angle', 'bodyA', 
-                                   'bodyB', 'limitEnabled', 'limits', 'lowerLimit', 
-                                   'maxMotorTorque', 'motorEnabled', 'motorSpeed', 'speed', 
+               'b2RevoluteJoint': ['active', 'anchorA', 'anchorB', 'angle', 'bodyA',
+                                   'bodyB', 'limitEnabled', 'limits', 'lowerLimit',
+                                   'maxMotorTorque', 'motorEnabled', 'motorSpeed', 'speed',
                                    'type', 'upperLimit', 'userData', ],
-               'b2RevoluteJointDef': ['anchor', 'bodyA', 'bodyB', 'collideConnected', 'enableLimit', 
-                                      'enableMotor', 'localAnchorA', 'localAnchorB', 'lowerAngle', 
-                                      'maxMotorTorque', 'motorSpeed', 'referenceAngle', 'type', 
+               'b2RevoluteJointDef': ['anchor', 'bodyA', 'bodyB', 'collideConnected', 'enableLimit',
+                                      'enableMotor', 'localAnchorA', 'localAnchorB', 'lowerAngle',
+                                      'maxMotorTorque', 'motorSpeed', 'referenceAngle', 'type',
                                       'upperAngle', 'userData', ],
-               'b2RopeJoint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB', 
-                               'limitState', 'maxLength', 'type', 'userData', 
+               'b2RopeJoint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB',
+                               'limitState', 'maxLength', 'type', 'userData',
                                ],
-               'b2RopeJointDef': ['anchorA', 'anchorB', 'bodyA', 'bodyB', 'collideConnected', 
-                                  'localAnchorA', 'localAnchorB', 'maxLength', 'type', 
+               'b2RopeJointDef': ['anchorA', 'anchorB', 'bodyA', 'bodyB', 'collideConnected',
+                                  'localAnchorA', 'localAnchorB', 'maxLength', 'type',
                                   'userData', ],
                'b2Shape': ['childCount', 'radius', 'type', ],
-               'b2Sweep': ['a', 'a0', 'alpha0', 'c', 'c0', 
+               'b2Sweep': ['a', 'a0', 'alpha0', 'c', 'c0',
                            'localCenter', ],
-               'b2TOIInput': ['proxyA', 'proxyB', 'sweepA', 'sweepB', 'tMax', 
+               'b2TOIInput': ['proxyA', 'proxyB', 'sweepA', 'sweepB', 'tMax',
                               ],
                'b2TOIOutput': ['state', 't', ],
                'b2Transform': ['R', 'angle', 'position', ],
-               'b2Vec2': ['length', 'lengthSquared', 'skew', 'tuple', 'valid', 
+               'b2Vec2': ['length', 'lengthSquared', 'skew', 'tuple', 'valid',
                           'x', 'y', ],
-               'b2Vec3': ['length', 'lengthSquared', 'tuple', 'valid', 'x', 
+               'b2Vec3': ['length', 'lengthSquared', 'tuple', 'valid', 'x',
                           'y', 'z', ],
                'b2Version': ['major', 'minor', 'revision', ],
-               'b2WeldJoint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB', 
+               'b2WeldJoint': ['active', 'anchorA', 'anchorB', 'bodyA', 'bodyB',
                                'type', 'userData', ],
-               'b2WeldJointDef': ['anchor', 'bodyA', 'bodyB', 'collideConnected', 'localAnchorA', 
-                                  'localAnchorB', 'referenceAngle', 'type', 'userData', 
+               'b2WeldJointDef': ['anchor', 'bodyA', 'bodyB', 'collideConnected', 'localAnchorA',
+                                  'localAnchorB', 'referenceAngle', 'type', 'userData',
                                   ],
-               'b2World': ['autoClearForces', 'bodies', 'bodyCount', 'contactCount', 'contactFilter', 
-                           'contactListener', 'contactManager', 'contacts', 'continuousPhysics', 
-                           'destructionListener', 'gravity', 'jointCount', 'joints', 
-                           'locked', 'proxyCount', 'renderer', 'subStepping', 
+               'b2World': ['autoClearForces', 'bodies', 'bodyCount', 'contactCount', 'contactFilter',
+                           'contactListener', 'contactManager', 'contacts', 'continuousPhysics',
+                           'destructionListener', 'gravity', 'jointCount', 'joints',
+                           'locked', 'proxyCount', 'renderer', 'subStepping',
                            'warmStarting', ],
                'b2WorldManifold': ['normal', 'points', ],
                }
@@ -378,7 +378,7 @@ def _format_repr(obj):
                     if i == 0:
                         ret.append('%s=%s' % (prop, line_))
                     else:
-                        ret.append(line_) 
+                        ret.append(line_)
             else:
                 ret.append('%s=%s' % (prop, lines[0].lstrip()))
                 if len(lines) > 1:
@@ -585,7 +585,7 @@ class b2ContactPoint(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 b2ContactPoint.__hash__ = new_instancemethod(_Box2D.b2ContactPoint___hash__, None, b2ContactPoint)
 b2ContactPoint_swigregister = _Box2D.b2ContactPoint_swigregister
@@ -650,7 +650,7 @@ class b2AssertException(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self):
@@ -721,7 +721,7 @@ class b2Version(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __repr__(self):
@@ -862,7 +862,7 @@ class b2Vec2(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, *args):
@@ -1077,7 +1077,7 @@ class b2Vec3(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, *args):
@@ -1290,7 +1290,7 @@ class b2Mat22(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, *args):
@@ -1424,7 +1424,7 @@ class b2Mat33(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, *args):
@@ -1585,7 +1585,7 @@ class b2Transform(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __get_rotation_matrix(self):
@@ -1663,7 +1663,7 @@ class b2Sweep(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def GetTransform(self, *args):
@@ -1802,7 +1802,7 @@ class b2ContactFeature(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self):
@@ -1836,7 +1836,7 @@ class b2ContactID(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, **kwargs):
@@ -1868,7 +1868,7 @@ class b2ManifoldPoint(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, **kwargs):
@@ -1907,7 +1907,7 @@ class b2Manifold(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __GetPoints(self):
@@ -1956,7 +1956,7 @@ class b2WorldManifold(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
 
@@ -2002,7 +2002,7 @@ class b2ClipVertex(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, **kwargs):
@@ -2033,7 +2033,7 @@ class b2RayCastInput(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, **kwargs):
@@ -2063,7 +2063,7 @@ class b2RayCastOutput(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, **kwargs):
@@ -2144,7 +2144,7 @@ class b2AABB(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
             # Read-only
@@ -2308,7 +2308,7 @@ class b2Color(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, *args):
@@ -2569,7 +2569,7 @@ class b2Draw(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     _flag_entries = [
@@ -2721,7 +2721,7 @@ class b2DrawExtended(b2Draw):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
     def __disown__(self):
         self.this.disown()
@@ -2758,7 +2758,7 @@ class b2MassData(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, **kwargs):
@@ -2900,7 +2900,7 @@ class b2Shape(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     __eq__ = b2ShapeCompare
@@ -2970,7 +2970,7 @@ class b2CircleShape(b2Shape):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
 
@@ -3015,7 +3015,7 @@ class b2EdgeShape(b2Shape):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __repr__(self):
@@ -3136,7 +3136,7 @@ class b2ChainShape(b2Shape):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __get_vertices(self):
@@ -3285,7 +3285,7 @@ class b2PolygonShape(b2Shape):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __get_vertices(self):
@@ -3417,7 +3417,7 @@ class b2Pair(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, **kwargs):
@@ -3520,7 +3520,7 @@ class b2BroadPhase(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     proxyCount=property(__GetProxyCount, None)
@@ -3616,7 +3616,7 @@ class b2DistanceProxy(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __get_vertices(self):
@@ -3655,7 +3655,7 @@ class b2DistanceInput(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, **kwargs):
@@ -3687,7 +3687,7 @@ class b2DistanceOutput(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, **kwargs):
@@ -3720,7 +3720,7 @@ class b2TOIInput(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, **kwargs):
@@ -3755,7 +3755,7 @@ class b2TOIOutput(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self):
@@ -3803,7 +3803,7 @@ class b2BodyDef(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __GetUserData(self):
@@ -4442,7 +4442,7 @@ class b2Body(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def DestroyFixture(self, fixture):
@@ -4807,7 +4807,7 @@ class b2Filter(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
     __swig_destroy__ = _Box2D.delete_b2Filter
 b2Filter.__hash__ = new_instancemethod(_Box2D.b2Filter___hash__, None, b2Filter)
@@ -4841,7 +4841,7 @@ class b2FixtureDef(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __GetUserData(self):
@@ -4902,7 +4902,7 @@ class b2FixtureProxy(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self):
@@ -5137,7 +5137,7 @@ class b2Fixture(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __GetUserData(self):
@@ -5234,7 +5234,7 @@ class b2DestructionListener(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, **kwargs):
@@ -5282,7 +5282,7 @@ class b2ContactFilter(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, **kwargs):
@@ -5319,7 +5319,7 @@ class b2ContactImpulse(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __get_normal_impulses(self):
@@ -5404,7 +5404,7 @@ class b2ContactListener(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, **kwargs):
@@ -5454,7 +5454,7 @@ class b2QueryCallback(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, **kwargs):
@@ -5513,7 +5513,7 @@ class b2RayCastCallback(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self):
@@ -5677,7 +5677,7 @@ class b2ContactManager(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
 
@@ -6084,7 +6084,7 @@ class b2World(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __CreateBody(self, defn):
@@ -6502,7 +6502,7 @@ class b2ContactEdge(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, **kwargs):
@@ -6682,6 +6682,16 @@ class b2Contact(object):
         return _Box2D.b2Contact___GetTangentSpeed(self)
 
 
+    def __GetUserData(self):
+        """__GetUserData(b2Contact self) -> float32"""
+        return _Box2D.b2Contact___GetUserData(self)
+
+
+    def __SetUserData(self, data):
+        """__SetUserData(b2Contact self, float32 data)"""
+        return _Box2D.b2Contact___SetUserData(self, data)
+
+
     def Evaluate(self, manifold, xfA, xfB):
         """
         Evaluate(b2Contact self, b2Manifold manifold, b2Transform xfA, b2Transform xfB)
@@ -6700,7 +6710,7 @@ class b2Contact(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __GetWorldManifold(self):
@@ -6725,6 +6735,9 @@ class b2Contact(object):
     tangentSpeed = property(__GetTangentSpeed, __SetTangentSpeed)
 
 
+
+    userData = property(__GetUserData, __SetUserData)
+
 b2Contact.__GetManifold = new_instancemethod(_Box2D.b2Contact___GetManifold, None, b2Contact)
 b2Contact.__GetWorldManifold_internal = new_instancemethod(_Box2D.b2Contact___GetWorldManifold_internal, None, b2Contact)
 b2Contact.__IsTouching = new_instancemethod(_Box2D.b2Contact___IsTouching, None, b2Contact)
@@ -6743,6 +6756,8 @@ b2Contact.__GetRestitution = new_instancemethod(_Box2D.b2Contact___GetRestitutio
 b2Contact.ResetRestitution = new_instancemethod(_Box2D.b2Contact_ResetRestitution, None, b2Contact)
 b2Contact.__SetTangentSpeed = new_instancemethod(_Box2D.b2Contact___SetTangentSpeed, None, b2Contact)
 b2Contact.__GetTangentSpeed = new_instancemethod(_Box2D.b2Contact___GetTangentSpeed, None, b2Contact)
+b2Contact.__GetUserData = new_instancemethod(_Box2D.b2Contact___GetUserData, None, b2Contact)
+b2Contact.__SetUserData = new_instancemethod(_Box2D.b2Contact___SetUserData, None, b2Contact)
 b2Contact.Evaluate = new_instancemethod(_Box2D.b2Contact_Evaluate, None, b2Contact)
 b2Contact.__hash__ = new_instancemethod(_Box2D.b2Contact___hash__, None, b2Contact)
 b2Contact_swigregister = _Box2D.b2Contact_swigregister
@@ -6768,7 +6783,7 @@ class b2Jacobian(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, **kwargs):
@@ -6800,7 +6815,7 @@ class b2JointEdge(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __init__(self, **kwargs):
@@ -6838,7 +6853,7 @@ class b2JointDef(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __GetUserData(self):
@@ -7003,7 +7018,7 @@ class b2Joint(object):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __GetUserData(self):
@@ -7103,7 +7118,7 @@ class b2DistanceJointDef(b2JointDef):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __update_length(self):
@@ -7206,7 +7221,7 @@ class b2DistanceJoint(b2Joint):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
 
@@ -7263,7 +7278,7 @@ class b2FrictionJointDef(b2JointDef):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __set_anchor(self, value):
@@ -7356,7 +7371,7 @@ class b2FrictionJoint(b2Joint):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
             # Read-write properties
@@ -7398,7 +7413,7 @@ class b2GearJointDef(b2JointDef):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
     __swig_destroy__ = _Box2D.delete_b2GearJointDef
 b2GearJointDef.__hash__ = new_instancemethod(_Box2D.b2GearJointDef___hash__, None, b2GearJointDef)
@@ -7451,7 +7466,7 @@ class b2GearJoint(b2Joint):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
             # Read-write properties
@@ -7591,7 +7606,7 @@ class b2MouseJointDef(b2JointDef):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
     __swig_destroy__ = _Box2D.delete_b2MouseJointDef
 b2MouseJointDef.__hash__ = new_instancemethod(_Box2D.b2MouseJointDef___hash__, None, b2MouseJointDef)
@@ -7672,7 +7687,7 @@ class b2MouseJoint(b2Joint):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
 
@@ -7742,7 +7757,7 @@ class b2PrismaticJointDef(b2JointDef):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __set_anchor(self, value):
@@ -7943,7 +7958,7 @@ class b2PrismaticJoint(b2Joint):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
 
@@ -8052,7 +8067,7 @@ class b2PulleyJointDef(b2JointDef):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __update_length(self):
@@ -8162,7 +8177,7 @@ class b2PulleyJoint(b2Joint):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
 
@@ -8227,7 +8242,7 @@ class b2RevoluteJointDef(b2JointDef):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __set_anchor(self, value):
@@ -8410,7 +8425,7 @@ class b2RevoluteJoint(b2Joint):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
 
@@ -8476,7 +8491,7 @@ class b2RopeJointDef(b2JointDef):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __set_anchorA(self, value):
@@ -8557,7 +8572,7 @@ class b2RopeJoint(b2Joint):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
 
@@ -8615,7 +8630,7 @@ class b2WeldJointDef(b2JointDef):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __set_anchor(self, value):
@@ -8696,7 +8711,7 @@ class b2WeldJoint(b2Joint):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
     __swig_destroy__ = _Box2D.delete_b2WeldJoint
 b2WeldJoint.GetLocalAnchorA = new_instancemethod(_Box2D.b2WeldJoint_GetLocalAnchorA, None, b2WeldJoint)
@@ -8748,7 +8763,7 @@ class b2WheelJointDef(b2JointDef):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
     def __set_anchor(self, value):
@@ -8927,7 +8942,7 @@ class b2WheelJoint(b2Joint):
 
 
     def __repr__(self):
-        return _format_repr(self) 
+        return _format_repr(self)
 
 
 

@@ -2,7 +2,7 @@
 * Python SWIG interface file for Box2D (www.box2d.org)
 *
 * Copyright (c) 2008 kne / sirkne at gmail dot com
-* 
+*
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
 * arising from the use of this software.
@@ -19,7 +19,7 @@
 */
 
 /* Note: Given that we have a definition (b2BodyDef) that takes the userData, then
-   passes it onto the factory output (b2Body) upon creation, it's necessary 
+   passes it onto the factory output (b2Body) upon creation, it's necessary
    to intercept the CreateBody/Joint/Shape functions to increase the refcount
    for each of those functions.
 
@@ -27,7 +27,7 @@
  */
 
 %extend b2World {
-public:        
+public:
     b2Body* __CreateBody(b2BodyDef* defn) {
         b2Body* ret;
         if (defn)
@@ -54,7 +54,7 @@ public:
 }
 
 %extend b2Body {
-public:        
+public:
     void DestroyFixture(b2Fixture* fixture) {
         Py_XDECREF((PyObject*)fixture->GetUserData());
         self->DestroyFixture(fixture);
@@ -87,7 +87,7 @@ public:
 }
 
 %extend b2Joint {
-public:        
+public:
     PyObject* __GetUserData() {
         PyObject* ret=(PyObject*)self->GetUserData();
         if (!ret) ret=Py_None;
@@ -109,7 +109,7 @@ public:
 }
 
 %extend b2Fixture {
-public:        
+public:
     PyObject* __GetUserData() {
         PyObject* ret=(PyObject*)self->GetUserData();
         if (!ret) ret=Py_None;
@@ -212,7 +212,17 @@ public:
     %}
 }
 
-// These renames are intentionally below the above CreateBody, as they will rename the 
+%extend b2Contact {
+public:
+    %pythoncode %{
+        userData = property(__GetUserData, __SetUserData)
+    %}
+}
+
+%rename (__GetUserData) b2Contact::GetUserData;
+%rename (__SetUserData) b2Contact::SetUserData;
+
+// These renames are intentionally below the above CreateBody, as they will rename the
 // original C++ versions and not the ones I have written.
 %ignore SetUserData;
 %ignore GetUserData;

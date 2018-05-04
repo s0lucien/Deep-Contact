@@ -33,3 +33,8 @@ number of contacts in the world, and might even be different from the total
 number of contacts in the world for which 'touching' is true.
 'velocityLambdaTwoNorms', 'velocityLambdaInfNorms' and 'positionLambdas' contains
 the convergence rate numbers, if 'convergenceRates' was set.
+
+b2Contact now has a 'userData' attribute similar to the b2World and b2Body classes.
+The b2Contact version only accepts float though, due to issues with pointers and
+segmentation faults. The main intended use is to assign each contact a unique id,
+allowing them to be identified across steps.

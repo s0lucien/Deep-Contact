@@ -141,6 +141,12 @@ public:
 	/// Get the desired tangent speed. In meters per second.
 	float32 GetTangentSpeed() const;
 
+    /// Get the user data. Use this to store your application specific data.
+	float32 GetUserData() const;
+
+	/// Set the user data. Use this to store your application specific data.
+    void SetUserData(float32 data);
+
 	/// Evaluate this contact with your own manifold and transforms.
 	virtual void Evaluate(b2Manifold* manifold, const b2Transform& xfA, const b2Transform& xfB) = 0;
 
@@ -217,6 +223,8 @@ protected:
 	float32 m_restitution;
 
 	float32 m_tangentSpeed;
+
+    float32 m_userData;
 };
 
 inline b2Manifold* b2Contact::GetManifold()
@@ -344,6 +352,16 @@ inline void b2Contact::SetTangentSpeed(float32 speed)
 inline float32 b2Contact::GetTangentSpeed() const
 {
 	return m_tangentSpeed;
+}
+
+inline float32 b2Contact::GetUserData() const
+{
+	return m_userData;
+}
+
+inline void b2Contact::SetUserData(float32 data)
+{
+	m_userData = data;
 }
 
 #endif
