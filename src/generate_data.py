@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
     h = 1
 
-    model = IdentityGridModel(world, p_ll, p_ur, xRes, yRes, h)
+    model = IdentityGridModel(p_ll, p_ur, xRes, yRes, h)
 
     # Timestep
     timeStep = 1.0 / 100
