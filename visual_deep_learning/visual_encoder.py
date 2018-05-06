@@ -44,7 +44,7 @@ def frame_2_pair(F1F2, F2F3, F3F4, F4F5, F5F6, x_cor, y_cor, FLAGS):
     img_pair = tf.concat(
       [F1F2, F2F3, F3F4, F4F5, F5F6], 0)
 
-    # First 2 layer conv(kernel size 3 and 4 channel)
+    # First 2 layer conv(kernel size 3 and 4 channels)
     w_1_1, b_1_1 = conv_variable([10, 10, FLAGS.col_dim*2, 4])
     h_1_1 = tf.nn.relu(conv2d(img_pair, w_1_1, 1) + b_1_1)
     w_1_2, b_1_2 = conv_variable([10, 10, 4, 4])
