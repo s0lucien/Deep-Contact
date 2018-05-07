@@ -13,7 +13,10 @@ class IdentityGridModel (Model):
         df_c = world_contact_dataframe(world)
 
         # Tell the gridmanager to create the required grids
-        self.gm.create_grids(df_b, df_c, channels=["ni", "ti"])
+        self.gm.create_grids(df_c, ["ni", "ti"])
+
+        # Tell the gridmanager to create the required interpolation functions
+        self.gm.create_interp(["ni, ti"])
 
 
     def Predict(self, contact):

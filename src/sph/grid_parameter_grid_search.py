@@ -39,10 +39,8 @@ attribute = "mass"
 # Grid parameters to try
 # Grid resolution
 res = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2]
-#res = [1]
 # Support radius
 h = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2]
-#h = [1]
 
 # Create all combinations of grid parameters
 parameters = list(product(*[res, h]))
@@ -63,11 +61,13 @@ for i in range(nParameters):
 
         # Create data frames
         df_b = world_body_dataframe(world)
-        df_c = world_contact_dataframe(world)
 
-        # Create gridmanager and grids
+        # Create gridmanager
         gm = SPHGridManager(p_ll, p_ur, p[0], p[0], p[1])
-        gm.create_grids(df_b, df_c, channels=[attribute])
+
+        # Tell it to create grids and interp functions
+        gm.create_grids(df_b, channels=[attribute])
+        gm.create_interp([attribute])
 
         # Query for all bodies and sum
         worldTotal = 0

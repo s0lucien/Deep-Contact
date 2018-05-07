@@ -38,7 +38,7 @@ def xml_body_dataframe(world:Element):
            float(b.find("velocity").get("vy")),
            float(b.find("angle").get("theta")),
            float(b.find("angular_velocity").get("omega"))
-    ] for b in bodies if b.get("type") is "free"]
+    ] for b in bodies if b.get("type") == "free"]
 
     df = pd.DataFrame(data=bs, columns=["id", "px", "py", "mass", "vx", "vy", "theta", "omega"])
     df.id = df.id.astype(int)
@@ -275,32 +275,39 @@ class SPHGridManager:
         self.grids = {}
         self.f_interp = {}
 
-    # The user can specify a list of "channels" to calculate grids and interpolation for, in case not all are needed
-    def create_grids(self, df_b, df_c, channels=[]):
+    def reset():
         self.grids = {}
         self.f_interp = {}
 
-        # Body grids
-        b_channels = [b for b in df_b.columns.tolist() if b not in ["px", "py"]]
-        if channels:
-            b_channels = list(set(b_channels).intersection(channels))
-        b_data = df_b[b_channels].values
-        b_grids = create_grids(self.X, self.Y, df_b.px, df_b.py, b_data, self.h, f_krn=W_poly6_2D)
-        for i in range(len(b_channels)):
-            self.grids[b_channels[i]] = b_grids[i]
+    # The user specifies a list of "channels" to calculate grids for
+    def create_grids(self, df, channels):
+        df_channels = [d for d in df.columns.tolist() if d not in ["px", "py"]]
+        known = []
+        for c in channels:
+            if c in df_channels:
+                known.append(c)
+            else:
+                print("Unknown channel: ", c)
+                logging.info("Unknown channel: " + c)
 
-        # Contact grids
-        c_channels = [c for c in df_c.columns.tolist() if c not in ["px", "py"]]
-        if channels:
-            c_channels = list(set(c_channels).intersection(channels))
-        c_data = df_c[c_channels].values
-        c_grids = create_grids(self.X, self.Y, df_c.px, df_c.py, c_data, self.h, f_krn=W_poly6_2D)
-        for i in range(len(c_channels)):
-            self.grids[c_channels[i]] = c_grids[i]
+        channels = known
+        if not channels:
+            return
 
-        # Interpolation
-        for chan in self.grids.keys():
-            self.f_interp[chan] = interpolate.RectBivariateSpline(self.x, self.y, self.grids[chan])
+        data = df[channels].values
+        grids = create_grids(self.X, self.Y, df.px, df.py, data, self.h, f_krn=W_poly6_2D)
+        for i in range(len(channels)):
+            self.grids[channels[i]] = grids[i]
+
+    # The user specifies a list of "channels" to calculate interpolation for
+    def create_interp(self, channels=[]):
+        for c in channels:
+            grid = self.grids.get(c)
+            if grid is not None:
+                self.f_interp[c] = interpolate.RectBivariateSpline(self.x, self.y, grid)
+            else:
+                print("Unknown channel: ", c)
+                logging.info("Unknown channel: " + c)
 
     # Only intended to be used to query for a single point at a time
     def query(self, Px, Py, channel):
