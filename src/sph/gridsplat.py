@@ -275,7 +275,7 @@ class SPHGridManager:
         self.grids = {}
         self.f_interp = {}
 
-    def reset():
+    def reset(self):
         self.grids = {}
         self.f_interp = {}
 
