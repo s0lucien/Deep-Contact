@@ -1,6 +1,6 @@
-# using tensorflow stuff
-from __future__ import division
+from __future__ import absolute_import, division, print_function
 
+# using tensorflow stuff here.
 import tensorflow as tf
 import numpy as np
 

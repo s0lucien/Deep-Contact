@@ -32,3 +32,5 @@ if __name__ == '__main__':
         help='The Number of filters',
     )
     FLAGS, args = parser.parse_args()
+    FLAGS.No = 2
+    print(FLAGS.No)
