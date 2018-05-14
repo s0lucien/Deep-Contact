@@ -6,6 +6,7 @@ import os, errno
 from ..sim_types import SimData
 
 
+
 def body_2_xml(body: b2Body):
     body_xml = Element('body')
     body_xml.set('index', str(body.userData.id))
@@ -21,6 +22,10 @@ def body_2_xml(body: b2Body):
     # mass
     mass = SubElement(body_xml, 'mass')
     mass.set('value', str(body.mass))
+
+    # inertia
+    inertia = SubElement(body_xml, "inertia")
+    inertia.set('value', str(body.inertia))
 
     # position
     pos = SubElement(body_xml, 'position')
@@ -135,8 +140,6 @@ class XMLExporter:
 
     # Save all the stored xml to a file
     def save_snapshot(self):
-        xml = prettify(self.cfg)
-
         if not os.path.isabs(self.export_root):
             file_dir=os.path.dirname(os.path.realpath(__file__))
             out_path = os.path.join(file_dir,self.export_root)
@@ -151,5 +154,5 @@ class XMLExporter:
                 raise
 
         file = os.path.join(directory,self.simData.name+"_"+str(self.simData.step)+".xml")
-        with open(file,"w") as f:
-            f.write(xml)
+        tree = ElementTree.ElementTree(self.cfg)
+        tree.write(file)

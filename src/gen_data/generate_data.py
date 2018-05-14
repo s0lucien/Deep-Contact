@@ -14,7 +14,7 @@ from ..opencv_draw import OpencvDrawFuncs
 # Number of bodies in world
 nBodies = 100
 # Seeds to use for body generator - determines the number of datasets created
-seeds = range(1)
+seeds = range(21, 26)
 # Something about spread of bodies?
 sigma_coef = 1.2
 # Dimension of static box
@@ -35,16 +35,15 @@ positionThreshold = 2*10**-5
 steps = 1000
 
 # Path to directory where data should be stored, relative to the xml_writing directory
-path = "../gen_data/data/"
+path = "../gen_data/data/xml/"
 # Decides whether to store configurations without any contacts
 skipContactless = True
 
 # Print various iteration numbers as simulation is running
-quiet = False
+quiet = True
 # Show visualization of world as simulation is running
 # note: significantly slower
 visualize = False
-
 
 
 # ----- Misc -----

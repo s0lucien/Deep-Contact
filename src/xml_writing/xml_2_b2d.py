@@ -32,6 +32,7 @@ def xml_2_b2bodies (world:b2World, xmlStr):
 
         bod.userData = BodyData(b_id=id, shape=shape)
         bod.mass = mass
+        bod.inertia = inertia
         bod.linearVelocity = b2Vec2(vx, vy)
         bod.angle = orientation
         bod.angularVelocity = spin

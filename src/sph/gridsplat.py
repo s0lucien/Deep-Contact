@@ -15,13 +15,14 @@ def world_body_dataframe(world:b2World):
            b.position.x,
            b.position.y,
            b.mass,
+           b.inertia,
            b.linearVelocity.x,
            b.linearVelocity.y,
            b.angle,
            b.angularVelocity
     ] for b in world.bodies if b.type is b2_dynamicBody]
 
-    df = pd.DataFrame(data=bs, columns=["id", "px", "py", "mass", "vx", "vy", "theta", "omega"])
+    df = pd.DataFrame(data=bs, columns=["id", "px", "py", "mass", "inertia", "vx", "vy", "theta", "omega"])
     df.id = df.id.astype(int)
     df = df.set_index("id")
 
@@ -34,13 +35,14 @@ def xml_body_dataframe(world:Element):
            float(b.find("position").get("x")),
            float(b.find("position").get("y")),
            float(b.find("mass").get("value")),
+           float(b.find("inertia").get("value")),
            float(b.find("velocity").get("vx")),
            float(b.find("velocity").get("vy")),
            float(b.find("angle").get("theta")),
            float(b.find("angular_velocity").get("omega"))
     ] for b in bodies if b.get("type") == "free"]
 
-    df = pd.DataFrame(data=bs, columns=["id", "px", "py", "mass", "vx", "vy", "theta", "omega"])
+    df = pd.DataFrame(data=bs, columns=["id", "px", "py", "mass", "inertia", "vx", "vy", "theta", "omega"])
     df.id = df.id.astype(int)
     df = df.set_index("id")
 
@@ -279,6 +281,10 @@ class SPHGridManager:
         self.grids = {}
         self.f_interp = {}
 
+    # Adds a grid to the grid manager
+    def add_grid(self, grid, channel):
+        self.grids[channel] = grid
+
     # The user specifies a list of "channels" to calculate grids for
     def create_grids(self, df, channels):
         df_channels = [d for d in df.columns.tolist() if d not in ["px", "py"]]
@@ -306,7 +312,6 @@ class SPHGridManager:
             if grid is not None:
                 self.f_interp[c] = interpolate.RectBivariateSpline(self.x, self.y, grid)
             else:
-                print("Unknown channel: ", c)
                 logging.info("Unknown channel: " + c)
 
     # Only intended to be used to query for a single point at a time
