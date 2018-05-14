@@ -91,5 +91,34 @@ def interaction_net(S, FLAGS, idx):
     return h2_out
 
 
+def dynamic_predictor(S1, S2, S3, S4, FLAGS):
+    '''
+    Parameters:
+        S(n): State code(1, 2, 3, 4)
+        FLAGS: Learning settings
+
+    retrun:
+        The next state code
+    '''
+    Sc1 = interaction_net(S1, FLAGS, 4)
+    Sc2 = interaction_net(S2, FLAGS, 3)
+    Sc3 = interaction_net(S3, FLAGS, 2)
+    Sc4 = interaction_net(S4, FLAGS, 1)
+    fil_num = 64
+
+    # Aggregator MLP
+    S = tf.concat([Sc1, Sc2, Sc3, Sc4], 2)
+    S = tf.reshape(S, [-1, FLAGS.Ds*4])
+    with tf.variable_scope('dynamic_predictor'):
+        w1 = tf.get_variable('w1', shape=[FLAGS.Ds*4, fil_num])
+        b1 = tf.get_variable('b1', shape=[fil_num])
+        h1 = tf.nn.relu(tf.matmul(S, w1) + b1)
+        w2 = tf.get_variable('w2', shape=[fil_num, FLAGS.Ds])
+        b2 = tf.get_variable('b2', shape=[FLAGS.Ds])
+        h2 = tf.matmul(h1, w2) + b2
+        h2 = tf.reshape(h2, [-1, FLAGS.No, FLAGS.Ds])
+
+    return h2
+
 # Just one learning model here, maybe more,
 # like LSTM, RNN

@@ -1,6 +1,5 @@
-import time
 import cv2
-import numpy as np
+import os
 
 from Box2D import (b2World, b2Vec2, b2ContactListener)
 
@@ -12,14 +11,12 @@ from ..opencv_draw import OpencvDrawFuncs
 
 # ----- Parameters -----
 # Number of bodies in world
-nBodies = 100
-# Seeds to use for body generator - determines the number of datasets created
-seeds = range(21, 26)
+nBodies = 50
 # Something about spread of bodies?
 sigma_coef = 1.2
 # Dimension of static box
-xlow, xhi = 0, 50
-ylow, yhi = 0, 50
+xlow, xhi = 0, 30
+ylow, yhi = 0, 30
 # body radius min and max
 r = (1, 1)
 
@@ -32,18 +29,12 @@ positionIterations = 2500
 velocityThreshold = 6*10**-5
 positionThreshold = 2*10**-5
 # Number of steps
-steps = 1000
+steps = 600
 
-# Path to directory where data should be stored, relative to the xml_writing directory
-path = "../gen_data/data/xml/"
 # Decides whether to store configurations without any contacts
-skipContactless = True
-
+skipContactless = False
 # Print various iteration numbers as simulation is running
 quiet = True
-# Show visualization of world as simulation is running
-# note: significantly slower
-visualize = False
 
 
 # ----- Misc -----
@@ -72,63 +63,89 @@ class ContactListener(b2ContactListener):
         self.xml_exp.snapshot_impulse(contact, impulse)
 
 
-# Define a drawer if set
-if visualize:
-    drawer = OpencvDrawFuncs(w=640, h=640, ppm=10)
-    drawer.install()
-
-
-
 # ----- Data generation -----
-for i in range(len(seeds)):
-    seed = seeds[i]
-    print("Running world %d of %d" % (i+1, len(seeds)))
+if __name__ == '__main__':
+    from optparse import OptionParser
 
-    # Create world
-    world = b2World()
-    world.userData = SimData(name=str(seed), d_t=timeStep,
-                             vel_iter=velocityIterations, pos_iter=positionIterations,
-                             vel_thres=velocityThreshold, pos_thres=positionThreshold)
+    parser = OptionParser()
+    parser.add_option('-s', '--seeds', type='int', default=100,
+                      dest='seeds')
+    parser.add_option('-p', '--path', dest='path')
+    parser.add_option('-V', '--visualize', action='store_true',
+                      dest='visualize')
 
-    # Fill world with static box and circles
-    new_confined_clustered_circles_world(world, nBodies, b2Vec2(xlow, ylow), b2Vec2(xhi, yhi), r, sigma_coef, seed)
+    options, _ = parser.parse_args()
 
-    # Set iteration thresholds
-    world.velocityThreshold = velocityThreshold
-    world.positionThreshold = positionThreshold
+    seeds = range(options.seeds)
+    path = options.path
+    visualize = options.visualize
 
-    # Initialize XML exporter
-    xml_exp = XMLExporter(world, path)
+    for i in range(len(seeds)):
+        # image generation
+        drawer = OpencvDrawFuncs(w=300, h=300, ppm=10)
+        drawer.install()
 
-    # Initialize contact listener
-    listener = ContactListener(xml_exp)
-    world.contactListener = listener
+        seed = seeds[i]
+        print("Running world %d of %d" % (i+1, len(seeds)))
 
-    # Run simulation
-    for i in range(steps):
-        if not quiet:
-            print("step", i)
+        # Create world
+        world = b2World()
+        world.userData = SimData(
+            name=str(seed),
+            d_t=timeStep,
+            vel_iter=velocityIterations,
+            pos_iter=positionIterations,
+            vel_thres=velocityThreshold,
+            pos_thres=positionThreshold
+        )
 
-        # Reset the contact listener
-        listener.reset()
+        # Fill world with static box and circles
+        new_confined_clustered_circles_world(
+            world, nBodies, b2Vec2(xlow, ylow), b2Vec2(xhi, yhi), r, sigma_coef, seed)
 
-        # Reset xml exporter and take snapshot of bodies
-        xml_exp.reset()
-        xml_exp.snapshot_bodies()
+        # Set iteration thresholds
+        world.velocityThreshold = velocityThreshold
+        world.positionThreshold = positionThreshold
 
-        # Tell the world to take a step
-        world.Step(timeStep, velocityIterations, positionIterations)
-        world.userData.tick()
-        world.ClearForces()
+        # Initialize XML exporter
+        xml_exp = XMLExporter(world, path)
 
-        # Draw the world
-        if visualize:
+        # Initialize contact listener
+        listener = ContactListener(xml_exp)
+        world.contactListener = listener
+
+        # Run simulation
+        for step in range(steps):
+            if not quiet:
+                print("step", step)
+
+            # Reset the contact listener
+            listener.reset()
+
+            # Reset xml exporter and take snapshot of bodies
+            xml_exp.reset()
+            xml_exp.snapshot_bodies()
+
+            # Tell the world to take a step
+            world.Step(timeStep, velocityIterations, positionIterations)
+            world.userData.tick()
+            world.ClearForces()
+
+            # Draw the world
             drawer.clear_screen()
             drawer.draw_world(world)
 
-            cv2.imshow('World', drawer.screen)
-            cv2.waitKey(25)
+            cv2.imwrite(
+                os.path.join(path,
+                             '{}'.format(i),
+                             '{}_{}.png'.format(i, step)),
+                drawer.screen,
+            )
 
-        # Save the snapshot if wanted
-        if not skipContactless or world.GetProfile().contactsSolved > 0:
-            xml_exp.save_snapshot()
+            if visualize:
+                cv2.imshow('World', drawer.screen)
+                cv2.waitKey(25)
+
+            # Save the snapshot if wanted
+            if not skipContactless or world.GetProfile().contactsSolved > 0:
+                xml_exp.save_snapshot()
