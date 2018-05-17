@@ -4,18 +4,28 @@ import numpy as np
 # ref: Lee - 2010 - Solving the Shallow Water equations using 2D SPH
 def W_poly6_2D(r, h):
     '''
-    :param r:
-    every r is a 2d col-vector . the rows represent the number of points in the vicinity
-    :param h:
+    :param r: A 2d matrix where each column is a vector
+    :param h: Support radius
     :return:
     '''
     assert r.shape[0] == 2
-    r_norm = np.linalg.norm(r,axis=0)
+
+    # We determine the length of the vectors and pick out those with length below h
+    r_norm = np.linalg.norm(r, axis=0)
     W = np.zeros(r_norm.shape)
-    W_i = np.where(h >= r_norm)
-    W[W_i] = 4 / (np.pi * np.power(h, 8)) * \
-                np.power((np.power(h, 2) - np.power(r_norm[W_i], 2)), 3)
+    W_i = np.where(r_norm < h)
+
+    # We determine the weights
+    c = 4 / (np.pi * np.power(h, 8))
+    h2 = np.power(h, 2)
+    W[W_i] = c * np.power(h2 - np.power(r_norm[W_i], 2), 3)
+
+    # We normalize the weights so that they add up to 1
+    W_sum = np.sum(W)
+    W = W / W_sum
+
     return W
+
 
 # no need to implement these yet
 # def nablaW_poly6_2D(r, h):

@@ -1,12 +1,15 @@
 import numpy as np
 import pandas as pd
 import networkx as nx
+import logging
 
 from scipy import spatial, interpolate
 from xml.etree.ElementTree import Element
 
 from Box2D import b2World, b2_dynamicBody
 from .kernel import W_poly6_2D
+
+logging.basicConfig(level=logging.INFO)
 
 
 # Creates a dataframe with all bodies and their values given a b2World
@@ -101,185 +104,70 @@ def xml_contact_dataframe(world:Element):
     return df
 
 
-
-# ----- Original, slow -----
-# Creates grid of coefficients - not used because slow
-def Wgrid(X, Y, Px, Py, ID, h, f_krn=W_poly6_2D):
-    '''
-    splatters the points onto a grid , resulting in coefficients for every point
-    :param X: grid X
-    :param Y: grid Y
-    :param Px : Points X axis
-    :param Py: Points Y axis
-    :param id: how are points identified
-    :param h: support radius
-    :param f_krn: the SPH kernel to use
-    :return:
-    '''
-    # sanity check
-    # assert Px.shape[1] == Py.shape[1] == 1
-    # assert Px.shape[0] == Py.shape[0]
-    # assert X.shape == Y.shape
-    Xsz, Ysz = X.shape
-    W_grid = np.zeros((Xsz, Ysz), dtype=object)  # TODO: change to sparse
-
-    if len(ID) > 0:
-        P_grid = np.c_[X.ravel(), Y.ravel()]
-        Pxy = np.c_[Px, Py]  # stack the points as row-vectors
-
-        KDTree = spatial.cKDTree(Pxy)
-        # nn contains all neighbors within range h for every grid point
-        NN = KDTree.query_ball_point(P_grid, h)
-        for i in range(NN.shape[0]):
-            if len(NN[i]) > 0:
-                xi, yi = np.unravel_index(i, (Xsz, Ysz))
-                g_nn = NN[i]  # grid nearest neighbors
-                r = P_grid[i] - Pxy[g_nn, :]  # the 3rd column is the body id
-                W = f_krn(r.T, h)
-                if W_grid[xi, yi] == 0:
-                    W_grid[xi, yi] = []
-
-                Ws = []
-                for nni in range(len(g_nn)):
-                    body_id = ID[g_nn[nni]]
-                    tup = (body_id, W[nni])  # we store the values as tuples (body_id, W) at each grid point
-                    Ws.append(tup)
-                W_grid[xi, yi] += Ws  # to merge the 2 lists we don't use append
-
-    return W_grid
-
-
-# Creates grid of values given data and grid of coefficients - not used because slow
-def W_value(W_grid, data, channel_name):
-    Xsz, Ysz = W_grid.shape
-    Z = np.zeros(W_grid.shape)
-    for i in range(Xsz):
-        for j in range(Ysz):
-            if W_grid[i,j] != 0:
-                z = 0
-                for (id, w) in W_grid[i,j]:
-                    z += data.loc[id][channel_name] * w
-                Z[i,j] = z
-    return Z
-
-
-# Creates an manages grids using above functions - not used because slow
-class SPHGridWorld:
-    def __init__(self, world:b2World, p_ll, p_hr, xRes, yRes, h):
-        self.world = world
-        self.h = h
-
-        xlo, ylo = p_ll
-        xhi, yhi = p_hr
-        self.x = np.arange(xlo, xhi, xRes)
-        self.y = np.arange(ylo, yhi, yRes)
-        self.X, self.Y =  np.mgrid[xlo:xhi:xRes, ylo:yhi:yRes]
-
-        self.grids = {}
-        self.f_interp = {}
-
-
-    # The user can specify a list of "channels" to calculate grids and interpolation for, in case not all are needed
-    def Step(self, channels=[]):
-        self.grids = {}
-        self.f_interp = {}
-
-        df_b = world_body_dataframe(self.world)
-        W_bodies = Wgrid(self.X, self.Y, df_b.px, df_b.py, df_b.index.values, self.h, f_krn=W_poly6_2D)
-        b_channels = [b for b in df_b.columns.tolist() if b not in ["px", "py"]]
-        if channels:
-            b_channels = list(set(b_channels).intersection(channels))
-        for b in b_channels:
-            self.grids[b] = W_value(W_bodies, df_b, b)
-
-        df_c = world_contact_dataframe(self.world)
-        W_contacts = Wgrid(self.X, self.Y, df_c.px, df_c.py, df_c.index.values, self.h, f_krn=W_poly6_2D)
-        c_channels = [c for c in df_c.columns.tolist() if c not in ["px", "py"]]
-        if channels:
-            c_channels = list(set(c_channels).intersection(channels))
-        for c in df_c.columns.tolist():
-            self.grids[c] = W_value(W_contacts, df_c, c)
-
-        for chan in self.grids.keys():
-            self.f_interp[chan] = interpolate.RectBivariateSpline(self.x, self.y, self.grids[chan])
-
-    # Only intended to be used to query for a single point at a time
-    def query(self, Px, Py, channel):
-        return self.f_interp[channel](Px,Py)[0][0]
-
-
-
-# ----- Modified, faster -----
-# Creates a grid of values for each set of values - faster than using the two above functions
-def create_grids(X, Y, Px, Py, values, h, f_krn=W_poly6_2D):
+# Creates a set of grids of values using SPH
+def create_grids(Gx, Gy, Px, Py, values, h, f_krn=W_poly6_2D):
     '''
     splatters the points and their values onto grids, one grid per value
-    :param X: grid Xs
-    :param Y: grid Ys
-    :param Px: Points X axis
-    :param Py: Points Y axis
-    :param values: point values to use
-    :param h: support radius
-    :param f_krn: the SPH kernel to use
+    :param Gx:     Grid Xs
+    :param Gy:     Grid Ys
+    :param Px:     Point Xs
+    :param Py:     Point Ys
+    :param values: Point values
+    :param h:      Support radius
+    :param f_krn:  The SPH kernel to use
     :return:
     '''
-    # sanity check
-    # assert Px.shape[1] == Py.shape[1] == 1
-    # assert Px.shape[0] == Py.shape[0]
-    # assert X.shape == Y.shape
-    # assert values.shape[0] = Px.shape[0]
     n = np.shape(values)[1]
     if n == 0:
         return []
 
-    Xsz, Ysz = X.shape
-    grids = [np.zeros((Xsz, Ysz), dtype=float) for _ in range(n)]  # TODO: change to sparse
+    # We create the grid
+    Gx_sz, Gy_sz = Gx.shape
+    grids = np.zeros((n, Gx_sz, Gy_sz), dtype=float) # TODO: change to sparse
 
-    if len(values) > 0:
-        P_grid = np.c_[X.ravel(), Y.ravel()]
-        Pxy = np.c_[Px, Py]  # stack the points as row-vectors
+    # Create array where each row is a x- and y-coordinate of a node in the grid
+    P_grid   = np.c_[Gx.ravel(), Gy.ravel()]
+    P_points = np.c_[Px, Py]
 
-        KDTree = spatial.cKDTree(Pxy)
-        # nn contains all neighbors within range h for every grid point
-        NN = KDTree.query_ball_point(P_grid, h)
-        for i in range(NN.shape[0]):
-            if len(NN[i]) > 0:
-                xi, yi = np.unravel_index(i, (Xsz, Ysz))
-                g_nn = NN[i]  # grid nearest neighbors
-                r = P_grid[i] - Pxy[g_nn, :]  # the 3rd column is the body id
-                W = f_krn(r.T, h)
+    # For each point we determine all grid nodes within radius h
+    KDTree = spatial.cKDTree(P_grid)
+    NNs = KDTree.query_ball_point(P_points, h)
 
-                # For all neighbors, multiply W with all values and store in V
-                V = [.0]*n
-                for nni in range(len(g_nn)):
-                    vs = values[g_nn[nni]]
-                    for i in range(n):
-                        V[i] += W[nni] * vs[i]
+    # For each point
+    for i in range(NNs.shape[0]):
+        # We determine distances between point and neighbouring grid nodes
+        neighbours = NNs[i]
+        rs = P_points[i] - P_grid[neighbours]
 
-                # Store V in grids
-                for i in range(n):
-                    grids[i][xi, yi] = V[i]
+        # We determine weights for each neighbouring grid node
+        Ws = f_krn(rs.T, h)
+
+        # For all neighbors, multiply weight with all point values and store in grid
+        for j in range(len(neighbours)):
+            gxi, gyi = np.unravel_index(neighbours[j], (Gx_sz, Gy_sz))
+            for k in range(n):
+                grids[k, gxi, gyi] += Ws[j] * values[i, k]
 
     return grids
 
 
-# Creates and manages grids given dataframes with body and contact values
+# Creates and manages grids
 class SPHGridManager:
     def __init__(self, p_ll, p_ur, xRes, yRes, h):
         xlo, ylo = p_ll
         xhi, yhi = p_ur
 
         self.h = h
-        self.x = np.arange(xlo, xhi, xRes)
-        self.y = np.arange(ylo, yhi, yRes)
-        self.X, self.Y =  np.mgrid[xlo:xhi:xRes, ylo:yhi:yRes]
+        self.x = np.arange(xlo, xhi+xRes, xRes)
+        self.y = np.arange(ylo, yhi+xRes, yRes)
+        self.X, self.Y = np.mgrid[xlo:(xhi+xRes):xRes, ylo:(yhi+yRes):yRes]
 
-        self.grids = {}
-        self.f_interp = {}
+        self.reset()
 
     def reset(self):
         self.grids = {}
         self.f_interp = {}
+        self.trees = {}
 
     # Adds a grid to the grid manager
     def add_grid(self, grid, channel):
@@ -306,7 +194,7 @@ class SPHGridManager:
             self.grids[channels[i]] = grids[i]
 
     # The user specifies a list of "channels" to calculate interpolation for
-    def create_interp(self, channels=[]):
+    def create_interp(self, channels):
         for c in channels:
             grid = self.grids.get(c)
             if grid is not None:
@@ -315,9 +203,51 @@ class SPHGridManager:
                 logging.info("Unknown channel: " + c)
 
     # Only intended to be used to query for a single point at a time
-    def query(self, Px, Py, channel):
+    def query_interp(self, Px, Py, channel):
         return self.f_interp[channel](Px,Py)[0][0]
 
+    # Create a KDTree used when querying
+    def create_tree(self, channels):
+        for c in channels:
+            grid = self.grids.get(c)
+            if grid is not None:
+                P_grid = np.c_[self.X.ravel(), self.Y.ravel()]
+                self.trees[c] = spatial.cKDTree(P_grid)
+            else:
+                logging.info("Unknown channel: " + c)
+
+    # We use our poly6 kernel instead of interpolation
+    def query_tree(self, Px, Py, channel):
+        grid = self.grids.get(channel)
+        tree = self.trees.get(channel)
+
+        if (grid is None) or (tree is None):
+            logging.info("Unknown channel: " + channel)
+        else:
+            P_points = np.c_[Px, Py]
+            P_grid = np.c_[self.X.ravel(), self.Y.ravel()]
+            n = P_points.shape[0]
+
+            # For each point determine neighbouring grid nodes
+            NNs = tree.query_ball_point(P_points, self.h)
+
+            # For each point
+            values = np.zeros(n, dtype=np.float64)
+            for i in range(n):
+                # We determine distances between point and neighbouring grid nodes
+                neighbours = NNs[i]
+                rs = P_points[i] - P_grid[neighbours]
+
+                # We determine weights for each neighbouring grid node
+                Ws = W_poly6_2D(rs.T, self.h)
+
+                # We multiply weights with values to get the point value
+                v = 0
+                for j in range(len(neighbours)):
+                    v += Ws[j] * grid[np.unravel_index(neighbours[j], self.X.shape)]
+                values[i] = v
+
+            return values
 
 
 # Creates a contact graph?

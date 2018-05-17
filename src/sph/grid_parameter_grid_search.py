@@ -10,12 +10,12 @@ from .gridsplat import SPHGridManager, world_body_dataframe, world_contact_dataf
 # Number of worlds to generate
 nWorlds = 25
 # Number of bodies in world
-nBodies = 100
+nBodies = 50
 # Something about spread of bodies?
 sigma_coef = 1.2
 # Dimension of static box
-p_ll = (-30, 0)
-p_ur = (30, 60)
+p_ll = (0, 0)
+p_ur = (50, 50)
 # Radius of bodies
 r = (1, 1)
 
@@ -66,8 +66,9 @@ for i in range(nParameters):
         gm = SPHGridManager(p_ll, p_ur, p[0], p[0], p[1])
 
         # Tell it to create grids and interp functions
-        gm.create_grids(df_b, channels=[attribute])
-        gm.create_interp([attribute])
+        grid = gm.create_grids(df_b, channels=[attribute])
+        #gm.create_interp([attribute])
+        gm.create_tree([attribute])
 
         # Query for all bodies and sum
         worldTotal = 0
@@ -75,7 +76,8 @@ for i in range(nParameters):
         k = 0
         for b in world.bodies:
             if b.type is b2_dynamicBody:
-                value = gm.query(b.position.x, b.position.y, attribute)
+                #value = gm.query_interp(b.position.x, b.position.y, attribute)
+                value = gm.query_tree([b.position.x], [b.position.y], attribute)
                 worldTotal += value
                 bodyDifferences[k] = abs(b.mass - value)
                 k += 1

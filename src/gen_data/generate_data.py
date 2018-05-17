@@ -29,7 +29,7 @@ positionIterations = 2500
 velocityThreshold = 6*10**-5
 positionThreshold = 2*10**-5
 # Number of steps
-steps = 600
+steps = 800
 
 # Decides whether to store configurations without any contacts
 skipContactless = False
