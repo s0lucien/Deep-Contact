@@ -40,7 +40,7 @@ quiet = True
 # ----- Misc -----
 # B2ContactListener for recording contacts and impulses
 class ContactListener(b2ContactListener):
-    def __init__(self, exporter:XMLExporter):
+    def __init__(self, exporter: XMLExporter):
         super(ContactListener, self).__init__()
 
         self.xml_exp = exporter
@@ -132,17 +132,17 @@ if __name__ == '__main__':
             world.ClearForces()
 
             # Draw the world
-            drawer.clear_screen()
-            drawer.draw_world(world)
-
-            cv2.imwrite(
-                os.path.join(path,
-                             '{}'.format(i),
-                             '{}_{}.png'.format(i, step)),
-                drawer.screen,
-            )
-
             if visualize:
+                drawer.clear_screen()
+                drawer.draw_world(world)
+
+                cv2.imwrite(
+                    os.path.join(path,
+                                 '{}'.format(i),
+                                 '{}_{}.png'.format(i, step)),
+                    drawer.screen,
+                )
+
                 cv2.imshow('World', drawer.screen)
                 cv2.waitKey(25)
 

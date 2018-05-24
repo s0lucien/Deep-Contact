@@ -107,7 +107,7 @@ class learning_model(object):
             metrics=self.metrics,
         )
 
-    def train(self, x_train, y_train, save=True):
+    def train(self, x_train, y_train, validation_rate=0.25, save=True):
         input_shape = x_train.shape[1:]
         output_shape = y_train.shape[1:]
 
@@ -121,12 +121,14 @@ class learning_model(object):
         # buid model firstly
         self.build_model(input_shape, output_shape)
 
-        self.model.fit_generator(
+        self.model.fit(
+            x_train,
+            y_train,
             batch_size=self.batch_size,
             step_per_epoch=self.iterations,
             epochs=self.epochs,
             callbacks=cbks,
-            validation_data=(x_val, y_val),
+            validation_split=validation_rate,
         )
 
         if save:
