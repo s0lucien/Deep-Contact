@@ -125,6 +125,10 @@ def create_grids(Gx, Gy, Px, Py, values, h, f_krn=W_poly6_2D):
     Gx_sz, Gy_sz = Gx.shape
     grids = np.zeros((n, Gx_sz, Gy_sz), dtype=float) # TODO: change to sparse
 
+    # If there are no values, return empty grid
+    if np.size(values) == 0:
+        return grids
+
     # Create array where each row is a x- and y-coordinate of a node in the grid
     P_grid   = np.c_[Gx.ravel(), Gy.ravel()]
     P_points = np.c_[Px, Py]
@@ -173,7 +177,7 @@ class SPHGridManager:
     def add_grid(self, grid, channel):
         self.grids[channel] = grid
 
-    # The user specifies a list of "channels" to calculate grids for
+    # The user specifies a list of "channels" to calculate grids for, and provides the data
     def create_grids(self, df, channels):
         df_channels = [d for d in df.columns.tolist() if d not in ["px", "py"]]
         known = []
@@ -190,8 +194,10 @@ class SPHGridManager:
 
         data = df[channels].values
         grids = create_grids(self.X, self.Y, df.px, df.py, data, self.h, f_krn=W_poly6_2D)
+
         for i in range(len(channels)):
             self.grids[channels[i]] = grids[i]
+
 
     # The user specifies a list of "channels" to calculate interpolation for
     def create_interp(self, channels):
@@ -205,6 +211,7 @@ class SPHGridManager:
     # Only intended to be used to query for a single point at a time
     def query_interp(self, Px, Py, channel):
         return self.f_interp[channel](Px,Py)[0][0]
+
 
     # Create a KDTree used when querying
     def create_tree(self, channels):
