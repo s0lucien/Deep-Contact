@@ -18,13 +18,13 @@ from keras.utils import plot_model
 class learning_model(object):
     def __init__(
         self,
-        input_shape,
         log_dir,
         # loss function, this is not classify question,
         # so choose another loss func here.
         loss_func='',
         metrics=['accuracy'],
         batch_size=200,
+        iterations=1000,
         epochs=1000,
         dropout=0.25,
         weight_decay=0.0001,
@@ -35,10 +35,10 @@ class learning_model(object):
             metrics:
         '''
         self.model = Sequential()
-        self.input_shape = input_shape
         self.optimizers = optimizers.SGD(
             lr=0.01, decay=1e-6, momentum=0.9, nesterov=True,
         )
+        self.iterations = iterations
         self.loss_func = loss_func
         self.metrics = metrics
         self.log_dir = log_dir
@@ -120,6 +120,7 @@ class learning_model(object):
 
         # buid model firstly
         self.build_model(input_shape, output_shape)
+        print(self.model.summary())
 
         self.model.fit(
             x_train,
