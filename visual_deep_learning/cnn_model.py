@@ -21,7 +21,9 @@ class learning_model(object):
         log_dir,
         # loss function, this is not classify question,
         # so choose another loss func here.
-        loss_func='',
+        # I think `mean squared error` should be good here.
+        optimizer,
+        loss_func,
         metrics=['accuracy'],
         batch_size=200,
         iterations=1000,
@@ -35,9 +37,7 @@ class learning_model(object):
             metrics:
         '''
         self.model = Sequential()
-        self.optimizers = optimizers.SGD(
-            lr=0.01, decay=1e-6, momentum=0.9, nesterov=True,
-        )
+        self.optimizer = optimizer
         self.iterations = iterations
         self.loss_func = loss_func
         self.metrics = metrics
@@ -51,8 +51,8 @@ class learning_model(object):
         self.model.add(Conv2D(64,
                               (3, 3),
                               padding='same',
-                              kernel_regularizer=keras.regularizer.l2(self.weight_decay),
-                              kernel_initiallizer='he_normal',
+                              kernel_regularizer=keras.regularizers.l2(self.weight_decay),
+                              kernel_initializer='he_normal',
                               input_shape=input_shape))
         self.model.add(Activation('relu'))
         self.model.add(MaxPooling2D(pool_size=(2, 2),
@@ -62,8 +62,8 @@ class learning_model(object):
         self.model.add(Conv2D(64,
                               (3, 3),
                               padding='same',
-                              kernel_regularizer=keras.regularizer.l2(self.weight_decay),
-                              kernel_initiallizer='he_normal'))
+                              kernel_regularizer=keras.regularizers.l2(self.weight_decay),
+                              kernel_initializer='he_normal'))
         self.model.add(Activation('relu'))
         self.model.add(MaxPooling2D(pool_size=(2, 2),
                                     strides=(2, 2),
@@ -72,8 +72,8 @@ class learning_model(object):
         self.model.add(Conv2D(128,
                               (3, 3),
                               padding='same',
-                              kernel_regularizer=keras.regularizer.l2(self.weight_decay),
-                              kernel_initiallizer='he_normal'))
+                              kernel_regularizer=keras.regularizers.l2(self.weight_decay),
+                              kernel_initializer='he_normal'))
         self.model.add(Activation('relu'))
         self.model.add(MaxPooling2D(pool_size=(2, 2),
                                     strides=(2, 2),
@@ -82,8 +82,8 @@ class learning_model(object):
         self.model.add(Conv2D(256,
                               (3, 3),
                               padding='same',
-                              kernel_regularizer=keras.regularizer.l2(self.weight_decay),
-                              kernel_initiallizer='he_normal'))
+                              kernel_regularizer=keras.regularizers.l2(self.weight_decay),
+                              kernel_initializer='he_normal'))
         self.model.add(Activation('relu'))
         self.model.add(MaxPooling2D(pool_size=(2, 2),
                                     strides=(2, 2),
@@ -91,19 +91,19 @@ class learning_model(object):
 
         self.model.add(Dropout(self.dropout))
         self.model.add(Flatten())
-        self.model.add(Dense(10))
+        self.model.add(Dense(4000))
         self.model.add(Activation('relu'))
         self.model.add(Dropout(0.5))
 
         # Flatten output here
-        output_size = output_shape[0] * output_shape[1]
+        output_size = output_shape[0]
 
         self.model.add(Dense(output_size))
         self.model.add(Activation('relu'))
 
         self.model.compile(
             loss=self.loss_func,
-            optimizers=self.optimizers,
+            optimizer=self.optimizer,
             metrics=self.metrics,
         )
 
@@ -125,8 +125,8 @@ class learning_model(object):
         self.model.fit(
             x_train,
             y_train,
-            batch_size=self.batch_size,
-            step_per_epoch=self.iterations,
+            # batch_size=self.batch_size,
+            steps_per_epoch=self.iterations,
             epochs=self.epochs,
             callbacks=cbks,
             validation_split=validation_rate,
