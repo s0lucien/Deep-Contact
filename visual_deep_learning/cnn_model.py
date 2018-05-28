@@ -25,7 +25,7 @@ class learning_model(object):
         optimizer,
         loss_func,
         metrics=['accuracy'],
-        batch_size=200,
+        batch_size=100,
         iterations=1000,
         epochs=1000,
         dropout=0.25,
@@ -59,16 +59,6 @@ class learning_model(object):
                                     strides=(2, 2),
                                     padding='same'))
 
-        self.model.add(Conv2D(64,
-                              (3, 3),
-                              padding='same',
-                              kernel_regularizer=keras.regularizers.l2(self.weight_decay),
-                              kernel_initializer='he_normal'))
-        self.model.add(Activation('relu'))
-        self.model.add(MaxPooling2D(pool_size=(2, 2),
-                                    strides=(2, 2),
-                                    padding='same'))
-
         self.model.add(Conv2D(128,
                               (3, 3),
                               padding='same',
@@ -80,6 +70,16 @@ class learning_model(object):
                                     padding='same'))
 
         self.model.add(Conv2D(256,
+                              (3, 3),
+                              padding='same',
+                              kernel_regularizer=keras.regularizers.l2(self.weight_decay),
+                              kernel_initializer='he_normal'))
+        self.model.add(Activation('relu'))
+        self.model.add(MaxPooling2D(pool_size=(2, 2),
+                                    strides=(2, 2),
+                                    padding='same'))
+
+        self.model.add(Conv2D(512,
                               (3, 3),
                               padding='same',
                               kernel_regularizer=keras.regularizers.l2(self.weight_decay),
@@ -107,7 +107,7 @@ class learning_model(object):
             metrics=self.metrics,
         )
 
-    def train(self, x_train, y_train, validation_rate=0.25, save=True):
+    def train(self, x_train, y_train, method, validation_rate=0.25, save=True):
         input_shape = x_train.shape[1:]
         output_shape = y_train.shape[1:]
 
@@ -122,14 +122,26 @@ class learning_model(object):
         self.build_model(input_shape, output_shape)
         print(self.model.summary())
 
+        methods = {
+            'batch_method': {
+                'batch_size': self.batch_size,
+            },
+            'fixed_iter': {
+                'steps_per_epoch': self.iterations,
+            },
+        }
+
+        if method not in methods.keys():
+            raise ValueError(
+                "method must be `batch_method` or `fixed_iter`")
+
         self.model.fit(
             x_train,
             y_train,
-            # batch_size=self.batch_size,
-            steps_per_epoch=self.iterations,
             epochs=self.epochs,
             callbacks=cbks,
             validation_split=validation_rate,
+            **methods.get(method),
         )
 
         if save:

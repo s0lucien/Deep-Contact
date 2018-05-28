@@ -13,7 +13,7 @@ if __name__ == '__main__':
 
 	parser = OptionParser()
 	parser.add_option('-p', '--path', dest='path')
-	parser.add_option('-n', '--number', dest='num')
+	parser.add_option('-n', '--number', type='int', dest='num')
 
 	options, _ = parser.parse_args()
 	path = options.path
@@ -26,8 +26,17 @@ if __name__ == '__main__':
 		log_dir='./log/',
 		loss_func=losses.mean_squared_error,
 	)
+	x_tr_li = [
+		load_grid(path, num)[0]
+		for num in range(number)
+	]
+	y_tr_li = [
+		load_grid(path, num)[1]
+		for num in range(number)
+	]
 
-	x_tr, y_tr = load_grid(path, number)
+	x_tr = np.concatenate(x_tr_li)
+	y_tr = np.concatenate(y_tr_li)
 
-	model.train(x_tr, y_tr)
+	model.train(x_tr, y_tr, method='batch_method')
 
