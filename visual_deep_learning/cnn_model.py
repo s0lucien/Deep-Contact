@@ -107,7 +107,7 @@ class learning_model(object):
             metrics=self.metrics,
         )
 
-    def train(self, x_train, y_train, method, validation_rate=0.25, save=True):
+    def train(self, x_train, y_train, method, validation_rate=0.2, save=True):
         input_shape = x_train.shape[1:]
         output_shape = y_train.shape[1:]
 
