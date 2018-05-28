@@ -36,7 +36,7 @@ label_channels = ["ni", "ti"]
 # Data information
 xml_path  = "../gen_data/data/xml/"
 grid_path = "../gen_data/data/grid/"
-numbers = range(26)
+numbers = range(30)
 steps = 800
 
 

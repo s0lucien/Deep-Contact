@@ -11,12 +11,11 @@ from ..opencv_draw import OpencvDrawFuncs
 
 # ----- Parameters -----
 # Number of bodies in world
-nBodies = 50
 # Something about spread of bodies?
 sigma_coef = 1.2
 # Dimension of static box
-xlow, xhi = 0, 30
-ylow, yhi = 0, 30
+xlow = 0
+ylow = 0
 # body radius min and max
 r = (1, 1)
 
@@ -34,13 +33,12 @@ steps = 800
 # Decides whether to store configurations without any contacts
 skipContactless = False
 # Print various iteration numbers as simulation is running
-quiet = True
 
 
 # ----- Misc -----
 # B2ContactListener for recording contacts and impulses
 class ContactListener(b2ContactListener):
-    def __init__(self, exporter:XMLExporter):
+    def __init__(self, exporter: XMLExporter):
         super(ContactListener, self).__init__()
 
         self.xml_exp = exporter
@@ -68,17 +66,25 @@ if __name__ == '__main__':
     from optparse import OptionParser
 
     parser = OptionParser()
+    parser.add_option('-n', '--num_bodies', type='int', dest='num')
+    parser.add_option('-S', '--size_box', type='int', dest='size',
+                      default=30)
     parser.add_option('-s', '--seeds', type='int', default=100,
                       dest='seeds')
     parser.add_option('-p', '--path', dest='path')
     parser.add_option('-V', '--visualize', action='store_true',
                       dest='visualize')
+    parser.add_option('-q', '--quite', action='store_true', dest='quiet')
 
     options, _ = parser.parse_args()
 
     seeds = range(options.seeds)
     path = options.path
     visualize = options.visualize
+    nBodies = options.num
+    xhi = options.size
+    yhi = options.size
+    quiet = options.quiet
 
     for i in range(len(seeds)):
         # image generation
@@ -132,17 +138,17 @@ if __name__ == '__main__':
             world.ClearForces()
 
             # Draw the world
-            drawer.clear_screen()
-            drawer.draw_world(world)
-
-            cv2.imwrite(
-                os.path.join(path,
-                             '{}'.format(i),
-                             '{}_{}.png'.format(i, step)),
-                drawer.screen,
-            )
-
             if visualize:
+                drawer.clear_screen()
+                drawer.draw_world(world)
+
+                cv2.imwrite(
+                    os.path.join(path,
+                                 '{}'.format(i),
+                                 '{}_{}.png'.format(i, step)),
+                    drawer.screen,
+                )
+
                 cv2.imshow('World', drawer.screen)
                 cv2.waitKey(25)
 
