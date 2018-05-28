@@ -37,11 +37,7 @@ afterwards. The configuration file includes bodies and contacts
 
 *Note*:
 ```
-python -m src.random_ball_falling --config_build --hz 100
-```
-Or just
-```
-./run
+python -m src.gen_data.generate_data -s 30 -p 'path' -n 10
 ```
 to generate the training data
 
@@ -71,50 +67,62 @@ to generate the training data
   </contact>
 ```
 
-A place for storing training datasets
+Then you can transform the xml data to grid ones which will return to `np.array`
 
-http://www.erda.dk/
+```
+python -m src.gen_data.load_xml_save_grid
+```
 
+### CNN structure
+```
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+conv2d_1 (Conv2D)            (None, 41, 41, 64)        2944
+_________________________________________________________________
+activation_1 (Activation)    (None, 41, 41, 64)        0
+_________________________________________________________________
+max_pooling2d_1 (MaxPooling2 (None, 21, 21, 64)        0
+_________________________________________________________________
+conv2d_2 (Conv2D)            (None, 21, 21, 128)       73856
+_________________________________________________________________
+activation_2 (Activation)    (None, 21, 21, 128)       0
+_________________________________________________________________
+max_pooling2d_2 (MaxPooling2 (None, 11, 11, 128)       0
+_________________________________________________________________
+conv2d_3 (Conv2D)            (None, 11, 11, 256)       295168
+_________________________________________________________________
+activation_3 (Activation)    (None, 11, 11, 256)       0
+_________________________________________________________________
+max_pooling2d_3 (MaxPooling2 (None, 6, 6, 256)         0
+_________________________________________________________________
+conv2d_4 (Conv2D)            (None, 6, 6, 512)         1180160
+_________________________________________________________________
+activation_4 (Activation)    (None, 6, 6, 512)         0
+_________________________________________________________________
+max_pooling2d_4 (MaxPooling2 (None, 3, 3, 512)         0
+_________________________________________________________________
+dropout_1 (Dropout)          (None, 3, 3, 512)         0
+_________________________________________________________________
+flatten_1 (Flatten)          (None, 4608)              0
+_________________________________________________________________
+dense_1 (Dense)              (None, 4000)              18436000
+_________________________________________________________________
+activation_5 (Activation)    (None, 4000)              0
+_________________________________________________________________
+dropout_2 (Dropout)          (None, 4000)              0
+_________________________________________________________________
+dense_2 (Dense)              (None, 3362)              13451362
+_________________________________________________________________
+activation_6 (Activation)    (None, 3362)              0
+=================================================================
+Total params: 33,439,490
+Trainable params: 33,439,490
+Non-trainable params: 0
+_________________________________________________________________
+```
 
-	for body in self.world.bodies:
-            if len(body.fixtures) > 0:
-                print('body:')
-                print('\tbody ID   = ', id(body))
-                for fixture in body.fixtures:
-                    print('\t\tshape id = ', id(fixture.shape))
-                    if fixture.shape.type is 1:
-                        print('\t\tedge vertices = ', fixture.shape.vertices)
-                    else:
-                        print('\t\tcircle radius = ', fixture.shape.radius)
-                print('\ttype    = ', 'free' if body.type is b2_dynamicBody else 'fixed')
-                print('\tx       = ', body.position(0))
-                print('\ty       = ', body.position(1))
-                print('\ttheta   = ', body.angle)
-                print('\tmass    = ', body.mass)
-                print('\tinertia = ', body.inertia)
-                print('\tvx      = ', body.linearVelocity(0))
-                print('\tvy      = ', body.linearVelocity(1))
-                print('\tomega   = ', body.angularVelocity)
-
-        for contact in self.world.contacts:
-            master = contact.fixtureA.body
-            slave = contact.fixtureB.body
-            master_shape = contact.fixtureA.shape
-            slave_shape = contact.fixtureB.shape
-            for i in range(contact.manifold.pointCount):
-                point = contact.worldManifold.points[i]
-                normal = contact.worldManifold.normal
-                manifold_point = contact.manifold.points[i]
-                impulse = (manifold_point.normalImpulse, manifold_point.tangentImpulse)
-                print('contact:')
-                print('\tmaster          = ', id(master))
-                print('\tmaster shape id = ', id(master_shape))
-                print('\tslave           = ', id(slave))
-                print('\tslave shape id  = ', id(slave_shape))
-                print('\t\tpx     =', point[0])
-                print('\t\tpy     =', point[1])
-                print('\t\tnx     =', normal.x)
-                print('\t\tny     =', normal.y)
-                print('\t\tFn     =', impulse[0])
-                print('\t\tFt     =', impulse[1])
-
+Start training by
+```
+python cnn_training.py -p src/gen_data/data/grid -n 30
+```

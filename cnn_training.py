@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
 	model = learning_model(
 		optimizer=optimizers.SGD(
-            lr=0.01, decay=1e-6, momentum=0.9, nesterov=True,
+			lr=0.01, decay=1e-6, momentum=0.9, nesterov=True,
 		),
 		log_dir='./log/',
 		loss_func=losses.mean_squared_error,
@@ -39,4 +39,3 @@ if __name__ == '__main__':
 	y_tr = np.concatenate(y_tr_li)
 
 	model.train(x_tr, y_tr, method='batch_method')
-
