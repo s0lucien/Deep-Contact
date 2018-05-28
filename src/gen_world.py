@@ -40,7 +40,9 @@ def new_confined_clustered_circles_world(world, n_bodies, p_ll , p_hr, radius_ra
     GenClusteredCirclesRegion(world, seed=seed).fill(n_bodies, p_ll, p_hr, radius_range, sigma)
 
     for i in range(world.bodyCount):
-        world.bodies[i].userData.id = i
+        body = world.bodies[i]
+        body.userData.id = i
+        body.sleepingAllowed = False
     world.initialized = True
 
 
@@ -104,7 +106,7 @@ class GenClusteredCirclesRegion(GenWorld):
         self.seed = seed
         self.random = np.random.RandomState(self.seed)
         self.sigma = sigma
-        self.max_consec_tries = 100
+        self.max_consec_tries = 1000
         self.mu=mu
 
     def fill(self, n, p_ll:b2Vec2, p_hr:b2Vec2, radius_range ,sigma_coef=1):
@@ -127,7 +129,7 @@ class GenClusteredCirclesRegion(GenWorld):
             rad = sz[i]
             #goes out of the box - not too good
             if np.any(np.asarray([p_hr - p, p - p_ll]).flatten() < rad):
-                logging.info("Out of the box")
+                #logging.info("Out of the box")
                 failed+=1
                 if failed > self.max_consec_tries:
                     failed = True

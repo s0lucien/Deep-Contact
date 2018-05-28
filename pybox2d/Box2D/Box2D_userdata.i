@@ -212,16 +212,6 @@ public:
     %}
 }
 
-%extend b2Contact {
-public:
-    %pythoncode %{
-        userData = property(__GetUserData, __SetUserData)
-    %}
-}
-
-%rename (__GetUserData) b2Contact::GetUserData;
-%rename (__SetUserData) b2Contact::SetUserData;
-
 // These renames are intentionally below the above CreateBody, as they will rename the
 // original C++ versions and not the ones I have written.
 %ignore SetUserData;

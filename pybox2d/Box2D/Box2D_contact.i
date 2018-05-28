@@ -2,7 +2,7 @@
 * pybox2d -- http://pybox2d.googlecode.com
 *
 * Copyright (c) 2010 Ken Lauer / sirkne at gmail dot com
-* 
+*
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
 * arising from the use of this software.
@@ -30,7 +30,7 @@
         b2GetPointStates(state1, state2, manifold1, manifold2);
 
         ret = PyTuple_New(2);
-        
+
         int state1_length=-1, state2_length=-1;
         PyObject* state1_t=Py_None;
         PyObject* state2_t=Py_None;
@@ -91,7 +91,7 @@ public:
             return NULL;
         return &( $self->points[i] );
     }
-    
+
 }
 
 /**** ContactManager ****/
@@ -173,6 +173,7 @@ public:
 
         # Read-write properties
         enabled = property(__IsEnabled, __SetEnabled)
+        userData = property(__GetUserData, __SetUserData)
 
         # Read-only
         next = property(__GetNext, None)
@@ -190,6 +191,8 @@ public:
     %}
 }
 
+%rename(__GetUserData) b2Contact::GetUserData;
+%rename(__SetUserData) b2Contact::SetUserData;
 %rename(__GetNext) b2Contact::GetNext;
 %rename(__GetFixtureB) b2Contact::GetFixtureB;
 %rename(__GetFixtureA) b2Contact::GetFixtureA;
@@ -259,7 +262,7 @@ public:
         non-tunneling collision. If you change the time interval, you should call this function
         again.
         Note: use b2Distance to compute the contact point and normal at the time of impact.
-        
+
         Can be called one of several ways:
         + b2TimeOfImpact(b2TOIInput) # utilizes the b2TOIInput structure, where you define your own proxies
 
@@ -272,7 +275,7 @@ public:
         (output state, time of impact)
 
         Where output state is in b2TOIOutput.[
-                e_unknown, 
+                e_unknown,
                 e_failed,
                 e_overlapped,
                 e_touching,
@@ -290,4 +293,3 @@ public:
 
 %newobject _b2TimeOfImpact;
 %ignore b2TimeOfImpact;
-

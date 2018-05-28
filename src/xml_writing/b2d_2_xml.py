@@ -52,7 +52,7 @@ def body_2_xml(body: b2Body):
     return body_xml
 
 
-def contact_2_xml(contact: b2Contact, c_ix=None):
+def contact_2_xml(contact: b2Contact):
     contact_xmls = []
     for i in range(contact.manifold.pointCount):
         # index
@@ -130,13 +130,16 @@ class XMLExporter:
         for i in range(contact.manifold.pointCount):
             # We find the corresponding contact xml
             index = str(int(contact.userData) + i)
-            ct_xml = self.contacts.findall(".//contact[@index='" + index + "']")[0]
+            ct_xml_list = self.contacts.findall(".//contact[@index='" + index + "']")
+
+            if len(ct_xml_list) != 1:
+                raise AssertionError("Found more (or less) than one contact with the given id in the xml tree!")
+            ct_xml = ct_xml_list[0]
 
             # We add the impulse
             impulse_xml = SubElement(ct_xml, "impulse")
             impulse_xml.set("ni", str(impulse.normalImpulses[i]))
             impulse_xml.set("ti", str(impulse.tangentImpulses[i]))
-
 
     # Save all the stored xml to a file
     def save_snapshot(self):

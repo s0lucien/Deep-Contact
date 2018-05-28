@@ -620,7 +620,7 @@ def b2TimeOfImpact(shapeA=None, idxA=0, shapeB=None, idxB=0, sweepA=None, sweepB
     (output state, time of impact)
 
     Where output state is in b2TOIOutput.[
-            e_unknown, 
+            e_unknown,
             e_failed,
             e_overlapped,
             e_touching,
@@ -6720,6 +6720,7 @@ class b2Contact(object):
 
     # Read-write properties
     enabled = property(__IsEnabled, __SetEnabled)
+    userData = property(__GetUserData, __SetUserData)
 
     # Read-only
     next = property(__GetNext, None)
@@ -6734,9 +6735,6 @@ class b2Contact(object):
     restitution = property(__GetRestitution, __SetRestitution)
     tangentSpeed = property(__GetTangentSpeed, __SetTangentSpeed)
 
-
-
-    userData = property(__GetUserData, __SetUserData)
 
 b2Contact.__GetManifold = new_instancemethod(_Box2D.b2Contact___GetManifold, None, b2Contact)
 b2Contact.__GetWorldManifold_internal = new_instancemethod(_Box2D.b2Contact___GetWorldManifold_internal, None, b2Contact)
