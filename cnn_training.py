@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function
 import numpy as np
 from keras import losses
 from keras import optimizers
+import keras.backend as K
 
 from visual_deep_learning.cnn_model import learning_model
 from src.gen_data.load_grid import load_grid
@@ -20,6 +21,8 @@ if __name__ == '__main__':
     number = options.num
 
     model = learning_model(
+        batch_size=1000,
+        metrics=[losses.mean_absolute_error],
         optimizer=optimizers.SGD(
             lr=0.01, decay=1e-6, momentum=0.9, nesterov=True,
         ),
