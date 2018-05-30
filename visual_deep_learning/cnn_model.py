@@ -33,7 +33,7 @@ class learning_model(object):
         metrics=['accuracy'],
         batch_size=100,
         iterations=1000,
-        epochs=1000,
+        epochs=100,
         dropout=0.25,
         weight_decay=0.0001,
     ):

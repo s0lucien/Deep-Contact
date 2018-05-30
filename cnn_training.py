@@ -22,12 +22,12 @@ if __name__ == '__main__':
 
     model = learning_model(
         batch_size=1000,
-        metrics=[losses.mean_absolute_error],
+        metrics=[losses.mean_absolute_percentage_error],
         optimizer=optimizers.SGD(
             lr=0.01, decay=1e-6, momentum=0.9, nesterov=True,
         ),
         log_dir='./log/',
-        loss_func=losses.mean_squared_error,
+        loss_func=losses.mean_absolute_percentage_error,
     )
     x_tr = np.concatenate([
         load_grid(path, num)[0]

@@ -54,11 +54,11 @@ for i in range(len(numbers)):
     )
 
     # If path is not absolute we make it
-    if not os.path.isabs(grid_path):
+    if not os.path.exists(grid_path):
         file_dir = os.path.dirname(os.path.realpath(__file__))
-        grid_path = os.path.join(file_dir, grid_path)
+        grid_path = os.path.join(file_dir, 'data/grid')
 
     # Save the grids using numpy
-    file = grid_path + str(n)
+    file = os.path.join(grid_path, str(n))
     np.savez(file, features=features, labels=labels)
     print("Processing took %d s" % (time.time() - start))
