@@ -177,6 +177,11 @@ class SPHGridManager:
     def add_grid(self, grid, channel):
         self.grids[channel] = grid
 
+    # Add grids to the grid manager
+    def add_grids(self, grids, channels):
+        for i, channel in enumerate(channels):
+            self.grids[channel] = grids[i]
+
     # The user specifies a list of "channels" to calculate grids for, and provides the data
     def create_grids(self, df, channels):
         df_channels = [d for d in df.columns.tolist() if d not in ["px", "py"]]
