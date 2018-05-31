@@ -29,5 +29,5 @@ class IdentityGridModel (Model):
             tangentImpulse = self.gm.query_interp(px, py, "ti")
 
             predictions.append((id, normalImpulse, tangentImpulse))
-            print(predictions)
+
         return predictions

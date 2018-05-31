@@ -36,4 +36,4 @@ class CnnIdentityGridModel(IdentityGridModel):
         self.gm.create_interp(["ni", "ti"])
         
     def Predict(self, contact):
-        super(CnnIdentityGridModel, self).Predict(contact)
+        return super(CnnIdentityGridModel, self).Predict(contact)
