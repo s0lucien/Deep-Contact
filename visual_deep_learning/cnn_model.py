@@ -25,9 +25,6 @@ class learning_model(object):
     def __init__(
         self,
         log_dir,
-        # loss function, this is not classify question,
-        # so choose another loss func here.
-        # I think `mean squared error` should be good here.
         optimizer,
         loss_func,
         metrics=['accuracy'],
