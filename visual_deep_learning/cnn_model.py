@@ -27,7 +27,7 @@ class learning_model(object):
         log_dir,
         optimizer,
         loss_func,
-        metrics=['accuracy'],
+        metrics,
         batch_size=100,
         iterations=1000,
         epochs=100,
