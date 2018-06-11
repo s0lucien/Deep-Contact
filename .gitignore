@@ -1,7 +1,7 @@
 *.pyc
 .*.swp
-gen_data/*.xml
-xml/
+gen_data/data/*
+tensorflow/models/*
 *.xml
 *.npz
 *.local

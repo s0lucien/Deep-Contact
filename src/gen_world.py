@@ -106,7 +106,7 @@ class GenClusteredCirclesRegion(GenWorld):
         self.seed = seed
         self.random = np.random.RandomState(self.seed)
         self.sigma = sigma
-        self.max_consec_tries = 1000
+        self.max_consec_tries = 10000
         self.mu=mu
 
     def fill(self, n, p_ll:b2Vec2, p_hr:b2Vec2, radius_range ,sigma_coef=1):

@@ -50,7 +50,7 @@ class GenWorld:
         self.world = world
         self.world.gravity = (0, -9.81)
         self.world.enableWarmStarting = True
-        self.world.enableContinous = False
+        self.world.continuousPhysics = False
         self.world.allowSleeping = False
         try:
             if self.world.initialized is True:
