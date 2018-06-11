@@ -1,5 +1,7 @@
 import time
 import numpy as np
+import matplotlib
+matplotlib.use('TKAgg')
 import matplotlib.pyplot as plt
 from Box2D import (b2World, b2Vec2)
 from keras import models
@@ -11,7 +13,7 @@ from cnn_grid_model import CnnIdentityGridModel
 
 # ----- Parameters -----
 # Number of bodies in world
-nBodies = 20
+nBodies = 60
 # Seed to use for body generator
 seed = 1234
 # Something about spread of bodies?
@@ -53,6 +55,7 @@ new_confined_clustered_circles_world(world, nBodies, b2Vec2(xlow, ylow), b2Vec2(
 solver = models.load_model('model.h5')
 
 model = CnnIdentityGridModel(p_ll, p_ur, xRes, yRes, h, solver)
+#model = None
 
 # Iteration counter plots
 plotIterationCounters = True
@@ -79,8 +82,6 @@ result = run_world(world, timeStep, steps,
                    velocityThreshold=velocityThreshold, positionThreshold=positionThreshold,
                    model=model, iterations=iter, convergenceRates=conv,
                    quiet=not printing, visualize=visualize)
-
-
 
 # ----- Process data -----
 totalStepTimes = result["totalStepTimes"]
