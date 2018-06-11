@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function
 
 import numpy as np
+import datetime
 from keras import losses
 from keras import optimizers
 import keras.backend as K
@@ -20,13 +21,15 @@ if __name__ == '__main__':
     path = options.path
     number = options.num
 
+    current_date = datetime.datetime.now().strftime('%Y-%m-%d')
+
     model = learning_model(
         batch_size=1000,
         metrics=[losses.mean_absolute_error],
         optimizer=optimizers.SGD(
             lr=0.01, decay=1e-6, momentum=0.9, nesterov=True,
         ),
-        log_dir='./log/',
+        log_dir='./log/{}'.format(current_date),
         loss_func=losses.mean_squared_error,
     )
     x_tr = np.concatenate([
