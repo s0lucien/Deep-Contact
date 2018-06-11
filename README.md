@@ -80,11 +80,15 @@ Layer (type)                 Output Shape              Param #
 =================================================================
 conv2d_1 (Conv2D)            (None, 41, 41, 64)        2944
 _________________________________________________________________
+batch_normalization_1 (Batch (None, 41, 41, 64)        256
+_________________________________________________________________
 activation_1 (Activation)    (None, 41, 41, 64)        0
 _________________________________________________________________
 max_pooling2d_1 (MaxPooling2 (None, 21, 21, 64)        0
 _________________________________________________________________
 conv2d_2 (Conv2D)            (None, 21, 21, 128)       73856
+_________________________________________________________________
+batch_normalization_2 (Batch (None, 21, 21, 128)       512
 _________________________________________________________________
 activation_2 (Activation)    (None, 21, 21, 128)       0
 _________________________________________________________________
@@ -92,11 +96,15 @@ max_pooling2d_2 (MaxPooling2 (None, 11, 11, 128)       0
 _________________________________________________________________
 conv2d_3 (Conv2D)            (None, 11, 11, 256)       295168
 _________________________________________________________________
+batch_normalization_3 (Batch (None, 11, 11, 256)       1024
+_________________________________________________________________
 activation_3 (Activation)    (None, 11, 11, 256)       0
 _________________________________________________________________
 max_pooling2d_3 (MaxPooling2 (None, 6, 6, 256)         0
 _________________________________________________________________
 conv2d_4 (Conv2D)            (None, 6, 6, 512)         1180160
+_________________________________________________________________
+batch_normalization_4 (Batch (None, 6, 6, 512)         2048
 _________________________________________________________________
 activation_4 (Activation)    (None, 6, 6, 512)         0
 _________________________________________________________________
@@ -116,13 +124,31 @@ dense_2 (Dense)              (None, 3362)              13451362
 _________________________________________________________________
 activation_6 (Activation)    (None, 3362)              0
 =================================================================
-Total params: 33,439,490
-Trainable params: 33,439,490
-Non-trainable params: 0
+Total params: 33,443,330
+Trainable params: 33,441,410
+Non-trainable params: 1,920
 _________________________________________________________________
+```
+Training Config
+```
+batch_size=1000,
+metrics=[losses.mean_absolute_error],
+optimizer=optimizers.SGD(
+    lr=0.01, decay=1e-6, momentum=0.9, nesterov=True,
+),
+loss_func=losses.mean_squared_error,
+```
+Train on `18208` samples, validate on `4553` samples. Training Size
+```
+Input Size: 41 * 41 *5
+Output Size: 3362 * 1
 ```
 
 Start training by
 ```
 python cnn_training.py -p src/gen_data/data/grid -n 30
+```
+After training finished, you can check the training logs by
+```
+tensorboard --logdir ./log/${date_folder}
 ```

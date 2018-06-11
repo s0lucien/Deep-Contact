@@ -1,27 +1,19 @@
 import time
 import numpy as np
 import matplotlib.pyplot as plt
-
-from .builtin_warmstart_model import BuiltinWarmStartModel
-from .bad_model import BadModel
-from .random_model import RandomModel
-from .parallel_world_model import ParallelWorldModel
-from .copy_world_model import CopyWorldModel
-from .identity_grid_model import IdentityGridModel
-from .nn_model import NNModel
-
 from Box2D import (b2World, b2Vec2)
+from keras import models
 
-from ..gen_world import new_confined_clustered_circles_world
-from .warm_start import run_world
-from ..tensorflow.cnn import CNN
+from src.gen_world import new_confined_clustered_circles_world
+from src.warm_starting.warm_start import run_world
+from cnn_grid_model import CnnIdentityGridModel
 
 
 # ----- Parameters -----
 # Number of bodies in world
-nBodies = 100
+nBodies = 20
 # Seed to use for body generator
-seed = 123
+seed = 1234
 # Something about spread of bodies?
 sigma_coef = 1.2
 # Dimension of static box
@@ -39,31 +31,35 @@ positionIterations = 2500
 velocityThreshold = 6*10**-5
 positionThreshold = 2*10**-5
 # Number of steps
-steps = 600
+steps = 1000
 
+# Grid parameters - only relevant for identity grid model
+# Grid lower left point
+p_ll = (xlow, ylow)
+# Grid upper right point
+p_ur = (xhi, yhi)
+# Grid x-resolution
+xRes = 0.75
+# Grid y-resolution
+yRes = 0.75
+# Support radius
+h = 1
 
 # Create world in case model needs it
 world = b2World()
 # Fill world with static box and circles
 new_confined_clustered_circles_world(world, nBodies, b2Vec2(xlow, ylow), b2Vec2(xhi, yhi), r, sigma_coef, seed)
 
-# Choose a model
-model = None
-#model = BuiltinWarmStartModel()
-#model = BadModel()
-#model = RandomModel(0)
-#model = ParallelWorldModel(world)
-#model = CopyWorldModel()
-#model = IdentityGridModel((xlow, ylow), (xhi, yhi), 0.25, 0.25, 1)
-#model = NNModel(CNN({}))
+solver = models.load_model('model.h5')
 
+model = CnnIdentityGridModel(p_ll, p_ur, xRes, yRes, h, solver)
 
 # Iteration counter plots
 plotIterationCounters = True
 # Velocity convergence rate plots
 plotVelocityConvergenceRates = True
 # Position convergence rate plots
-plotPositionConvergenceRates = False
+plotPositionConvergenceRates = True
 # Limit on percentage of contributors left for cutoff (see convergence plots)
 limit = 0.2
 
@@ -72,6 +68,7 @@ printing = True
 # Show visualization of world as simulation is running
 # note: significantly slower
 visualize = True
+
 
 
 # ----- Run simulation -----

@@ -5,12 +5,18 @@ import numpy as np
 import keras
 from keras.models import Sequential
 from keras.layers import (
-    Dense, Dropout, Activation, Flatten, Conv2D, MaxPooling2D,
-    GlobalAveragePooling2D, AveragePooling2D
+    Dense,
+    Dropout,
+    Activation,
+    Flatten,
+    Conv2D,
+    MaxPooling2D,
 )
 from keras import optimizers
-from keras.initializers import RandomNormal
-from keras.callbacks import LearningRateScheduler, TensorBoard
+from keras.callbacks import (
+    LearningRateScheduler,
+    TensorBoard,
+)
 from keras.layers.normalization import BatchNormalization
 from keras.utils import plot_model
 
@@ -19,15 +25,12 @@ class learning_model(object):
     def __init__(
         self,
         log_dir,
-        # loss function, this is not classify question,
-        # so choose another loss func here.
-        # I think `mean squared error` should be good here.
         optimizer,
         loss_func,
-        metrics=['accuracy'],
+        metrics,
         batch_size=100,
         iterations=1000,
-        epochs=1000,
+        epochs=100,
         dropout=0.25,
         weight_decay=0.0001,
     ):
@@ -54,6 +57,7 @@ class learning_model(object):
                               kernel_regularizer=keras.regularizers.l2(self.weight_decay),
                               kernel_initializer='he_normal',
                               input_shape=input_shape))
+        self.model.add(BatchNormalization())
         self.model.add(Activation('relu'))
         self.model.add(MaxPooling2D(pool_size=(2, 2),
                                     strides=(2, 2),
@@ -64,6 +68,7 @@ class learning_model(object):
                               padding='same',
                               kernel_regularizer=keras.regularizers.l2(self.weight_decay),
                               kernel_initializer='he_normal'))
+        self.model.add(BatchNormalization())
         self.model.add(Activation('relu'))
         self.model.add(MaxPooling2D(pool_size=(2, 2),
                                     strides=(2, 2),
@@ -74,6 +79,7 @@ class learning_model(object):
                               padding='same',
                               kernel_regularizer=keras.regularizers.l2(self.weight_decay),
                               kernel_initializer='he_normal'))
+        self.model.add(BatchNormalization())
         self.model.add(Activation('relu'))
         self.model.add(MaxPooling2D(pool_size=(2, 2),
                                     strides=(2, 2),
@@ -84,6 +90,7 @@ class learning_model(object):
                               padding='same',
                               kernel_regularizer=keras.regularizers.l2(self.weight_decay),
                               kernel_initializer='he_normal'))
+        self.model.add(BatchNormalization())
         self.model.add(Activation('relu'))
         self.model.add(MaxPooling2D(pool_size=(2, 2),
                                     strides=(2, 2),

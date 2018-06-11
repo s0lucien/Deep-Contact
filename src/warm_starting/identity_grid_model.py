@@ -6,7 +6,6 @@ class IdentityGridModel (Model):
         # Initialize the grid
         self.gm = SPHGridManager(p_ll, p_ur, xRes, yRes, h)
 
-
     def Step(self, world, timeStep, velocityIterations, positionIterations):
         # Create the data frames
         df_b = world_body_dataframe(world)
@@ -16,8 +15,7 @@ class IdentityGridModel (Model):
         self.gm.create_grids(df_c, ["ni", "ti"])
 
         # Tell the gridmanager to create the required interpolation functions
-        self.gm.create_interp(["ni, ti"])
-
+        self.gm.create_interp(["ni", "ti"])
 
     def Predict(self, contact):
         predictions = []
@@ -27,8 +25,9 @@ class IdentityGridModel (Model):
             py = contact.worldManifold.points[i][1]
 
             id = contact.manifold.points[i].id
-            normalImpulse = self.gm.query(px, py, "ni")
-            tangentImpulse = self.gm.query(px, py, "ti")
+            normalImpulse = self.gm.query_interp(px, py, "ni")
+            tangentImpulse = self.gm.query_interp(px, py, "ti")
 
             predictions.append((id, normalImpulse, tangentImpulse))
+
         return predictions

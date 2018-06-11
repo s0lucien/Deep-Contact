@@ -4,7 +4,7 @@ gen_data/data/*
 tensorflow/models/*
 *.xml
 *.npz
-*.local
+*.h5
 
 # Created by https://www.gitignore.io/api/c,c++,code,cuda,macos,matlab,opencv,python,pycharm,jupyternotebook
 
