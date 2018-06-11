@@ -31,7 +31,7 @@ positionThreshold = 2*10**-5
 steps = 800
 
 # Decides whether to store configurations without any contacts
-skipContactless = False
+skipContactless = True
 # Print various iteration numbers as simulation is running
 
 
