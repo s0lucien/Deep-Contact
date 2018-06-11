@@ -8,23 +8,25 @@ from .random_model import RandomModel
 from .parallel_world_model import ParallelWorldModel
 from .copy_world_model import CopyWorldModel
 from .identity_grid_model import IdentityGridModel
+from .nn_model import NNModel
 
 from Box2D import (b2World, b2Vec2)
 
 from ..gen_world import new_confined_clustered_circles_world
 from .warm_start import run_world
+from ..tensorflow.cnn import CNN
 
 
 # ----- Parameters -----
 # Number of bodies in world
 nBodies = 100
 # Seed to use for body generator
-seed = 1234
+seed = 123
 # Something about spread of bodies?
 sigma_coef = 1.2
 # Dimension of static box
-xlow, xhi = 0, 50
-ylow, yhi = 0, 50
+xlow, xhi = 0, 30
+ylow, yhi = 0, 30
 # body radius min and max
 r = (1, 1)
 
@@ -37,19 +39,8 @@ positionIterations = 2500
 velocityThreshold = 6*10**-5
 positionThreshold = 2*10**-5
 # Number of steps
-steps = 1000
+steps = 600
 
-# Grid parameters - only relevant for identity grid model
-# Grid lower left point
-p_ll = (xlow, ylow)
-# Grid upper right point
-p_ur = (xhi, yhi)
-# Grid x-resolution
-xRes = 0.75
-# Grid y-resolution
-yRes = 0.75
-# Support radius
-h = 1
 
 # Create world in case model needs it
 world = b2World()
@@ -57,20 +48,22 @@ world = b2World()
 new_confined_clustered_circles_world(world, nBodies, b2Vec2(xlow, ylow), b2Vec2(xhi, yhi), r, sigma_coef, seed)
 
 # Choose a model
-model = None
-#model = BuiltinWarmStartModel()
+#model = None
+model = BuiltinWarmStartModel()
 #model = BadModel()
 #model = RandomModel(0)
 #model = ParallelWorldModel(world)
 #model = CopyWorldModel()
-#model = IdentityGridModel(p_ll, p_ur, xRes, yRes, h)
+#model = IdentityGridModel((xlow, ylow), (xhi, yhi), 0.25, 0.25, 1)
+#model = NNModel(CNN({}))
+
 
 # Iteration counter plots
 plotIterationCounters = True
 # Velocity convergence rate plots
 plotVelocityConvergenceRates = True
 # Position convergence rate plots
-plotPositionConvergenceRates = True
+plotPositionConvergenceRates = False
 # Limit on percentage of contributors left for cutoff (see convergence plots)
 limit = 0.2
 
@@ -79,7 +72,6 @@ printing = True
 # Show visualization of world as simulation is running
 # note: significantly slower
 visualize = False
-
 
 
 # ----- Run simulation -----

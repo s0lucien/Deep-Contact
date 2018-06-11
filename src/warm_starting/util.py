@@ -22,4 +22,8 @@ def copyWorld(world):
                         linearVelocity=b2Vec2(body.linearVelocity.x, body.linearVelocity.y),
                         angularVelocity=body.angularVelocity)
 
+    for body in copy.bodies:
+        body.sleepingAllowed = False
+
+
     return copy
