@@ -213,48 +213,42 @@ class SPHGridManager:
         return self.f_interp[channel](Px,Py)[0][0]
 
 
-    # Create a KDTree used when querying
-    def create_tree(self, channels):
-        for c in channels:
-            grid = self.grids.get(c)
-            if grid is not None:
-                P_grid = np.c_[self.X.ravel(), self.Y.ravel()]
-                self.trees[c] = spatial.cKDTree(P_grid)
-            else:
-                logging.info("Unknown channel: " + c)
+    # Takes a list of particles and a list of grids as input, and returns a list
+    # of lists of values, one list for each particle with one value for each grid
+    def grids_to_particles(self, grids, points):
+        grid_nodes = np.c_[self.X.ravel(), self.Y.ravel()]
+        N = grid_nodes.shape[0]
 
-    # We use our poly6 kernel instead of interpolation
-    def query_tree(self, Px, Py, channel):
-        grid = self.grids.get(channel)
-        tree = self.trees.get(channel)
+        # We create the tree
+        tree = spatial.cKDTree(points)
 
-        if (grid is None) or (tree is None):
-            logging.info("Unknown channel: " + channel)
-        else:
-            P_points = np.c_[Px, Py]
-            P_grid = np.c_[self.X.ravel(), self.Y.ravel()]
-            n = P_points.shape[0]
+        # For each grid point, determine neighbouring particles
+        NNs = tree.query_ball_point(grid_nodes, self.h)
 
-            # For each point determine neighbouring grid nodes
-            NNs = tree.query_ball_point(P_points, self.h)
+        # An array for storing a value for each grid for each particle
+        values = np.zeros([points.shape[0], grids.shape[0]], dtype=np.float64)
 
-            # For each point
-            values = np.zeros(n, dtype=np.float64)
-            for i in range(n):
-                # We determine distances between point and neighbouring grid nodes
-                neighbours = NNs[i]
-                rs = P_points[i] - P_grid[neighbours]
+        # For each grid node
+        for i in range(N):
+            # We determine distances between grid node and neighbouring particles
+            neighbours = NNs[i]
+            if len(neighbours) > 0:
+                rs = grid_nodes[i] - points[neighbours]
 
-                # We determine weights for each neighbouring grid node
+                # We determine weights for each neighbouring particle
                 Ws = W_poly6_2D(rs.T, self.h)
 
-                # We multiply weights with values to get the point value
-                v = 0
-                for j in range(len(neighbours)):
-                    v += Ws[j] * grid[np.unravel_index(neighbours[j], self.X.shape)]
-                values[i] = v
+                # iy and ix are the index into the unflattened array
+                iy, ix = np.unravel_index(i, self.X.shape)
 
-            return values
+                # We multiply weights with values to get the particle values
+                for j in range(len(neighbours)):
+                    n = neighbours[j]
+                    w = Ws[j]
+                    for k in range(grids.shape[0]):
+                        values[n, k] += w * grids[k, iy, ix]
+
+        return values
 
 
 # Creates a contact graph?

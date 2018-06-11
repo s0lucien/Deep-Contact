@@ -76,8 +76,7 @@ for i in range(nParameters):
         k = 0
         for b in world.bodies:
             if b.type is b2_dynamicBody:
-                #value = gm.query_interp(b.position.x, b.position.y, attribute)
-                value = gm.query_tree([b.position.x], [b.position.y], attribute)
+                value = gm.query_interp(b.position.x, b.position.y, attribute)
                 worldTotal += value
                 bodyDifferences[k] = abs(b.mass - value)
                 k += 1
