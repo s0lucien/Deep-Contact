@@ -129,6 +129,20 @@ Trainable params: 33,441,410
 Non-trainable params: 1,920
 _________________________________________________________________
 ```
+Training Config
+```
+batch_size=1000,
+metrics=[losses.mean_absolute_error],
+optimizer=optimizers.SGD(
+    lr=0.01, decay=1e-6, momentum=0.9, nesterov=True,
+),
+loss_func=losses.mean_squared_error,
+```
+Train on `18208` samples, validate on `4553` samples. Training Size
+```
+Input Size: 41 * 41 *5
+Output Size: 3362 * 1
+```
 
 Start training by
 ```
