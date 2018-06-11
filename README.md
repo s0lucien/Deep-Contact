@@ -148,3 +148,7 @@ Start training by
 ```
 python cnn_training.py -p src/gen_data/data/grid -n 30
 ```
+After training finished, you can check the training logs by
+```
+tensorboard --logdir ./log/${date_folder}
+```
