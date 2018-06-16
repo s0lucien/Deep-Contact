@@ -59,9 +59,9 @@ class learning_model(object):
                               input_shape=input_shape))
         self.model.add(BatchNormalization())
         self.model.add(Activation('relu'))
-        self.model.add(MaxPooling2D(pool_size=(2, 2),
-                                    strides=(2, 2),
-                                    padding='same'))
+        #self.model.add(MaxPooling2D(pool_size=(2, 2),
+        #                            strides=(2, 2),
+        #                            padding='same'))
 
         self.model.add(Conv2D(128,
                               (3, 3),
@@ -81,9 +81,9 @@ class learning_model(object):
                               kernel_initializer='he_normal'))
         self.model.add(BatchNormalization())
         self.model.add(Activation('relu'))
-        self.model.add(MaxPooling2D(pool_size=(2, 2),
-                                    strides=(2, 2),
-                                    padding='same'))
+        #self.model.add(MaxPooling2D(pool_size=(2, 2),
+        #                            strides=(2, 2),
+        #                            padding='same'))
 
         self.model.add(Conv2D(512,
                               (3, 3),
@@ -148,8 +148,7 @@ class learning_model(object):
             epochs=self.epochs,
             callbacks=cbks,
             validation_split=validation_rate,
-            **methods.get(method),
-        )
+            **methods.get(method))
 
         if save:
             self.model.save('model.h5')

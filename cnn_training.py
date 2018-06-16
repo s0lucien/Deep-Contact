@@ -29,8 +29,11 @@ if __name__ == '__main__':
     current_date = datetime.datetime.now().strftime('%Y-%m-%d')
 
     model = learning_model(
-        batch_size=1000,
-        metrics=[losses.mean_absolute_error],
+        batch_size=200,
+        epochs=1000,
+        metrics=[
+            losses.mean_squared_error,
+            losses.mean_absolute_error],
         optimizer=optimizers.SGD(
             lr=0.01, decay=1e-6, momentum=0.9, nesterov=True,
         ),
