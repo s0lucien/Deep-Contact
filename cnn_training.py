@@ -1,5 +1,10 @@
 from __future__ import absolute_import, division, print_function
 
+# using GPU for training
+import os
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+
 import numpy as np
 import datetime
 from keras import losses
