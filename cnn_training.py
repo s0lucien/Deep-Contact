@@ -1,9 +1,18 @@
 from __future__ import absolute_import, division, print_function
 
+from optparse import OptionParser
+
+parser = OptionParser()
+parser.add_option('-p', '--path', dest='path')
+parser.add_option('-n', '--number', type='int', dest='num')
+parser.add_option('-g', '--gpu', type='str', dest='gpu')
+
+options, _ = parser.parse_args()
+
 # using GPU for training
 import os
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = options.gpu
 
 import numpy as np
 import datetime
@@ -16,13 +25,6 @@ from src.gen_data.load_grid import load_grid
 
 
 if __name__ == '__main__':
-    from optparse import OptionParser
-
-    parser = OptionParser()
-    parser.add_option('-p', '--path', dest='path')
-    parser.add_option('-n', '--number', type='int', dest='num')
-
-    options, _ = parser.parse_args()
     path = options.path
     number = options.num
 
