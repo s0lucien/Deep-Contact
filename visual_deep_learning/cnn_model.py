@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function
 import numpy as np
 
 import keras
+from keras import backend as K
 from keras.models import Sequential
 from keras.layers import (
     Dense,
@@ -107,9 +108,9 @@ class learning_model(object):
 
         self.model.add(Dropout(self.dropout))
         self.model.add(Flatten())
-        self.model.add(Dense(output_shape[0] * 3))
-        self.model.add(Activation('relu'))
-        self.model.add(Dropout(0.5))
+        #self.model.add(Dense(output_shape[0] * 3))
+        #self.model.add(Activation('relu'))
+        #self.model.add(Dropout(0.5))
 
         # Flatten output here
         output_size = output_shape[0]
