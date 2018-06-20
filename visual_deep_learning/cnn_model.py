@@ -98,7 +98,7 @@ class learning_model(object):
 
         self.model.add(Dropout(self.dropout))
         self.model.add(Flatten())
-        self.model.add(Dense(4000))
+        self.model.add(Dense(output_shape[0] * 3))
         self.model.add(Activation('relu'))
         self.model.add(Dropout(0.5))
 
@@ -155,8 +155,8 @@ class learning_model(object):
 
     @staticmethod
     def scheduler(epoch):
-        if epoch <= 30:
+        if epoch <= 100:
             return 0.05
-        if epoch <= 60:
+        if epoch <= 400:
             return 0.02
         return 0.01
