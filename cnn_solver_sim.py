@@ -4,12 +4,18 @@ import matplotlib
 matplotlib.use('TKAgg')
 import matplotlib.pyplot as plt
 from Box2D import (b2World, b2Vec2)
-from keras import models
 
 from src.gen_world import new_confined_clustered_circles_world
 from src.warm_starting.warm_start import run_world
 from cnn_grid_model import CnnIdentityGridModel
 
+# Add options
+from optparse import OptionParser
+
+parser = OptionParser()
+parser.add_option('-p', '--model_path', dest='path')
+
+options, _ = parser.parse_args()
 
 # ----- Parameters -----
 # Number of bodies in world
@@ -33,7 +39,7 @@ positionIterations = 2500
 velocityThreshold = 6*10**-5
 positionThreshold = 2*10**-5
 # Number of steps
-steps = 1000
+steps = 500
 
 # Grid parameters - only relevant for identity grid model
 # Grid lower left point
@@ -45,17 +51,20 @@ xRes = 0.75
 # Grid y-resolution
 yRes = 0.75
 # Support radius
-h = 1
+h = 0.5
 
 # Create world in case model needs it
 world = b2World()
 # Fill world with static box and circles
 new_confined_clustered_circles_world(world, nBodies, b2Vec2(xlow, ylow), b2Vec2(xhi, yhi), r, sigma_coef, seed)
 
-solver = models.load_model('model.h5')
+if options.path:
+    from keras import models
 
-model = CnnIdentityGridModel(p_ll, p_ur, xRes, yRes, h, solver)
-#model = None
+    solver = models.load_model(options.path)
+    model = CnnIdentityGridModel(p_ll, p_ur, xRes, yRes, h, solver)
+else:
+    model = None
 
 # Iteration counter plots
 plotIterationCounters = True

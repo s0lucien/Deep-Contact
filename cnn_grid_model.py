@@ -14,9 +14,15 @@ class CnnIdentityGridModel(IdentityGridModel):
         self.learning_model = learning_model
 
     def Step(self, world, timeStep, velocityIterations, positionIterations):
+        self.predictions = {}
+
         # Create the data frames
         df_b = world_body_dataframe(world)
         df_c = world_contact_dataframe(world)
+
+        if df_c.empty:
+            return
+
         self.gm.create_grids(
             df_b, ["mass", "vx", "vy", "omega"]
         )
@@ -29,11 +35,29 @@ class CnnIdentityGridModel(IdentityGridModel):
         )
         grid_c = self.learning_model.predict(train_grid.reshape((1, 41, 41, 5))).reshape((2, 41, 41))
 
-        # Tell the gridmanager to add the required grids
-        self.gm.add_grids(grid_c, ["ni", "ti"])
-    
-        # Tell the gridmanager to add the required interpolation functions
-        self.gm.create_interp(["ni", "ti"])
+        # do the prediction
+        points = []
+        for ic, c in enumerate(world.contacts):
+            if c.touching:
+                c.userData = ic
+
+                px = c.worldManifold.points[0][0]
+                py = c.worldManifold.points[0][1]
+
+                points.append([px, py])
+
+        points = np.array(points)
+        values = self.gm.grids_to_particles(grid_c, points)
+        for i in range(len(values)):
+            self.predictions[i] = values[i]
         
     def Predict(self, contact):
-        return super(CnnIdentityGridModel, self).Predict(contact)
+        ic = contact.userData
+        prediction = self.predictions.get(ic, [])
+        if len(prediction) == 0:
+            return [(contact.manifold.points[0].id, 0, 0)]
+
+        normalImpulse  = prediction[0]
+        tangentImpulse = prediction[1]
+
+        return [(contact.manifold.points[0].id, normalImpulse, tangentImpulse)]
