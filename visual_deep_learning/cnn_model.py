@@ -21,6 +21,15 @@ from keras.layers.normalization import BatchNormalization
 from keras.utils import plot_model
 
 
+def loss_func(y_true, y_pred):
+    # remove 0 in y_true
+    return K.mean(K.square((y_pred - y_true)[y_true != 0]), axis=-1)
+
+
+def mean_absolute_loss(y_true, y_pred):
+    return K.mean(K.abs((y_pred - y_true)[y_true != 0]), axis=-1)
+
+
 class learning_model(object):
     def __init__(
         self,

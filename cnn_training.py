@@ -5,7 +5,7 @@ from optparse import OptionParser
 parser = OptionParser()
 parser.add_option('-p', '--path', dest='path')
 parser.add_option('-n', '--number', type='int', dest='num')
-parser.add_option('-g', '--gpu', type='str', dest='gpu')
+parser.add_option('-g', '--gpu', type='str', dest='gpu', default='0')
 
 options, _ = parser.parse_args()
 
@@ -16,11 +16,14 @@ os.environ["CUDA_VISIBLE_DEVICES"] = options.gpu
 
 import numpy as np
 import datetime
-from keras import losses
 from keras import optimizers
 import keras.backend as K
 
-from visual_deep_learning.cnn_model import learning_model
+from visual_deep_learning.cnn_model import (
+    learning_model,
+    loss_func,
+    mean_absolute_loss,
+)
 from src.gen_data.load_grid import load_grid
 
 
@@ -34,13 +37,13 @@ if __name__ == '__main__':
         batch_size=200,
         epochs=1000,
         metrics=[
-            losses.mean_squared_error,
-            losses.mean_absolute_error],
+            loss_func,
+            mean_absolute_loss],
         optimizer=optimizers.SGD(
             lr=0.01, decay=1e-6, momentum=0.9, nesterov=True,
         ),
         log_dir='./log/{}'.format(current_date),
-        loss_func=losses.mean_squared_error,
+        loss_func=loss_func,
     )
     x_tr = np.concatenate([
         load_grid(path, num)[0]
