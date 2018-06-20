@@ -2,6 +2,8 @@ from __future__ import absolute_import, division, print_function
 
 import numpy as np
 
+import tensorflow as tf
+
 import keras
 from keras import backend as K
 from keras.models import Sequential
@@ -24,11 +26,13 @@ from keras.utils import plot_model
 
 def loss_func(y_true, y_pred):
     # remove 0 in y_true
-    return K.mean(K.square((y_pred - y_true)[y_true != 0]), axis=-1)
+    flags = tf.to_float(K.not_equal(y_true, 0.0))
+    return K.mean(K.square((y_pred - y_true) * flags), axis=-1)
 
 
 def mean_absolute_loss(y_true, y_pred):
-    return K.mean(K.abs((y_pred - y_true)[y_true != 0]), axis=-1)
+    flags = tf.to_float(K.not_equal(y_true, 0.0))
+    return K.mean(K.abs((y_pred - y_true) * flags), axis=-1)
 
 
 class learning_model(object):
