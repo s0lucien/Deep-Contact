@@ -11,7 +11,9 @@ from Box2D import (b2World, b2Vec2)
 
 from src.gen_world import new_confined_clustered_circles_world
 from src.warm_starting.warm_start import run_world
-from cnn_grid_model import CnnIdentityGridModel
+from src.warm_starting.builtin_warmstart_model import BuiltinWarmStartModel
+from jwu_model.cnn_grid_model import CnnIdentityGridModel
+from cnn_training import loss_func, mean_absolute_loss
 
 # Add options
 from optparse import OptionParser
@@ -23,7 +25,7 @@ options, _ = parser.parse_args()
 
 # ----- Parameters -----
 # Number of bodies in world
-nBodies = 60
+nBodies = 100
 # Seed to use for body generator
 seed = 1234
 # Something about spread of bodies?
@@ -65,10 +67,15 @@ new_confined_clustered_circles_world(world, nBodies, b2Vec2(xlow, ylow), b2Vec2(
 if options.path:
     from keras import models
 
-    solver = models.load_model(options.path)
+    solver = models.load_model(
+        options.path,
+        custom_objects={
+            'loss_func': loss_func,
+            'mean_absolute_loss': mean_absolute_loss,
+        })
     model = CnnIdentityGridModel(p_ll, p_ur, xRes, yRes, h, solver)
 else:
-    model = None
+    model = BuiltinWarmStartModel()
 
 # Iteration counter plots
 plotIterationCounters = True
