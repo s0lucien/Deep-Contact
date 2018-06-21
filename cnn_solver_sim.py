@@ -1,7 +1,11 @@
 import time
 import numpy as np
 import matplotlib
-matplotlib.use('TKAgg')
+
+# fix some bugs in darwin
+import tkinter as tk
+root = tk.Tk()
+
 import matplotlib.pyplot as plt
 from Box2D import (b2World, b2Vec2)
 
