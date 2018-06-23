@@ -19,6 +19,7 @@ from keras import optimizers
 from keras.callbacks import (
     LearningRateScheduler,
     TensorBoard,
+    ModelCheckpoint,
 )
 from keras.layers.normalization import BatchNormalization
 from keras.utils import plot_model
@@ -174,7 +175,15 @@ class learning_model(object):
 
         # change learning rate
         change_lr = LearningRateScheduler(self.scheduler)
-        cbks = [change_lr, tb_cb]
+        # checkpoint
+        filepath="weights.best.hdf5"
+        checkpoint = ModelCheckpoint(
+            filepath,
+            monitor='val_acc',
+            verbose=1,
+            save_best_only=True,
+            mode='max')
+        cbks = [change_lr, tb_cb, checkpoint]
 
         # buid model firstly
         self.build_model(input_shape, output_shape)
