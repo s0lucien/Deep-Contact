@@ -57,5 +57,5 @@ if __name__ == '__main__':
     model.train(
         x_tr,
         y_tr,
-        validation_rate=0.1
+        validation_rate=0.1,
         method='batch_method')
