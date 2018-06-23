@@ -179,10 +179,10 @@ class learning_model(object):
         filepath="weights.best.hdf5"
         checkpoint = ModelCheckpoint(
             filepath,
-            monitor='val_acc',
+            monitor='val_loss',
             verbose=1,
             save_best_only=True,
-            mode='max')
+            mode='min')
         cbks = [change_lr, tb_cb, checkpoint]
 
         # buid model firstly
