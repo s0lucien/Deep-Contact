@@ -54,4 +54,8 @@ if __name__ == '__main__':
         for num in range(number)
     ])
 
-    model.train(x_tr, y_tr, method='batch_method')
+    model.train(
+        x_tr,
+        y_tr,
+        validation_rate=0.1
+        method='batch_method')
