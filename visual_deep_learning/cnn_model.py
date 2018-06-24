@@ -67,7 +67,7 @@ class learning_model(object):
 
     def build_model(self, input_shape, output_shape):
         self.model.add(Conv2D(64,
-                              (3, 3),
+                              (2, 2),
                               padding='same',
                               kernel_regularizer=keras.regularizers.l2(self.weight_decay),
                               kernel_initializer='he_normal',
@@ -75,50 +75,40 @@ class learning_model(object):
         self.model.add(Activation('relu'))
 
         self.model.add(Conv2D(64,
-                              (3, 3),
+                              (2, 2),
                               padding='same',
                               kernel_regularizer=keras.regularizers.l2(self.weight_decay),
                               kernel_initializer='he_normal',
                               input_shape=input_shape))
         self.model.add(Activation('relu'))
+
         self.model.add(MaxPooling2D(pool_size=(2, 2),
                                     strides=(2, 2),
                                     padding='same'))
 
         self.model.add(Conv2D(128,
-                              (3, 3),
+                              (2, 2),
                               padding='same',
                               kernel_regularizer=keras.regularizers.l2(self.weight_decay),
                               kernel_initializer='he_normal'))
         self.model.add(Activation('relu'))
 
         self.model.add(Conv2D(128,
-                              (3, 3),
-                              padding='same',
-                              kernel_regularizer=keras.regularizers.l2(self.weight_decay),
-                              kernel_initializer='he_normal'))
-        self.model.add(Activation('relu'))        
-
-        self.model.add(MaxPooling2D(pool_size=(2, 2),
-                                    strides=(2, 2),
-                                    padding='same'))
-
-        self.model.add(Conv2D(256,
-                              (3, 3),
+                              (2, 2),
                               padding='same',
                               kernel_regularizer=keras.regularizers.l2(self.weight_decay),
                               kernel_initializer='he_normal'))
         self.model.add(Activation('relu'))
 
-        self.model.add(Conv2D(256,
-                              (3, 3),
+        self.model.add(Conv2D(128,
+                              (2, 2),
                               padding='same',
                               kernel_regularizer=keras.regularizers.l2(self.weight_decay),
                               kernel_initializer='he_normal'))
         self.model.add(Activation('relu'))
 
-        self.model.add(Conv2D(256,
-                              (3, 3),
+        self.model.add(Conv2D(128,
+                              (2, 2),
                               padding='same',
                               kernel_regularizer=keras.regularizers.l2(self.weight_decay),
                               kernel_initializer='he_normal'))
@@ -128,20 +118,59 @@ class learning_model(object):
                                     strides=(2, 2),
                                     padding='same'))
 
+        self.model.add(Conv2D(256,
+                              (2, 2),
+                              padding='same',
+                              kernel_regularizer=keras.regularizers.l2(self.weight_decay),
+                              kernel_initializer='he_normal'))
+        self.model.add(Activation('relu'))
+
+        self.model.add(Conv2D(256,
+                              (2, 2),
+                              padding='same',
+                              kernel_regularizer=keras.regularizers.l2(self.weight_decay),
+                              kernel_initializer='he_normal'))
+        self.model.add(Activation('relu'))
+
+        self.model.add(Conv2D(256,
+                              (2, 2),
+                              padding='same',
+                              kernel_regularizer=keras.regularizers.l2(self.weight_decay),
+                              kernel_initializer='he_normal'))
+        self.model.add(Activation('relu'))
+
+        self.model.add(Conv2D(256,
+                              (2, 2),
+                              padding='same',
+                              kernel_regularizer=keras.regularizers.l2(self.weight_decay),
+                              kernel_initializer='he_normal'))
+        self.model.add(Activation('relu'))
+
+        self.model.add(MaxPooling2D(pool_size=(2, 2),
+                                    strides=(2, 2),
+                                    padding='same'))
+
         self.model.add(Conv2D(512,
-                              (3, 3),
+                              (2, 2),
                               padding='same',
                               kernel_regularizer=keras.regularizers.l2(self.weight_decay),
                               kernel_initializer='he_normal'))
         self.model.add(Activation('relu'))
         self.model.add(Conv2D(512,
-                              (3, 3),
+                              (2, 2),
                               padding='same',
                               kernel_regularizer=keras.regularizers.l2(self.weight_decay),
                               kernel_initializer='he_normal'))
         self.model.add(Activation('relu'))
         self.model.add(Conv2D(512,
-                              (3, 3),
+                              (2, 2),
+                              padding='same',
+                              kernel_regularizer=keras.regularizers.l2(self.weight_decay),
+                              kernel_initializer='he_normal'))
+        self.model.add(Activation('relu'))
+
+        self.model.add(Conv2D(512,
+                              (2, 2),
                               padding='same',
                               kernel_regularizer=keras.regularizers.l2(self.weight_decay),
                               kernel_initializer='he_normal'))
