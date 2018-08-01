@@ -26,7 +26,22 @@ def W_poly6_2D(r, h):
 
     return W
 
+def spiky_2D(r, h):
+    assert r.shape[0] == 2
 
+    r_norm = np.linalg.norm(r, axis=0)
+    W = np.zeros(r_norm.shape)
+    W_i = np.where(r_norm < h)
+
+    c = 15 / (np.pi * np.power(h, 6))
+    h2 = np.power(h, 2)
+    W[W_i] = c * np.power(h - np.abs(r_norm[W_i]), 3)
+
+    # We normalize the weights so that they add up to 1
+    W_sum = np.sum(W)
+    W = W / W_sum
+
+    return W
 # no need to implement these yet
 # def nablaW_poly6_2D(r, h):
 #     pass

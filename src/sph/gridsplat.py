@@ -7,7 +7,7 @@ from scipy import spatial, interpolate
 from xml.etree.ElementTree import Element
 
 from Box2D import b2World, b2_dynamicBody
-from .kernel import W_poly6_2D
+from .kernel import W_poly6_2D, spiky_2D
 
 logging.basicConfig(level=logging.INFO)
 
@@ -157,10 +157,11 @@ def create_grids(Gx, Gy, Px, Py, values, h, f_krn=W_poly6_2D):
 
 # Creates and manages grids
 class SPHGridManager:
-    def __init__(self, p_ll, p_ur, xRes, yRes, h):
+    def __init__(self, p_ll, p_ur, xRes, yRes, h, kernel=W_poly6_2D):
         xlo, ylo = p_ll
         xhi, yhi = p_ur
 
+        self.kernel = kernel
         self.h = h
         self.x = np.arange(xlo, xhi+xRes, xRes)
         self.y = np.arange(ylo, yhi+xRes, yRes)
@@ -198,7 +199,7 @@ class SPHGridManager:
             return
 
         data = df[channels].values
-        grids = create_grids(self.X, self.Y, df.px, df.py, data, self.h, f_krn=W_poly6_2D)
+        grids = create_grids(self.X, self.Y, df.px, df.py, data, self.h, f_krn=self.kernel)
 
         for i in range(len(channels)):
             self.grids[channels[i]] = grids[i]

@@ -51,7 +51,7 @@ def run_world(world, timeStep, steps,
         world.warmStarting = False
 
     # Define a drawer if set
-    drawer = OpencvDrawFuncs(w=500, h=500, ppm=10)
+    drawer = OpencvDrawFuncs(w=300, h=300, ppm=10)
     drawer.install()
 
     # We store the performance data in a dictionary
