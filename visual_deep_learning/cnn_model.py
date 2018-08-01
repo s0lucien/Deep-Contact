@@ -44,7 +44,7 @@ class learning_model(object):
         loss_func,
         metrics,
         batch_size=100,
-        iterations=1000,
+        iterations=500,
         epochs=100,
         dropout=0.25,
         weight_decay=0.0001,
@@ -80,6 +80,7 @@ class learning_model(object):
                               kernel_regularizer=keras.regularizers.l2(self.weight_decay),
                               kernel_initializer='he_normal',
                               input_shape=input_shape))
+        self.model.add(BatchNormalization())
         self.model.add(Activation('relu'))
 
         self.model.add(MaxPooling2D(pool_size=(2, 2),
@@ -112,6 +113,7 @@ class learning_model(object):
                               padding='same',
                               kernel_regularizer=keras.regularizers.l2(self.weight_decay),
                               kernel_initializer='he_normal'))
+        self.model.add(BatchNormalization())
         self.model.add(Activation('relu'))
 
         self.model.add(MaxPooling2D(pool_size=(2, 2),
@@ -144,6 +146,7 @@ class learning_model(object):
                               padding='same',
                               kernel_regularizer=keras.regularizers.l2(self.weight_decay),
                               kernel_initializer='he_normal'))
+        self.model.add(BatchNormalization())
         self.model.add(Activation('relu'))
 
         self.model.add(MaxPooling2D(pool_size=(2, 2),
@@ -174,6 +177,7 @@ class learning_model(object):
                               padding='same',
                               kernel_regularizer=keras.regularizers.l2(self.weight_decay),
                               kernel_initializer='he_normal'))
+        self.model.add(BatchNormalization())
         self.model.add(Activation('relu'))
 
         self.model.add(MaxPooling2D(pool_size=(2, 2),
@@ -186,7 +190,6 @@ class learning_model(object):
         output_size = output_shape[0]
 
         self.model.add(Dense(output_size))
-        self.model.add(BatchNormalization())
         self.model.add(Activation('relu'))
 
         self.model.compile(
