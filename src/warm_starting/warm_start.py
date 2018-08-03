@@ -7,6 +7,7 @@ import cv2
 import matplotlib.pyplot as plt
 
 from ..opencv_draw import OpencvDrawFuncs
+from .util import copyWorld
 
 
 # Warm-Starting Listener
@@ -15,9 +16,13 @@ class WarmStartListener(b2ContactListener):
         super(WarmStartListener, self).__init__()
 
         self.model = model
+        self.start = None
 
     def PreSolve(self, contact, old_manifold):
         predictions = self.model.Predict(contact)
+
+        # Start step timer
+        self.start = time.time()
 
         # Match predictions to manifold points
         m = contact.manifold
@@ -69,19 +74,23 @@ def run_world(world, timeStep, steps,
         if not quiet:
             print("step", i)
 
-        # Start step timer
-        step = time.time()
 
+            step = time.time()
         # Tell the model to take a step
         if model:
-            model.Step(world, timeStep, velocityIterations, positionIterations)
+            copy = copyWorld(world)
+            world.contactListener.model.Step(copy, timeStep, velocityIterations, positionIterations)
 
         # Tell the world to take a step
         world.Step(timeStep, velocityIterations, positionIterations)
+        step = world.contactListener.start
         world.ClearForces()
 
         # Determine total step time
-        step = time.time() - step
+        if step is not None:
+            step = time.time() - step
+        else:
+            step = 0
         totalStepTimes.append(step)
 
         # Draw the world

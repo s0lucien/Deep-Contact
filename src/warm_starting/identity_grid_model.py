@@ -1,15 +1,20 @@
 from .model import Model
+from ..sph.kernel import W_poly6_2D, spiky_2D
 from ..sph.gridsplat import SPHGridManager, world_body_dataframe, world_contact_dataframe
+from .util import copyWorld
 
-class IdentityGridModel (Model):
-    def __init__(self, p_ll, p_ur, xRes, yRes, h):
+class IdentityGridModel(Model):
+    def __init__(self, p_ll, p_ur, xRes, yRes, h, kernel=W_poly6_2D):
         # Initialize the grid
-        self.gm = SPHGridManager(p_ll, p_ur, xRes, yRes, h)
+        self.gm = SPHGridManager(p_ll, p_ur, xRes, yRes, h, kernel)
 
     def Step(self, world, timeStep, velocityIterations, positionIterations):
+        copy = copyWorld(world)
+        copy.Step(timeStep, velocityIterations, positionIterations)
+
         # Create the data frames
-        df_b = world_body_dataframe(world)
-        df_c = world_contact_dataframe(world)
+        df_b = world_body_dataframe(copy)
+        df_c = world_contact_dataframe(copy)
 
         # Tell the gridmanager to create the required grids
         self.gm.create_grids(df_c, ["ni", "ti"])
