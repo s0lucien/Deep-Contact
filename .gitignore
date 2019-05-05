@@ -1,11 +1,4 @@
-*.pyc
-.*.swp
-gen_data/data/*
-tensorflow/models/*
-*.xml
-*.npz
-*.h5
-
+Scratch/
 # Created by https://www.gitignore.io/api/c,c++,code,cuda,macos,matlab,opencv,python,pycharm,jupyternotebook
 
 ### C ###
@@ -332,5 +325,3 @@ venv.bak/
 # End of https://www.gitignore.io/api/c,c++,code,cuda,macos,matlab,opencv,python,pycharm,jupyternotebook
 **/.idea/workspace.xml
 **/tmp/**
-
-training_img/
