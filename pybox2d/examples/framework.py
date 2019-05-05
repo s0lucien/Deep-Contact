@@ -1,3 +1,22 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# C++ version Copyright (c) 2006-2007 Erin Catto http://www.box2d.org
+# Python version by Ken Lauer / sirkne at gmail dot com
+#
+# This software is provided 'as-is', without any express or implied
+# warranty.  In no event will the authors be held liable for any damages
+# arising from the use of this software.
+# Permission is granted to anyone to use this software for any purpose,
+# including commercial applications, and to alter it and redistribute it
+# freely, subject to the following restrictions:
+# 1. The origin of this software must not be misrepresented; you must not
+# claim that you wrote the original software. If you use this software
+# in a product, an acknowledgment in the product documentation would be
+# appreciated but is not required.
+# 2. Altered source versions must be plainly marked as such, and must not be
+# misrepresented as being the original software.
+# 3. This notice may not be removed or altered from any source distribution.
 
 """
 The framework's base is FrameworkBase. See its help for more information.
@@ -126,9 +145,22 @@ class FrameworkBase(b2ContactListener):
         """
 
         self.stepCount += 1
-        timeStep= settings.timeStep
+        # Don't do anything if the setting's Hz are <= 0
+        if settings.hz > 0.0:
+            timeStep = 1.0 / settings.hz
+        else:
+            timeStep = 0.0
 
         renderer = self.renderer
+
+        # If paused, display so
+        if settings.pause:
+            if settings.singleStep:
+                settings.singleStep = False
+            else:
+                timeStep = 0.0
+
+            self.Print("****PAUSED****", (200, 0, 0))
 
         # Set the flags based on what the settings show
         if renderer:
@@ -181,6 +213,25 @@ class FrameworkBase(b2ContactListener):
         # contact points)
 
         if renderer:
+            # If there's a mouse joint, draw the connection between the object
+            # and the current pointer position.
+            if self.mouseJoint:
+                p1 = renderer.to_screen(self.mouseJoint.anchorB)
+                p2 = renderer.to_screen(self.mouseJoint.target)
+
+                renderer.DrawPoint(p1, settings.pointSize,
+                                   self.colors['mouse_point'])
+                renderer.DrawPoint(p2, settings.pointSize,
+                                   self.colors['mouse_point'])
+                renderer.DrawSegment(p1, p2, self.colors['joint_line'])
+
+            # Draw the slingshot bomb
+            if self.bombSpawning:
+                renderer.DrawPoint(renderer.to_screen(self.bombSpawnPoint),
+                                   settings.pointSize, self.colors['bomb_center'])
+                renderer.DrawSegment(renderer.to_screen(self.bombSpawnPoint),
+                                     renderer.to_screen(self.mouseWorld),
+                                     self.colors['bomb_line'])
 
             # Draw each of the contact points in different colors.
             if self.settings.drawContactPoints:
@@ -222,6 +273,24 @@ class FrameworkBase(b2ContactListener):
                 if len(self.t_steps) > 2:
                     self.t_steps.pop(0)
 
+            if settings.drawFPS:
+                self.Print("Combined FPS %d" % self.fps)
+
+            if settings.drawStats:
+                self.Print("bodies=%d contacts=%d joints=%d proxies=%d" %
+                           (self.world.bodyCount, self.world.contactCount,
+                            self.world.jointCount, self.world.proxyCount))
+
+                self.Print("hz %d vel/pos iterations %d/%d" %
+                           (settings.hz, settings.velocityIterations,
+                            settings.positionIterations))
+
+                if self.t_draws and self.t_steps:
+                    self.Print("Potential draw rate: %.2f fps Step rate: %.2f Hz"
+                               "" % (sum(self.t_draws) / len(self.t_draws),
+                                     sum(self.t_steps) / len(self.t_steps))
+                               )
+
     def ShiftMouseDown(self, p):
         """
         Indicates that there was a left click at point p (world coordinates)
@@ -229,6 +298,8 @@ class FrameworkBase(b2ContactListener):
         """
         self.mouseWorld = p
 
+        if not self.mouseJoint:
+            self.SpawnBomb(p)
 
     def MouseDown(self, p):
         """
@@ -256,6 +327,75 @@ class FrameworkBase(b2ContactListener):
                 maxForce=1000.0 * body.mass)
             body.awake = True
 
+    def MouseUp(self, p):
+        """
+        Left mouse button up.
+        """
+        if self.mouseJoint:
+            self.world.DestroyJoint(self.mouseJoint)
+            self.mouseJoint = None
+
+        if self.bombSpawning:
+            self.CompleteBombSpawn(p)
+
+    def MouseMove(self, p):
+        """
+        Mouse moved to point p, in world coordinates.
+        """
+        self.mouseWorld = p
+        if self.mouseJoint:
+            self.mouseJoint.target = p
+
+    def SpawnBomb(self, worldPt):
+        """
+        Begins the slingshot bomb by recording the initial position.
+        Once the user drags the mouse and releases it, then
+        CompleteBombSpawn will be called and the actual bomb will be
+        released.
+        """
+        self.bombSpawnPoint = worldPt.copy()
+        self.bombSpawning = True
+
+    def CompleteBombSpawn(self, p):
+        """
+        Create the slingshot bomb based on the two points
+        (from the worldPt passed to SpawnBomb to p passed in here)
+        """
+        if not self.bombSpawning:
+            return
+        multiplier = 30.0
+        vel = self.bombSpawnPoint - p
+        vel *= multiplier
+        self.LaunchBomb(self.bombSpawnPoint, vel)
+        self.bombSpawning = False
+
+    def LaunchBomb(self, position, velocity):
+        """
+        A bomb is a simple circle which has the specified position and velocity.
+        position and velocity must be b2Vec2's.
+        """
+        if self.bomb:
+            self.world.DestroyBody(self.bomb)
+            self.bomb = None
+
+        self.bomb = self.world.CreateDynamicBody(
+            allowSleep=True,
+            position=position,
+            linearVelocity=velocity,
+            fixtures=b2FixtureDef(
+                shape=b2CircleShape(radius=0.3),
+                density=20,
+                restitution=0.1)
+
+        )
+
+    def LaunchRandomBomb(self):
+        """
+        Create a new bomb and launch it at the testbed.
+        """
+        p = b2Vec2(b2Random(-15.0, 15.0), 30.0)
+        v = -5.0 * p
+        self.LaunchBomb(p, v)
 
     def SimulationLoop(self):
         """
@@ -382,4 +522,21 @@ if __name__ == '__main__':
           'all of the frameworks.')
     exit(1)
 
-from own.pygame_framework import PygameFramework as Framework
+
+# Your framework classes should follow this format. If it is the 'foobar'
+# framework, then your file should be 'backends/foobar_framework.py' and you
+# should have a class 'FoobarFramework' that subclasses FrameworkBase. Ensure
+# proper capitalization for portability.
+from . import backends
+
+try:
+    framework_name = '%s_framework' % (fwSettings.backend.lower())
+    __import__('backends', globals(), fromlist=[framework_name], level=1)
+    framework_module = getattr(backends, framework_name)
+    Framework = getattr(framework_module,
+                        '%sFramework' % fwSettings.backend.capitalize())
+except Exception as ex:
+    print('Unable to import the back-end %s: %s' % (fwSettings.backend, ex))
+    print('Attempting to fall back on the pygame back-end.')
+
+    from .backends.pygame_framework import PygameFramework as Framework
